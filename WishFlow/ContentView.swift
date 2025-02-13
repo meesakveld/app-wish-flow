@@ -17,7 +17,18 @@ struct ContentView: View {
             Text("Hello, world!")
         }
         .onAppear {
-            printer("Dfsdfds")
+            Task {
+                do {
+                    print(
+                        try await Strapi.contentManager
+                            .collection("currencies")
+                            .withDocumentId("y1itvxj3ky3vp1jcnkstks6v")
+                            .getDocument()
+                    )
+                } catch {
+                    print(error)
+                }
+            }
         }
     }
 }
