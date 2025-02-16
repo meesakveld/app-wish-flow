@@ -21,9 +21,18 @@ struct ContentView: View {
                 do {
                     print(
                         try await Strapi.contentManager
-                            .collection("currencies")
-                            .withDocumentId("y1itvxj3ky3vp1jcnkstks6v")
-                            .getDocument()
+                            .collection("events")
+                            .populate("event_participant") { item in
+                                item
+                                    .populate("user") { user in
+                                        user
+                                            .populate("event_participant") { event_participant in
+                                                event_participant
+                                                    .populate("event")
+                                            }
+                                    }
+                            }
+                            .getDocuments()
                     )
                 } catch {
                     print(error)
