@@ -59,9 +59,9 @@
 			isa = PBXGroup;
 			children = (
 				8F91F1732D517EAA00DA8891 /* StrapiSwift */,
-				8FE1FC012D51746B0086A51D /* WishFlow */,
 				8F91F1742D517EDA00DA8891 /* Frameworks */,
 				8FE1FC002D51746B0086A51D /* Products */,
+				8FE1FC012D51746B0086A51D /* WishFlow */,
 			);
 			sourceTree = "<group>";
 		};

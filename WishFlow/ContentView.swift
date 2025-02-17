@@ -13,9 +13,11 @@ struct ContentView: View {
         HStack {
             Image(systemName: "globe")
                 .imageScale(.large)
-                .foregroundStyle(.tint)
+                .foregroundStyle(.orange)
             Text("Hello, world!")
+                .style(textStyle: .text(.regular), color: .blue)
         }
+        .background(Color.green)
         .onAppear {
             Task {
                 do {
