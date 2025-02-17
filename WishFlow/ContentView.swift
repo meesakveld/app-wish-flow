@@ -15,7 +15,7 @@ struct ContentView: View {
                 .imageScale(.large)
                 .foregroundStyle(.orange)
             Text("Hello, world!")
-                .style(textStyle: .text(.regular), color: .blue)
+                .style(textStyle: .text(.regular), color: .cBlue)
         }
         .background(Color.green)
         .onAppear {
