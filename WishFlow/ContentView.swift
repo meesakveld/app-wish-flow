@@ -26,7 +26,6 @@ struct ContentView: View {
 //                                .populate("user")
 //                        }
 //                        .getDocuments(as: String.self)
-//                    
                     
 //                    let user = try await Strapi.authentication
 //                        .local
