@@ -14,18 +14,20 @@ struct TextEntry: View {
     
     let title: String
     let placeholder: String
-    let errors: [TextEntryError]?
+    @Binding var errors: [TextEntryError]
     let isSecureField: Bool
+    let isOptionalField: Bool
     
     @State private var isSecure: Bool
     
-    init(identifier: String, value: Binding<String>, title: String, placeholder: String, errors: [TextEntryError]? = nil, isSecureField: Bool = false) {
+    init(identifier: String, value: Binding<String>, title: String, placeholder: String, errors: Binding<[TextEntryError]>? = nil, isSecureField: Bool = false, isOptionalField: Bool = false) {
         self.identifier = identifier
         self._value = value
         self.title = title
         self.placeholder = placeholder
-        self.errors = errors
+        self._errors = errors ?? .constant([])
         self.isSecureField = isSecureField
+        self.isOptionalField = isOptionalField
         self._isSecure = State(initialValue: isSecureField)
     }
     
@@ -33,7 +35,7 @@ struct TextEntry: View {
         VStack(alignment: .leading, spacing: 8) {
             
             // MARK: - Title
-            Text(title)
+            Text(title + (isOptionalField ? " (optional)" : ""))
                 .style(textStyle: .text(.medium), color: .cForeground)
             
             // MARK: - TextField + SecureField Toggle
@@ -70,7 +72,7 @@ struct TextEntry: View {
             )
             
             // MARK: - Error
-            if let errors = errors {
+            if !errors.isEmpty {
                 let errorsOfTextField = errors
                     .filter { $0.identifier == identifier }
                     .map((\.message))
@@ -92,9 +94,9 @@ struct TextEntry: View {
             value: .constant(""),
             title: "Password",
             placeholder: "Enter password",
-            errors: [
+            errors: .constant([
                 TextEntryError(identifier: "email", message: "Email is required")
-            ],
+            ]),
             isSecureField: true
         )
     }

@@ -13,7 +13,7 @@ class LoginViewModel: ObservableObject {
     private let auth = Strapi.authentication.local
     
     func login(identifier: String, password: String) async throws {
-        let loginResponse = try await auth.login(
+        let _ = try await auth.login(
             identifier: identifier,
             password: password,
             as: User.self
@@ -49,7 +49,7 @@ struct LoginView: View {
                         value: $identifier,
                         title: "Email or username",
                         placeholder: "Enter email or username",
-                        errors: errors
+                        errors: $errors
                     )
                     
                     TextEntry(
@@ -57,7 +57,7 @@ struct LoginView: View {
                         value: $password,
                         title: "Password",
                         placeholder: "Enter password",
-                        errors: errors,
+                        errors: $errors,
                         isSecureField: true
                     )
                 }
@@ -66,7 +66,7 @@ struct LoginView: View {
                     Button {
                         Task {
                             do {
-                                try await vm.login(identifier: identifier, password: password)
+//                                try await vm.login(identifier: identifier, password: password)
                             } catch {
                                 print(error)
                             }
