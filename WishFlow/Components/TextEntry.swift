@@ -14,18 +14,22 @@ struct TextEntry: View {
     
     let title: String
     let placeholder: String
+    
     @Binding var errors: [TextEntryError]
+    let isShowingErrors: Bool
+    
     let isSecureField: Bool
     let isOptionalField: Bool
     
     @State private var isSecure: Bool
     
-    init(identifier: String, value: Binding<String>, title: String, placeholder: String, errors: Binding<[TextEntryError]>? = nil, isSecureField: Bool = false, isOptionalField: Bool = false) {
+    init(identifier: String, value: Binding<String>, title: String, placeholder: String, errors: Binding<[TextEntryError]>? = nil, isShowingErrors: Bool = false, isSecureField: Bool = false, isOptionalField: Bool = false) {
         self.identifier = identifier
         self._value = value
         self.title = title
         self.placeholder = placeholder
         self._errors = errors ?? .constant([])
+        self.isShowingErrors = isShowingErrors
         self.isSecureField = isSecureField
         self.isOptionalField = isOptionalField
         self._isSecure = State(initialValue: isSecureField)
@@ -70,12 +74,28 @@ struct TextEntry: View {
                 RoundedRectangle(cornerRadius: 7.5)
                     .stroke(Color.cBlack, lineWidth: 2)
             )
+            .onAppear {
+                    if !isOptionalField && value.isEmpty {
+                        if !errors.contains(where: { $0.identifier == identifier }) {
+                            errors.append(TextEntryError(identifier: identifier, message: "\(title) is required."))
+                        }
+                    }
+            }
+            .onChange(of: value) { _, _ in
+                if !isOptionalField {
+                    if !value.isEmpty {
+                        errors = errors.filter { $0.identifier != identifier && $0.message != "\(title) is required." }
+                    } else {
+                        errors.append(TextEntryError(identifier: identifier, message: "\(title) is required."))
+                    }
+                }
+            }
             
             // MARK: - Error
-            if !errors.isEmpty {
+            if !errors.isEmpty && isShowingErrors {
                 let errorsOfTextField = errors
                     .filter { $0.identifier == identifier }
-                    .map((\.message))
+                    .map(\.message)
                 
                 if !errorsOfTextField.isEmpty {
                     Text(errorsOfTextField.first!)

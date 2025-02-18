@@ -8,10 +8,16 @@
 import SwiftUI
 
 struct RegisterView: View {
+    
+    // Form entries
     @State var email: String = ""
     @State var username: String = ""
     @State var password: String = ""
     @State var passwordConfirmation: String = ""
+    
+    // Form error handling
+    @State var errors: [TextEntryError] = []
+    @State var isShowingErrors: Bool = false
     
     var body: some View {
         VStack {
@@ -32,14 +38,18 @@ struct RegisterView: View {
                         identifier: "email",
                         value: $email,
                         title: "Email",
-                        placeholder: "Enter email"
+                        placeholder: "Enter email",
+                        errors: $errors,
+                        isShowingErrors: isShowingErrors
                     )
                     
                     TextEntry(
                         identifier: "username",
                         value: $username,
                         title: "Username",
-                        placeholder: "Enter username"
+                        placeholder: "Enter username",
+                        errors: $errors,
+                        isShowingErrors: isShowingErrors
                     )
                     
                     TextEntry(
@@ -47,6 +57,8 @@ struct RegisterView: View {
                         value: $password,
                         title: "Password",
                         placeholder: "Enter password",
+                        errors: $errors,
+                        isShowingErrors: isShowingErrors,
                         isSecureField: true
                     )
                     
@@ -55,12 +67,15 @@ struct RegisterView: View {
                         value: $passwordConfirmation,
                         title: "Password confirmation",
                         placeholder: "Enter password again",
+                        errors: $errors,
+                        isShowingErrors: isShowingErrors,
                         isSecureField: true
                     )
                 }
                 
                 HStack(spacing: 16) {
                     Button {
+                        isShowingErrors = true
                         print("register")
                     } label: {
                         DropEffect {

@@ -28,6 +28,7 @@ struct LoginView: View {
     @State var identifier: String = ""
     @State var password: String = ""
     @State var errors: [TextEntryError] = []
+    @State var isShowingErrors: Bool = false
     
     var body: some View {
         VStack {
@@ -49,7 +50,8 @@ struct LoginView: View {
                         value: $identifier,
                         title: "Email or username",
                         placeholder: "Enter email or username",
-                        errors: $errors
+                        errors: $errors,
+                        isShowingErrors: isShowingErrors
                     )
                     
                     TextEntry(
@@ -58,6 +60,7 @@ struct LoginView: View {
                         title: "Password",
                         placeholder: "Enter password",
                         errors: $errors,
+                        isShowingErrors: isShowingErrors,
                         isSecureField: true
                     )
                 }
@@ -66,7 +69,10 @@ struct LoginView: View {
                     Button {
                         Task {
                             do {
-//                                try await vm.login(identifier: identifier, password: password)
+                                isShowingErrors = true
+                                if errors.isEmpty {
+                                    try await vm.login(identifier: identifier, password: password)
+                                }
                             } catch {
                                 print(error)
                             }
