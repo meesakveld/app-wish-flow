@@ -6,10 +6,33 @@
 //
 
 import SwiftUI
+import StrapiSwift
+
+class LoginViewModel: ObservableObject {
+    
+    private let auth = Strapi.authentication.local
+    
+    func login(identifier: String, password: String) async throws {
+        let loginResponse = try await auth.login(
+            identifier: identifier,
+            password: password,
+            as: User.self
+        )
+    }
+    
+}
+
+struct TextEntryError {
+   let identifier: String
+   let error: String
+}
 
 struct LoginView: View {
-    @State var email: String = ""
+    @ObservedObject var vm: LoginViewModel = LoginViewModel()
+    
+    @State var identifier: String = ""
     @State var password: String = ""
+    @State var isValidating: Bool = true
     
     var body: some View {
         VStack {
@@ -27,22 +50,30 @@ struct LoginView: View {
                 
                 VStack(alignment: .leading, spacing: 16) {
                     TextEntry(
-                        value: $email,
-                        title: "Email",
-                        placeholder: "Enter email"
+                        value: $identifier,
+                        title: "Email or username",
+                        placeholder: "Enter email or username",
+                        error: isValidating ? identifier == "" ? "Email or username is required." : "" : nil
                     )
                     
                     TextEntry(
                         value: $password,
                         title: "Password",
                         placeholder: "Enter password",
+                        error: isValidating ? password == "" ? "Password is required." : "" : nil,
                         isSecureField: true
                     )
                 }
                 
                 HStack(spacing: 16) {
                     Button {
-                        print("login")
+                        Task {
+                            do {
+                                try await vm.login(identifier: identifier, password: password)
+                            } catch {
+                                print(error)
+                            }
+                        }
                     } label: {
                         DropEffect {
                             HStack {
