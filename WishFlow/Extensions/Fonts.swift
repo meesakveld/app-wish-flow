@@ -30,32 +30,38 @@ enum TextStyle {
         case medium
     }
     
-    func getFont() -> Font {
+    struct FontStyle {
+        let font: String
+        let fontSize: CGFloat
+        let lineHeight: CGFloat
+    }
+
+    func getFontStyle() -> FontStyle {
         switch self {
         case .title(let title):
             switch title {
             case .h1:
-                return .custom("YesevaOne-Regular", size: 32)
+                return FontStyle(font: "YesevaOne-Regular", fontSize: 32, lineHeight: 32.2)
             case .h2:
-                return .custom("YesevaOne-Regular", size: 21.8)
+                return FontStyle(font: "YesevaOne-Regular", fontSize: 21.8, lineHeight: 21.8)
             case .h3:
-                return .custom("YesevaOne-Regular", size: 18.3)
+                return FontStyle(font: "YesevaOne-Regular", fontSize: 18.3, lineHeight: 18.3)
             }
         case .text(let text):
             switch text {
             case .regular:
-                return .custom("Poppins-Regular", size: 16)
+                return FontStyle(font: "Poppins-Regular", fontSize: 16, lineHeight: 25)
             case .medium:
-                return .custom("Poppins-Medium", size: 16)
+                return FontStyle(font: "Poppins-Medium", fontSize: 16, lineHeight: 25)
             case .bold:
-                return .custom("Poppins-Bold", size: 16)
+                return FontStyle(font: "Poppins-Bold", fontSize: 16, lineHeight: 25)
             }
         case .textSmall(let textSmall):
             switch textSmall {
             case .regular:
-                return .custom("Poppins-Regular", size: 12)
+                return FontStyle(font: "Poppins-Regular", fontSize: 14, lineHeight: 20)
             case .medium:
-                return .custom("Poppins-Medium", size: 12)
+                return FontStyle(font: "Poppins-Medium", fontSize: 14, lineHeight: 20)
             }
         }
     }
@@ -70,8 +76,10 @@ extension View {
     }
     
     func style(textStyle: TextStyle) -> some View {
-        self
-            .font(textStyle.getFont())
+        let fontStyle = textStyle.getFontStyle()
+        return self
+            .font(.custom(fontStyle.font, size: fontStyle.fontSize))
+            .lineSpacing(fontStyle.lineHeight - fontStyle.fontSize)
     }
     
     func style(color: Color) -> some View {
