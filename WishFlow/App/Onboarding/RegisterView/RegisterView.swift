@@ -8,8 +8,74 @@
 import SwiftUI
 
 struct RegisterView: View {
+    @State var email: String = ""
+    @State var username: String = ""
+    @State var password: String = ""
+    @State var passwordConfirmation: String = ""
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            Spacer()
+            
+            VStack(alignment: .leading, spacing: 24) {
+                
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Create an account")
+                        .style(textStyle: .title(.h1), color: .cForeground)
+                    
+                    Text("Create an account to manage your wish lists and gift groups. Sign up now and start planning the perfect gifts!")
+                        .style(textStyle: .text(.regular), color: .cForeground)
+                }
+                
+                VStack(alignment: .leading, spacing: 16) {
+                    TextEntry(
+                        value: $email,
+                        title: "Email",
+                        placeholder: "Enter email"
+                    )
+                    
+                    TextEntry(
+                        value: $username,
+                        title: "Username",
+                        placeholder: "Enter username"
+                    )
+                    
+                    TextEntry(
+                        value: $password,
+                        title: "Password",
+                        placeholder: "Enter password",
+                        isSecureField: true
+                    )
+                    
+                    TextEntry(
+                        value: $passwordConfirmation,
+                        title: "Password confirmation",
+                        placeholder: "Enter password again",
+                        isSecureField: true
+                    )
+                }
+                
+                HStack(spacing: 16) {
+                    Button {
+                        print("register")
+                    } label: {
+                        DropEffect {
+                            HStack {
+                                Text("Register")
+                                    .style(textStyle: .text(.bold), color: .cBlack)
+                                    .padding(15)
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: 50)
+                            .background(Color.cBlue)
+                        }
+                    }
+                }
+            }
+            .padding(.bottom)
+        }
+        .padding(.horizontal)
+        .background(Color.cBackground)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
