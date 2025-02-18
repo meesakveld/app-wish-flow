@@ -22,17 +22,12 @@ class LoginViewModel: ObservableObject {
     
 }
 
-struct TextEntryError {
-   let identifier: String
-   let error: String
-}
-
 struct LoginView: View {
     @ObservedObject var vm: LoginViewModel = LoginViewModel()
     
     @State var identifier: String = ""
     @State var password: String = ""
-    @State var isValidating: Bool = true
+    @State var errors: [TextEntryError] = []
     
     var body: some View {
         VStack {
@@ -50,17 +45,19 @@ struct LoginView: View {
                 
                 VStack(alignment: .leading, spacing: 16) {
                     TextEntry(
+                        identifier: "identifier",
                         value: $identifier,
                         title: "Email or username",
                         placeholder: "Enter email or username",
-                        error: isValidating ? identifier == "" ? "Email or username is required." : "" : nil
+                        errors: errors
                     )
                     
                     TextEntry(
+                        identifier: "password",
                         value: $password,
                         title: "Password",
                         placeholder: "Enter password",
-                        error: isValidating ? password == "" ? "Password is required." : "" : nil,
+                        errors: errors,
                         isSecureField: true
                     )
                 }

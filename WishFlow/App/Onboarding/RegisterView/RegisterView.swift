@@ -29,18 +29,21 @@ struct RegisterView: View {
                 
                 VStack(alignment: .leading, spacing: 16) {
                     TextEntry(
+                        identifier: "email",
                         value: $email,
                         title: "Email",
                         placeholder: "Enter email"
                     )
                     
                     TextEntry(
+                        identifier: "username",
                         value: $username,
                         title: "Username",
                         placeholder: "Enter username"
                     )
                     
                     TextEntry(
+                        identifier: "password",
                         value: $password,
                         title: "Password",
                         placeholder: "Enter password",
@@ -48,6 +51,7 @@ struct RegisterView: View {
                     )
                     
                     TextEntry(
+                        identifier: "confirmation",
                         value: $passwordConfirmation,
                         title: "Password confirmation",
                         placeholder: "Enter password again",

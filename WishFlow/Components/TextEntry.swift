@@ -8,21 +8,23 @@
 import SwiftUI
 
 struct TextEntry: View {
+    let identifier: String
     
     @Binding var value: String
     
     let title: String
     let placeholder: String
-    let error: String?
+    let errors: [TextEntryError]?
     let isSecureField: Bool
     
     @State private var isSecure: Bool
     
-    init(value: Binding<String>, title: String, placeholder: String, error: String? = nil, isSecureField: Bool = false) {
+    init(identifier: String, value: Binding<String>, title: String, placeholder: String, errors: [TextEntryError]? = nil, isSecureField: Bool = false) {
+        self.identifier = identifier
         self._value = value
         self.title = title
         self.placeholder = placeholder
-        self.error = error
+        self.errors = errors
         self.isSecureField = isSecureField
         self._isSecure = State(initialValue: isSecureField)
     }
@@ -39,9 +41,11 @@ struct TextEntry: View {
                 if isSecure {
                     SecureField(placeholder, text: $value)
                         .style(textStyle: .text(.regular), color: .cBlack)
+                        .textInputAutocapitalization(.never)
                 } else {
                     TextField(placeholder, text: $value)
                         .style(textStyle: .text(.regular), color: .cBlack)
+                        .textInputAutocapitalization(.never)
                 }
                 
                 // Switch between secure en normal textfield.
@@ -66,9 +70,15 @@ struct TextEntry: View {
             )
             
             // MARK: - Error
-            if let error = error {
-                Text(error)
-                    .style(textStyle: .text(.medium), color: .cOrange)
+            if let errors = errors {
+                let errorsOfTextField = errors
+                    .filter { $0.identifier == identifier }
+                    .map((\.message))
+                
+                if !errorsOfTextField.isEmpty {
+                    Text(errorsOfTextField.first!)
+                        .style(textStyle: .text(.medium), color: .cOrange)
+                }
             }
         }
     }
@@ -76,8 +86,17 @@ struct TextEntry: View {
 
 #Preview {
     VStack(spacing: 20) {
-        TextEntry(value: .constant(""), title: "Email", placeholder: "Enter email")
-        TextEntry(value: .constant(""), title: "Password", placeholder: "Enter password", error: "Error is required.", isSecureField: true)
+        TextEntry(identifier: "email", value: .constant(""), title: "Email", placeholder: "Enter email")
+        TextEntry(
+            identifier: "email",
+            value: .constant(""),
+            title: "Password",
+            placeholder: "Enter password",
+            errors: [
+                TextEntryError(identifier: "email", message: "Email is required")
+            ],
+            isSecureField: true
+        )
     }
     .padding()
 }
