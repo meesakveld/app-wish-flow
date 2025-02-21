@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8F61BEC52D67441800395280 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 8F61BEC42D67441800395280 /* SwiftKeychainWrapper */; };
 		8F91F1762D517EDA00DA8891 /* StrapiSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8F91F1752D517EDA00DA8891 /* StrapiSwift */; };
 /* End PBXBuildFile section */
 
@@ -41,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8F61BEC52D67441800395280 /* SwiftKeychainWrapper in Frameworks */,
 				8F91F1762D517EDA00DA8891 /* StrapiSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -94,6 +96,7 @@
 			name = WishFlow;
 			packageProductDependencies = (
 				8F91F1752D517EDA00DA8891 /* StrapiSwift */,
+				8F61BEC42D67441800395280 /* SwiftKeychainWrapper */,
 			);
 			productName = WishFlow;
 			productReference = 8FE1FBFF2D51746B0086A51D /* WishFlow.app */;
@@ -123,6 +126,9 @@
 			);
 			mainGroup = 8FE1FBF62D51746B0086A51D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				8F61BEC32D67441800395280 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8FE1FC002D51746B0086A51D /* Products */;
 			projectDirPath = "";
@@ -374,7 +380,23 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		8F61BEC32D67441800395280 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jrendel/SwiftKeychainWrapper";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		8F61BEC42D67441800395280 /* SwiftKeychainWrapper */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8F61BEC32D67441800395280 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */;
+			productName = SwiftKeychainWrapper;
+		};
 		8F91F1752D517EDA00DA8891 /* StrapiSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = StrapiSwift;

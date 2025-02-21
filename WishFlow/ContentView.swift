@@ -8,15 +8,28 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var navigationPath = NavigationPath()
+    @StateObject private var authManager = AuthenticationManager.shared
+    @EnvironmentObject private var navigationManager: NavigationManager
 
     var body: some View {
-        NavigationStack(path: $navigationPath) {
-            WelcomeView()
+        NavigationStack(path: $navigationManager.navigationPath) {
+            Group {
+                if authManager.isLoggedIn {
+                    // General
+                    HomeView()
+                } else {
+                    // Onboarding & Authentication
+                    WelcomeView()
+                }
+            }
+            .navigationDestination(for: NavigationManager.NavigationDestination.self) { destination in
+                navigationManager.destinationView(for: destination)
+            }
         }
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(NavigationManager())
 }

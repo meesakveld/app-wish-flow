@@ -10,21 +10,16 @@ import StrapiSwift
 
 class LoginViewModel: ObservableObject {
     
-    private let auth = Strapi.authentication.local
-    
     func login(identifier: String, password: String) async throws {
-        let _ = try await auth.login(
-            identifier: identifier,
-            password: password,
-            as: User.self
-        )
+        try await AuthenticationManager.shared.login(identifier: identifier, password: password)
     }
     
 }
 
 struct LoginView: View {
     @ObservedObject var vm: LoginViewModel = LoginViewModel()
-    
+    @EnvironmentObject private var navigationManager: NavigationManager
+
     @State var identifier: String = ""
     @State var password: String = ""
     @State var errors: [TextEntryError] = []
@@ -42,6 +37,7 @@ struct LoginView: View {
                     
                     Text("Welcome back to WishFlow! Log in to manage your wish lists, join gift groups, and stay updated on your gifting plans.")
                         .style(textStyle: .text(.regular), color: .cForeground)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 
                 VStack(alignment: .leading, spacing: 16) {
@@ -72,6 +68,7 @@ struct LoginView: View {
                                 isShowingErrors = true
                                 if errors.isEmpty {
                                     try await vm.login(identifier: identifier, password: password)
+                                    navigationManager.navigate(to: .home)
                                 }
                             } catch {
                                 print(error)
@@ -100,4 +97,5 @@ struct LoginView: View {
 
 #Preview {
     LoginView()
+        .environmentObject(NavigationManager())
 }

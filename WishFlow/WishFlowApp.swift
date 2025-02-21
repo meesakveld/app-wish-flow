@@ -11,10 +11,12 @@ import StrapiSwift
 @main
 struct WishFlowApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-
+    @StateObject private var navigationManager = NavigationManager()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(navigationManager)
         }
     }
 }

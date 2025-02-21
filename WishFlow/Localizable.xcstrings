@@ -1,7 +1,36 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Create an account" : {
 
+    },
+    "Create an account to manage your wish lists and gift groups. Sign up now and start planning the perfect gifts!" : {
+
+    },
+    "Hello, World!" : {
+
+    },
+    "Login" : {
+
+    },
+    "Login to your account" : {
+
+    },
+    "Logout" : {
+
+    },
+    "Register" : {
+
+    },
+    "Welcome back to WishFlow! Log in to manage your wish lists, join gift groups, and stay updated on your gifting plans." : {
+
+    },
+    "Welcome to Wishflow" : {
+
+    },
+    "WishFlow makes it easy to manage wish lists and gift groups for any occasion. With features like visibility settings and gift assignments, users can prevent duplicate presents and ensure a smooth gifting experience." : {
+
+    }
   },
   "version" : "1.0"
 }
