@@ -7,16 +7,20 @@
 
 import SwiftUI
 
-struct FormWrapper<Content: View>: View {
+struct FormWrapper<TextEntries: View, Submit: View>: View {
     @State private var loadingState: LoadingState = .readyToLoad
     @State private var formError: String? = nil
-    @State private var errors: [TextEntryError] = []
-    @State private var isShowingErrors: Bool = false
+    @State private var inputsErrors: [TextEntryError] = []
+    @State private var isShowingInputsErrors: Bool = false
     
-    let content: (_ isLoading: Binding<LoadingState>,
+    let textEntries: (
+                  _ inputsErrors: Binding<[TextEntryError]>,
+                  _ isShowingInputsErrors: Bool) -> TextEntries
+    
+    let submit: (_ setIsLoading: @escaping (LoadingState) -> Void,
                   _ setFormError: @escaping (String?) -> Void,
-                  _ entriesErrors: Binding<[TextEntryError]>,
-                  _ isShowingEntriesErrors: Binding<Bool>) -> Content
+                  _ inputsErrors: [TextEntryError],
+                  _ isShowingInputsErrors: Binding<Bool>) -> Submit
     
     var body: some View {
         VStack(spacing: 16) {
@@ -33,30 +37,25 @@ struct FormWrapper<Content: View>: View {
                 .cornerRadius(7.5)
             }
             
-            content(
-                $loadingState,
-                { newError in formError = newError },
-                $errors,
-                $isShowingErrors
-            )
-        }
-    }
-}
-
-#Preview {
-    FormWrapper { isLoading, setFormError, entriesErrors, isShowingEntriesErrors in
-        VStack {
-            Text("Preview Content")
-                .onAppear {
-                    setFormError("This is a test error")
-                    isLoading.wrappedValue = .finished
-                    entriesErrors.wrappedValue = [TextEntryError(identifier: "email", message: "Invalid input")]
-                    isShowingEntriesErrors.wrappedValue = true
+            VStack(alignment: .leading, spacing: 24) {
+                
+                VStack(alignment: .leading, spacing: 16) {
+                    textEntries(
+                        $inputsErrors,
+                        isShowingInputsErrors
+                    )
                 }
-            
-            if isLoading.wrappedValue.getBool() {
-                ProgressView()
+                .loadingEffect(loadingState)
+                
+                submit(
+                    { newLoadingState in setLoading(value: $loadingState, newLoadingState) },
+                    { newError in formError = newError },
+                    inputsErrors,
+                    $isShowingInputsErrors
+                )
+                
             }
+            .disabled(loadingState.getBool())
         }
     }
 }

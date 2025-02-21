@@ -47,7 +47,6 @@ extension View {
         return self
             .optModifiers(loadingState.getBool()) { VStack in
                 VStack
-                    .disabled(true)
                     .redacted(reason: .placeholder)
                     .modifier(OpacityPulseAnimation())
             }

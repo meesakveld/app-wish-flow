@@ -35,73 +35,63 @@ struct LoginView: View {
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                         
-                        FormWrapper { isLoading, setFormError, entriesErrors, isShowingEntriesErrors in
-                            
-                            VStack(alignment: .leading, spacing: 24) {
+                        FormWrapper { inputsErrors, isShowingInputsErrors in
+                            Group {
+                                TextEntry(
+                                    identifier: "identifier",
+                                    value: $identifier,
+                                    title: "Email or username",
+                                    placeholder: "Enter email or username",
+                                    errors: inputsErrors,
+                                    isShowingErrors: isShowingInputsErrors
+                                )
                                 
-                                VStack(alignment: .leading, spacing: 16) {
-                                    TextEntry(
-                                        identifier: "identifier",
-                                        value: $identifier,
-                                        title: "Email or username",
-                                        placeholder: "Enter email or username",
-                                        errors: entriesErrors,
-                                        isShowingErrors: isShowingEntriesErrors.wrappedValue
-                                    )
-                                    
-                                    TextEntry(
-                                        identifier: "password",
-                                        value: $password,
-                                        title: "Password",
-                                        placeholder: "Enter password",
-                                        errors: entriesErrors,
-                                        isShowingErrors: isShowingEntriesErrors.wrappedValue,
-                                        isSecureField: true
-                                    )
-                                }
-                                .loadingEffect(isLoading.wrappedValue)
-                                
-                                HStack(spacing: 16) {
-                                    Button {
-                                        Task {
-                                            setLoading(value: isLoading, .isLoading)
-                                            setFormError(nil)
-                                            isShowingEntriesErrors.wrappedValue = true
-                                            
-                                            if entriesErrors.wrappedValue.isEmpty {
-                                                do {
-                                                    try await vm.login(identifier: identifier, password: password)
-                                                    navigationManager.navigate(to: .home)
-                                                } catch let error as StrapiSwiftError {
-                                                    // Verwerk de specifieke fout
-                                                    switch error {
-                                                    case .badResponse(_, let message):
-                                                        setFormError(message)
-                                                    default:
-                                                        setFormError("Something went wrong")
-                                                    }
-                                                } catch {
-                                                    print(error)
-                                                    setFormError("Something went wrong")
-                                                }
+                                TextEntry(
+                                    identifier: "password",
+                                    value: $password,
+                                    title: "Password",
+                                    placeholder: "Enter password",
+                                    errors: inputsErrors,
+                                    isShowingErrors: isShowingInputsErrors,
+                                    isSecureField: true
+                                )
+                            }
+                        } submit: { setIsLoading, setFormError, inputsErrors, isShowingInputsErrors in
+                            Button {
+                                Task {
+                                    setIsLoading(.isLoading)
+                                    setFormError(nil)
+                                    isShowingInputsErrors.wrappedValue = true
+
+                                    if inputsErrors.isEmpty {
+                                        do {
+                                            try await vm.login(identifier: identifier, password: password)
+                                            navigationManager.navigate(to: .home)
+                                        } catch let error as StrapiSwiftError {
+                                            switch error {
+                                            case .badResponse(_, let message):
+                                                setFormError(message)
+                                            default:
+                                                setFormError("Something went wrong")
                                             }
-                                            
-                                            setLoading(value: isLoading, .finished)
-                                        }
-                                    } label: {
-                                        DropEffect {
-                                            HStack {
-                                                Text("Login")
-                                                    .style(textStyle: .text(.medium), color: .cBlack)
-                                                    .padding(15)
-                                            }
-                                            .frame(maxWidth: .infinity, maxHeight: 50)
-                                            .background(Color.cGreen)
+                                        } catch {
+                                            print(error)
+                                            setFormError("Something went wrong")
                                         }
                                     }
-                                    .disabled(isLoading.wrappedValue.getBool())
+
+                                    setIsLoading(.finished)
                                 }
-                                
+                            } label: {
+                                DropEffect {
+                                    HStack {
+                                        Text("Login")
+                                            .style(textStyle: .text(.medium), color: .cBlack)
+                                            .padding(15)
+                                    }
+                                    .frame(maxWidth: .infinity, maxHeight: 50)
+                                    .background(Color.cGreen)
+                                }
                             }
                         }
                     }
