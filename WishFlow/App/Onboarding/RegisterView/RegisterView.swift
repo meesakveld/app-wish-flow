@@ -31,6 +31,7 @@ struct RegisterView: View {
                     
                     Text("Create an account to manage your wish lists and gift groups. Sign up now and start planning the perfect gifts!")
                         .style(textStyle: .text(.regular), color: .cForeground)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 
                 VStack(alignment: .leading, spacing: 16) {
