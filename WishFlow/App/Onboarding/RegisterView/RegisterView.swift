@@ -6,22 +6,22 @@
 //
 
 import SwiftUI
+import StrapiSwift
 
 struct RegisterView: View {
+    @ObservedObject var vm: RegisterViewModel = RegisterViewModel()
+    @EnvironmentObject private var navigationManager: NavigationManager
     
     // Form entries
     @State var email: String = ""
     @State var username: String = ""
+    @State var firstname: String = ""
+    @State var lastname: String = ""
     @State var password: String = ""
     @State var passwordConfirmation: String = ""
     
-    // Form error handling
-    @State var errors: [TextEntryError] = []
-    @State var isShowingErrors: Bool = false
-    
     var body: some View {
-        VStack {
-            Spacer()
+        ScrollView {
             
             VStack(alignment: .leading, spacing: 24) {
                 
@@ -34,71 +34,125 @@ struct RegisterView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 
-                VStack(alignment: .leading, spacing: 16) {
-                    TextEntry(
-                        identifier: "email",
-                        value: $email,
-                        title: "Email",
-                        placeholder: "Enter email",
-                        errors: $errors,
-                        isShowingErrors: isShowingErrors
-                    )
+                FormWrapper { isLoading, setFormError, entriesErrors, isShowingEntriesErrors in
                     
-                    TextEntry(
-                        identifier: "username",
-                        value: $username,
-                        title: "Username",
-                        placeholder: "Enter username",
-                        errors: $errors,
-                        isShowingErrors: isShowingErrors
-                    )
-                    
-                    TextEntry(
-                        identifier: "password",
-                        value: $password,
-                        title: "Password",
-                        placeholder: "Enter password",
-                        errors: $errors,
-                        isShowingErrors: isShowingErrors,
-                        isSecureField: true
-                    )
-                    
-                    TextEntry(
-                        identifier: "confirmation",
-                        value: $passwordConfirmation,
-                        title: "Password confirmation",
-                        placeholder: "Enter password again",
-                        errors: $errors,
-                        isShowingErrors: isShowingErrors,
-                        isSecureField: true
-                    )
-                }
-                
-                HStack(spacing: 16) {
-                    Button {
-                        isShowingErrors = true
-                        print("register")
-                    } label: {
-                        DropEffect {
-                            HStack {
-                                Text("Register")
-                                    .style(textStyle: .text(.bold), color: .cBlack)
-                                    .padding(15)
-                            }
-                            .frame(maxWidth: .infinity, maxHeight: 50)
-                            .background(Color.cBlue)
+                    VStack(alignment: .leading, spacing: 24) {
+                        
+                        VStack(alignment: .leading, spacing: 16) {
+                            TextEntry(
+                                identifier: "firstname",
+                                value: $firstname,
+                                title: "First name",
+                                placeholder: "Enter your first name",
+                                errors: entriesErrors,
+                                isShowingErrors: isShowingEntriesErrors.wrappedValue
+                            )
+                            
+                            TextEntry(
+                                identifier: "lastname",
+                                value: $lastname,
+                                title: "Last name",
+                                placeholder: "Enter your last name",
+                                errors: entriesErrors,
+                                isShowingErrors: isShowingEntriesErrors.wrappedValue
+                            )
+                            
+                            TextEntry(
+                                identifier: "email",
+                                value: $email,
+                                title: "Email",
+                                placeholder: "Enter email",
+                                errors: entriesErrors,
+                                isShowingErrors: isShowingEntriesErrors.wrappedValue
+                            )
+                            
+                            TextEntry(
+                                identifier: "username",
+                                value: $username,
+                                title: "Username",
+                                placeholder: "Enter username",
+                                errors: entriesErrors,
+                                isShowingErrors: isShowingEntriesErrors.wrappedValue
+                            )
+                            
+                            TextEntry(
+                                identifier: "password",
+                                value: $password,
+                                title: "Password",
+                                placeholder: "Enter password",
+                                errors: entriesErrors,
+                                isShowingErrors: isShowingEntriesErrors.wrappedValue,
+                                isSecureField: true
+                            )
+                            
+                            TextEntry(
+                                identifier: "confirmation",
+                                value: $passwordConfirmation,
+                                title: "Password confirmation",
+                                placeholder: "Enter password again",
+                                errors: entriesErrors,
+                                isShowingErrors: isShowingEntriesErrors.wrappedValue,
+                                isSecureField: true
+                            )
                         }
+                        .loadingEffect(isLoading.wrappedValue)
+                        
+                        HStack(spacing: 16) {
+                            Button {
+                                Task {
+                                    setLoading(value: isLoading, .isLoading)
+                                    setFormError(nil)
+                                    isShowingEntriesErrors.wrappedValue = true
+                                    
+                                    if entriesErrors.wrappedValue.isEmpty {
+                                        guard password == passwordConfirmation else {
+                                            setFormError("Passwords do not match.")
+                                            return setLoading(value: isLoading, .finished)
+                                        }
+                                        
+                                        do {
+                                            try await vm.register(email: email, username: username, firstname: firstname, lastname: lastname, password: password)
+                                            navigationManager.navigate(to: .home)
+                                        } catch let error as StrapiSwiftError {
+                                            switch error {
+                                            case .badResponse(_, let message):
+                                                setFormError(message)
+                                            default:
+                                                setFormError("Something went wrong")
+                                            }
+                                        } catch {
+                                            print(error)
+                                            setFormError("Something went wrong")
+                                        }
+                                    }
+                                    
+                                    setLoading(value: isLoading, .finished)
+                                }
+                            } label: {
+                                DropEffect {
+                                    HStack {
+                                        Text("Register")
+                                            .style(textStyle: .text(.medium), color: .cBlack)
+                                            .padding(15)
+                                    }
+                                    .frame(maxWidth: .infinity, maxHeight: 50)
+                                    .background(Color.cBlue)
+                                }
+                            }
+                        }
+                        
                     }
                 }
             }
             .padding(.bottom)
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
-        .background(Color.cBackground)
+        .background(Color.cBackground.ignoresSafeArea())
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
 #Preview {
     RegisterView()
+        .environmentObject(NavigationManager())
 }

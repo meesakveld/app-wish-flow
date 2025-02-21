@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct WelcomeView: View {
+    
+    @State var isLoading = false
+    
     var body: some View {
         VStack {
             Spacer()

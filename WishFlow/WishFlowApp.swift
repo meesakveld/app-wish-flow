@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import StrapiSwift
 
 @main
 struct WishFlowApp: App {
@@ -21,14 +20,9 @@ struct WishFlowApp: App {
     }
 }
 
-class AppDelegate: NSObject, UIApplicationDelegate {
+class AppDelegate: NSObject, UIApplicationDelegate {    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-        Task {
-            Strapi.configure(
-                baseURL: "https://" + (Bundle.main.infoDictionary?["STRAPI_BASE_URL"] as? String ?? ""),
-                token: Bundle.main.infoDictionary?["STRAPI_TOKEN"] as? String
-            )
-        }
+        StrapiSwiftManager.shared.configure()
         return true
     }
 }
