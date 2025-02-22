@@ -27,26 +27,36 @@ final class AuthenticationManager: ObservableObject, Sendable {
             as: User.self
         )
         
+        // Update token
         strapiJWT = login.jwt
-        isLoggedIn = true
-        
-        // Update token user for StrapiSwift requests
         StrapiSwiftManager.shared.updateStrapiToken(login.jwt)
     }
     
     func register(email: String, username: String, firstname: String, lastname: String, password: String) async throws {
-        // Register user
-        let register = try await Strapi.authentication.local.register(
-            username: username,
-            email: email,
-            password: password,
-            as: User.self)
-        
-        // Update StrapiSwift token
-        StrapiSwiftManager.shared.updateStrapiToken(register.jwt)
-
-        // Add firstname and lastname to user account
-        // TODO: Do this ^
+        do {
+            // Register user
+            let register = try await Strapi.authentication.local.register(
+                username: username,
+                email: email,
+                password: password,
+                as: User.self)
+            
+            // Update StrapiSwift token
+            strapiJWT = register.jwt
+            StrapiSwiftManager.shared.updateStrapiToken(register.jwt)
+            
+            // Add firstname and lastname to user account
+            let data: StrapiRequestBody = StrapiRequestBody([
+                "firstname": .string(firstname),
+                "lastname": .string(lastname)
+            ])
+            
+            try await Strapi.authentication.local.updateProfile(data, userId: register.user.id, as: User.self)
+            
+        } catch {
+            StrapiSwiftManager.shared.updateStrapiTokenToDefaultToken()
+            throw(error)
+        }
     }
     
     func logout() {
