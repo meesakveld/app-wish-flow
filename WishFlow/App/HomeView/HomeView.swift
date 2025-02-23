@@ -10,6 +10,7 @@ import StrapiSwift
 
 struct HomeView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
+    let user: User? = AuthenticationManager.shared.user
     
     var body: some View {
         ScrollView {

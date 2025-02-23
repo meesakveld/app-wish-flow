@@ -46,6 +46,25 @@ struct User: Decodable, Sendable, Encodable {
         publishedAt = try Self.decodeDate(from: container, forKey: .publishedAt, using: formatter)
     }
     
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encode(id, forKey: .id)
+        try container.encode(documentId, forKey: .documentId)
+        try container.encodeIfPresent(firstname, forKey: .firstname)
+        try container.encodeIfPresent(lastname, forKey: .lastname)
+        try container.encode(username, forKey: .username)
+        try container.encode(email, forKey: .email)
+        try container.encode(confirmed, forKey: .confirmed)
+        try container.encode(blocked, forKey: .blocked)
+        try container.encode(provider, forKey: .provider)
+        
+        let formatter = DateFormatter.iso8601WithMilliseconds
+        try container.encode(formatter.string(from: createdAt), forKey: .createdAt)
+        try container.encode(formatter.string(from: updatedAt), forKey: .updatedAt)
+        try container.encode(formatter.string(from: publishedAt), forKey: .publishedAt)
+    }
+    
     // Helperfunctie for parsing date
     private static func decodeDate(from container: KeyedDecodingContainer<CodingKeys>, forKey key: CodingKeys, using formatter: DateFormatter) throws -> Date {
         let dateString = try container.decode(String.self, forKey: key)

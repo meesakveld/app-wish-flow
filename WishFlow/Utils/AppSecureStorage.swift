@@ -39,3 +39,24 @@ public struct AppSecureStorage: DynamicProperty {
         self.accessibility = accessibility
     }
 }
+
+@propertyWrapper
+public struct AppStorageData<T: Codable>: DynamicProperty {
+    private let key: String
+    @AppStorage private var storedData: Data?
+
+    public init(_ key: String) {
+        self.key = key
+        self._storedData = AppStorage(key)
+    }
+    
+    public var wrappedValue: T? {
+        get {
+            guard let data = storedData else { return nil }
+            return try? JSONDecoder().decode(T.self, from: data)
+        }
+        nonmutating set {
+            storedData = try? JSONEncoder().encode(newValue)
+        }
+    }
+}

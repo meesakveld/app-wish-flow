@@ -13,6 +13,7 @@ final class AuthenticationManager: ObservableObject, Sendable {
     
     static let shared = AuthenticationManager()
     
+    @AppStorageData("user") var user: User?
     @AppSecureStorage("strapiJWT") private var strapiJWT: String?
     @Published var isLoggedIn: Bool = false
     
@@ -30,6 +31,9 @@ final class AuthenticationManager: ObservableObject, Sendable {
         // Update token
         strapiJWT = login.jwt
         StrapiSwiftManager.shared.updateStrapiToken(login.jwt)
+        
+        // Store user
+        user = login.user
     }
     
     func register(email: String, username: String, firstname: String, lastname: String, password: String) async throws {
@@ -53,6 +57,8 @@ final class AuthenticationManager: ObservableObject, Sendable {
             
             try await Strapi.authentication.local.updateProfile(data, userId: register.user.id, as: User.self)
             
+            // Store user
+            user = register.user
         } catch {
             StrapiSwiftManager.shared.updateStrapiTokenToDefaultToken()
             throw(error)
@@ -65,5 +71,8 @@ final class AuthenticationManager: ObservableObject, Sendable {
         
         // Update StrapiSwift token
         StrapiSwiftManager.shared.updateStrapiTokenToDefaultToken()
+        
+        // Remove user from storage
+        user = nil
     }
 }
