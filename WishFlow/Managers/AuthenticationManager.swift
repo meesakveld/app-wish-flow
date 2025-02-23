@@ -37,8 +37,7 @@ final class AuthenticationManager: ObservableObject, Sendable {
             Strapi.useTokenOnce(token: login.jwt)
             user = try await Strapi.authentication.local.me(as: User.self)
         } catch {
-            StrapiSwiftManager.shared.updateStrapiTokenToDefaultToken()
-            strapiJWT = nil
+            logout()
             throw(error)
         }
     }
@@ -67,10 +66,8 @@ final class AuthenticationManager: ObservableObject, Sendable {
             // Get user with avatar and role | Save to user
             Strapi.useTokenOnce(token: register.jwt)
             user = try await Strapi.authentication.local.me(as: User.self)
-            print("USER: \(String(describing: user))")
         } catch {
-            StrapiSwiftManager.shared.updateStrapiTokenToDefaultToken()
-            strapiJWT = nil
+            logout()
             throw(error)
         }
     }
