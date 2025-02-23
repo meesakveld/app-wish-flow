@@ -22,6 +22,7 @@ struct DropEffect<Content: View>: View {
                 .foregroundStyle(.cBlack)
                 .frame(width: size.width, height: size.height)
                 .offset(x: 5, y: 5)
+                .padding(.trailing, 5)
             
             content
                 .background(
@@ -41,6 +42,7 @@ struct DropEffect<Content: View>: View {
                         .foregroundStyle(Color.clear)
                 }
                 .cornerRadius(7.5)
+                .padding(.trailing, 5)
         }
     }
 }
