@@ -22,18 +22,25 @@ final class AuthenticationManager: ObservableObject, Sendable {
     }
     
     func login(identifier: String, password: String) async throws {
-        let login = try await Strapi.authentication.local.login(
-            identifier: identifier,
-            password: password,
-            as: User.self
-        )
-        
-        // Update token
-        strapiJWT = login.jwt
-        StrapiSwiftManager.shared.updateStrapiToken(login.jwt)
-        
-        // Store user
-        user = login.user
+        do {
+            let login = try await Strapi.authentication.local.login(
+                identifier: identifier,
+                password: password,
+                as: User.self
+            )
+            
+            // Update token
+            strapiJWT = login.jwt
+            StrapiSwiftManager.shared.updateStrapiToken(login.jwt)
+            
+            // Get user with avatar and role | Save to user
+            Strapi.useTokenOnce(token: login.jwt)
+            user = try await Strapi.authentication.local.me(as: User.self)
+        } catch {
+            StrapiSwiftManager.shared.updateStrapiTokenToDefaultToken()
+            strapiJWT = nil
+            throw(error)
+        }
     }
     
     func register(email: String, username: String, firstname: String, lastname: String, password: String) async throws {
@@ -54,13 +61,15 @@ final class AuthenticationManager: ObservableObject, Sendable {
                 "firstname": .string(firstname),
                 "lastname": .string(lastname)
             ])
-            
             try await Strapi.authentication.local.updateProfile(data, userId: register.user.id, as: User.self)
             
-            // Store user
-            user = register.user
+            // Get user with avatar and role | Save to user
+            Strapi.useTokenOnce(token: register.jwt)
+            user = try await Strapi.authentication.local.me(as: User.self)
+            print("USER: \(String(describing: user))")
         } catch {
             StrapiSwiftManager.shared.updateStrapiTokenToDefaultToken()
+            strapiJWT = nil
             throw(error)
         }
     }

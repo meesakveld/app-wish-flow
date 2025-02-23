@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import StrapiSwift
 
-struct User: Decodable, Sendable, Encodable {
+struct User: Codable {
     let id: Int
     let documentId: String
     let firstname: String?
@@ -20,9 +21,11 @@ struct User: Decodable, Sendable, Encodable {
     let createdAt: Date
     let updatedAt: Date
     let publishedAt: Date
+    let avatar: StrapiImage?
+    let role: Role?
     
     enum CodingKeys: String, CodingKey {
-        case id, documentId, firstname, lastname, username, email, confirmed, blocked, provider, createdAt, updatedAt, publishedAt
+        case id, documentId, firstname, lastname, username, email, confirmed, blocked, provider, createdAt, updatedAt, publishedAt, avatar, role
     }
     
     init(from decoder: Decoder) throws {
@@ -37,13 +40,15 @@ struct User: Decodable, Sendable, Encodable {
         confirmed = try container.decode(Bool.self, forKey: .confirmed)
         blocked = try container.decode(Bool.self, forKey: .blocked)
         provider = try container.decode(String.self, forKey: .provider)
+        avatar = try container.decodeIfPresent(StrapiImage.self, forKey: .avatar)
+        role = try container.decodeIfPresent(Role.self, forKey: .role)
         
         // Use a custom formatter that supports milliseconds
         let formatter = DateFormatter.iso8601WithMilliseconds
         
-        createdAt = try Self.decodeDate(from: container, forKey: .createdAt, using: formatter)
-        updatedAt = try Self.decodeDate(from: container, forKey: .updatedAt, using: formatter)
-        publishedAt = try Self.decodeDate(from: container, forKey: .publishedAt, using: formatter)
+        createdAt = try decoder.decodeDate(from: container, forKey: .createdAt, using: formatter)
+        updatedAt = try decoder.decodeDate(from: container, forKey: .updatedAt, using: formatter)
+        publishedAt = try decoder.decodeDate(from: container, forKey: .publishedAt, using: formatter)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -58,23 +63,12 @@ struct User: Decodable, Sendable, Encodable {
         try container.encode(confirmed, forKey: .confirmed)
         try container.encode(blocked, forKey: .blocked)
         try container.encode(provider, forKey: .provider)
+        try container.encodeIfPresent(avatar, forKey: .avatar)
+        try container.encodeIfPresent(role, forKey: .role)
         
         let formatter = DateFormatter.iso8601WithMilliseconds
         try container.encode(formatter.string(from: createdAt), forKey: .createdAt)
         try container.encode(formatter.string(from: updatedAt), forKey: .updatedAt)
         try container.encode(formatter.string(from: publishedAt), forKey: .publishedAt)
     }
-    
-    // Helperfunctie for parsing date
-    private static func decodeDate(from container: KeyedDecodingContainer<CodingKeys>, forKey key: CodingKeys, using formatter: DateFormatter) throws -> Date {
-        let dateString = try container.decode(String.self, forKey: key)
-        guard let date = formatter.date(from: dateString) else {
-            throw DecodingError.dataCorruptedError(forKey: key, in: container, debugDescription: "Invalid date format: \(dateString)")
-        }
-        return date
-    }
-}
-
-struct Role {
-    
 }

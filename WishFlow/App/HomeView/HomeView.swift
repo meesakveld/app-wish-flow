@@ -49,7 +49,7 @@ struct HomeView: View {
                             let result = try await Strapi.contentManager
                                 .collection("events")
                                 .withDocumentId("evzjtxte3fxlvkx7w15q5lhp")
-                                .putData(data, as: String.self)
+                                .putData(data, as: User.self)
                             print(result)
                             
                         } catch {
@@ -58,6 +58,20 @@ struct HomeView: View {
                     }
                 } label: {
                     Text("Update event")
+                }
+                
+                Button {
+                    Task {
+                        do {
+                            let result = try await Strapi.authentication.local.me(as: User.self)
+                            print(result)
+                            
+                        } catch {
+                            print(error)
+                        }
+                    }
+                } label: {
+                    Text("Get me")
                 }
             }
         }
