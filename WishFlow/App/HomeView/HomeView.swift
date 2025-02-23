@@ -12,69 +12,108 @@ struct HomeView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     let user: User? = AuthenticationManager.shared.user
     
+    @State var search = ""
+    
     var body: some View {
         ScrollView {
-            VStack {
+            VStack(spacing: 40) {
+                
+                // MARK: - Header
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(greet())
+                            .style(textStyle: .text(.regular), color: .cForeground)
+                        HStack(alignment: .center) {
+                            if let firstname = user?.firstname {
+                                Text(firstname)
+                                    .style(textStyle: .title(.h1), color: .cForeground)
+                            }
+                            
+                            Image("smiley")
+                                .frame(maxWidth: 27, maxHeight: 27)
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    HStack {
+                        //TODO: MAKE BUTTON TO SHOW NOTIFICATIONS
+                        //TODO: ONAPPEAR -> CHECK FOR NOTIFICATIONS
+                        Image(systemName: "bell.circle")
+                            .font(.custom("", fixedSize: 32))
+                            .foregroundStyle(.cForeground)
+                    }
+                    
+                    ZStack {
+                        Image("avatarPlaceholder")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 44, height: 44)
+                        
+                        if let url = user?.avatar?.formats?.small?.url {
+                            AsyncImage(url: URL(string: url)) { image in
+                                image.resizable()
+                                    .scaledToFill()
+                            } placeholder: {
+                                ProgressView()
+                            }
+                            .frame(width: 44, height: 44)
+                            .clipShape(Circle())
+                        }
+                    }
+                    .overlay(Circle().stroke(Color.cForeground, lineWidth: 2))
+                    .padding(1)
+                }
+                
+                // MARK: - Search
+                NavigationLink {
+                    EventsView()
+                } label: {
+                    Searchbar(search: .constant(""))
+                        .disabled(true)
+                }
+                
+                
+                // MARK: - Wistlist & Buylist
+                HStack {
+                    Card(title: "Wish\nlist", image: "giftWithStars", bgColor: .cBlue)
+                    
+                    Card(title: "Buy\nlist", image: "giftlist", bgColor: .cOrange)
+                }
+                
+                
+                // MARK: - Upcoming events
+                VStack {
+                    HStack {
+                        Text("Upcoming Events")
+                            .style(textStyle: .text(.bold), color: .cForeground)
+                        
+                        Spacer()
+                        
+                        NavigationLink {
+                            EventsView()
+                        } label: {
+                            HStack {
+                                Text("See all")
+                                Image(systemName: "arrow.up.right")
+                            }
+                        }
+                        .style(textStyle: .textSmall(.regular), color: .cForeground)
+                    }
+                    
+                }
+                
+                
+                
                 Button {
                     AuthenticationManager.shared.logout()
                 } label: {
-                    Text("Uitloggen")
+                    Text("Logout")
                 }
                 
-                Button {
-                    Task {
-                        do {
-                            let data: StrapiRequestBody = StrapiRequestBody([
-                                "event": .int(1),
-                                "invitedUserEmail": .string("akveldmees@gmail.com")
-                            ])
-                            
-                            let result = try await Strapi.contentManager.collection("event-invites").postData(data, as: String.self)
-                            print(result)
-                        } catch {
-                            print(error)
-                        }
-                    }
-                } label: {
-                    Text("Add invite")
-                }
-                
-                Button {
-                    Task {
-                        do {
-                            let data: StrapiRequestBody = StrapiRequestBody([
-                                "title": .string("Event titel nieuw")
-                            ])
-                            
-                            let result = try await Strapi.contentManager
-                                .collection("events")
-                                .withDocumentId("evzjtxte3fxlvkx7w15q5lhp")
-                                .putData(data, as: User.self)
-                            print(result)
-                            
-                        } catch {
-                            print(error)
-                        }
-                    }
-                } label: {
-                    Text("Update event")
-                }
-                
-                Button {
-                    Task {
-                        do {
-                            let result = try await Strapi.authentication.local.me(as: User.self)
-                            print(result)
-                            
-                        } catch {
-                            print(error)
-                        }
-                    }
-                } label: {
-                    Text("Get me")
-                }
             }
         }
+        .padding(.horizontal)
         .background(Color.cBackground.ignoresSafeArea())
     }
 }
