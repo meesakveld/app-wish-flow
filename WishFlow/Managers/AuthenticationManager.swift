@@ -57,6 +57,7 @@ final class AuthenticationManager: ObservableObject, Sendable {
             StrapiSwiftManager.shared.updateStrapiToken(register.jwt)
             
             // Add firstname and lastname to user account
+            Strapi.useTokenOnce(token: register.jwt)
             let data: StrapiRequestBody = StrapiRequestBody([
                 "firstname": .string(firstname),
                 "lastname": .string(lastname)
