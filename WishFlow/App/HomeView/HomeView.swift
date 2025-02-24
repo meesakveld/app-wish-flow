@@ -62,6 +62,7 @@ struct HomeView: View {
                             .font(.custom("", fixedSize: 32))
                             .foregroundStyle(.cForeground)
                     }
+                    
                     Menu {
                         Button("Logout", systemImage: "rectangle.portrait.and.arrow.right", role: .destructive) {
                             AuthenticationManager.shared.logout()
