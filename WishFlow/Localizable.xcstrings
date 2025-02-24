@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Add new event" : {
+
+    },
     "Create an account" : {
 
     },
@@ -16,10 +19,19 @@
     "Login to your account" : {
 
     },
-    "Logout" : {
+    "No upcoming events planned — why not plan something fun?" : {
 
     },
     "Register" : {
+
+    },
+    "Search an event" : {
+
+    },
+    "See all" : {
+
+    },
+    "Upcoming Events" : {
 
     },
     "Welcome back to WishFlow! Log in to manage your wish lists, join gift groups, and stay updated on your gifting plans." : {

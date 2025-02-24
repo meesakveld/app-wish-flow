@@ -8,15 +8,15 @@
 import Foundation
 import StrapiSwift
 
-struct Event: Codable {
+struct Event: Codable, Identifiable {
     var id: Int
     var documentId: String
     var title: String
     var description: String
-    var eventDate: String
-    var giftDeadline: String
-    var claimDeadline: String
-    var eventType: String
+    var eventDate: Date
+    var giftDeadline: Date
+    var claimDeadline: Date
+    var eventType: EventType
     var image: StrapiImage?
     var minBudget: Price?
     var maxBudget: Price?
@@ -29,10 +29,32 @@ struct Event: Codable {
     var updatedAt: Date
     var publishedAt: Date
 
+    init() {
+        self.id = 1
+        self.documentId = UUID().uuidString
+        self.title = "Test Event titel feest"
+        self.description = "Test Event Description"
+        self.eventDate = Date()
+        self.giftDeadline = Date()
+        self.claimDeadline = Date()
+        self.eventType = .singleRecipient
+        self.image = nil
+        self.minBudget = nil
+        self.maxBudget = nil
+        self.gifts = nil
+        self.eventParticipants = nil
+        self.giftClaims = nil
+        self.eventAssignments = nil
+        self.eventInvites = nil
+        self.createdAt = Date()
+        self.updatedAt = Date()
+        self.publishedAt = Date()
+    }
+    
     enum CodingKeys: String, CodingKey {
         case id, documentId, title, description, eventDate, giftDeadline, claimDeadline, eventType, image, minBudget, maxBudget, gifts, eventParticipants, giftClaims, eventAssignments, eventInvites, createdAt, updatedAt, publishedAt
     }
-
+    
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -40,10 +62,7 @@ struct Event: Codable {
         documentId = try container.decode(String.self, forKey: .documentId)
         title = try container.decode(String.self, forKey: .title)
         description = try container.decode(String.self, forKey: .description)
-        eventDate = try container.decode(String.self, forKey: .eventDate)
-        giftDeadline = try container.decode(String.self, forKey: .giftDeadline)
-        claimDeadline = try container.decode(String.self, forKey: .claimDeadline)
-        eventType = try container.decode(String.self, forKey: .eventType)
+        eventType = try container.decode(EventType.self, forKey: .eventType)
         image = try container.decodeIfPresent(StrapiImage.self, forKey: .image)
         minBudget = try container.decodeIfPresent(Price.self, forKey: .minBudget)
         maxBudget = try container.decodeIfPresent(Price.self, forKey: .maxBudget)
@@ -52,11 +71,16 @@ struct Event: Codable {
         giftClaims = try container.decodeIfPresent([GiftClaim].self, forKey: .giftClaims)
         eventAssignments = try container.decodeIfPresent([EventAssignment].self, forKey: .eventAssignments)
         eventInvites = try container.decodeIfPresent([EventInvite].self, forKey: .eventInvites)
+        
+        let shortDateFormatter = DateFormatter.shortDate
+        eventDate = try decoder.decodeDate(from: container, forKey: .eventDate, using: shortDateFormatter)
+        giftDeadline = try decoder.decodeDate(from: container, forKey: .giftDeadline, using: shortDateFormatter)
+        claimDeadline = try decoder.decodeDate(from: container, forKey: .claimDeadline, using: shortDateFormatter)
 
-        let formatter = DateFormatter.iso8601WithMilliseconds
-        createdAt = try decoder.decodeDate(from: container, forKey: .createdAt, using: formatter)
-        updatedAt = try decoder.decodeDate(from: container, forKey: .updatedAt, using: formatter)
-        publishedAt = try decoder.decodeDate(from: container, forKey: .publishedAt, using: formatter)
+        let iso8601WithMillisecondsFormatter = DateFormatter.iso8601WithMilliseconds
+        createdAt = try decoder.decodeDate(from: container, forKey: .createdAt, using: iso8601WithMillisecondsFormatter)
+        updatedAt = try decoder.decodeDate(from: container, forKey: .updatedAt, using: iso8601WithMillisecondsFormatter)
+        publishedAt = try decoder.decodeDate(from: container, forKey: .publishedAt, using: iso8601WithMillisecondsFormatter)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -84,4 +108,10 @@ struct Event: Codable {
         try container.encode(formatter.string(from: updatedAt), forKey: .updatedAt)
         try container.encode(formatter.string(from: publishedAt), forKey: .publishedAt)
     }
+}
+
+// MARK: - EventType Enum
+
+enum EventType: String, Codable {
+    case singleRecipient, groupGifting, oneToOne
 }

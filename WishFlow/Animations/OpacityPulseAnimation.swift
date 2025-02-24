@@ -9,31 +9,21 @@ import Foundation
 import SwiftUI
 
 extension View {
-    // Pulsatie-effect voor opacity toevoegen als modifier
     func opacityPulseEffect() -> some View {
-        self
-            .modifier(OpacityPulseAnimation())
+        OpacityPulsingView(content: self)
     }
 }
 
-
-struct OpacityPulseAnimation: ViewModifier {
+private struct OpacityPulsingView<Content: View>: View {
+    let content: Content
     @State private var opacity: Double = 1.0
-    
-    func body(content: Content) -> some View {
+
+    var body: some View {
         content
-            .opacity(opacity) // Variabele opacity toepassen
-            .animation(
-                Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true),
-                value: opacity
-            )
+            .opacity(opacity)
             .onAppear {
-                opacity = 0.3 // Start met lage opacity
-            }
-            .onChange(of: opacity) { _, _ in
-                // Zorg ervoor dat de animatie heen en weer blijft bewegen
-                withAnimation {
-                    opacity = opacity == 0.3 ? 1.0 : 0.3
+                withAnimation(Animation.easeInOut(duration: 1).repeatForever(autoreverses: true)) {
+                    opacity = 0.5
                 }
             }
     }

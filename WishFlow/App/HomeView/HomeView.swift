@@ -8,10 +8,29 @@
 import SwiftUI
 import StrapiSwift
 
-struct HomeView: View {
-    @EnvironmentObject private var navigationManager: NavigationManager
-    let user: User? = AuthenticationManager.shared.user
+@MainActor
+class HomeViewModel: ObservableObject {
+    @Published var upcomingEvents: [Event] = []
+    @Published var isLoadingUpcomingEvents: LoadingState = .readyToLoad
     
+    @AppStorageData("user") var user: User?
+    
+    func getUpcomingEvents(isLoading: Binding<LoadingState>) async {
+        setLoading(value: isLoading, .isLoading)
+        do {
+            upcomingEvents = try await EventManager.shared.getUpcomingEvents(userId: user!.id)
+        } catch {
+            print(error)
+        }
+        setLoading(value: isLoading, .finished)
+    }
+}
+
+struct HomeView: View {
+    @ObservedObject var vm: HomeViewModel = HomeViewModel()
+    @EnvironmentObject private var navigationManager: NavigationManager
+    
+    let user: User? = AuthenticationManager.shared.user
     @State var search = ""
     
     var body: some View {
@@ -47,8 +66,9 @@ struct HomeView: View {
                     ZStack {
                         Image("avatarPlaceholder")
                             .resizable()
-                            .scaledToFill()
                             .frame(width: 44, height: 44)
+                            .scaledToFill()
+                            .aspectRatio(1, contentMode: .fit)
                         
                         if let url = user?.avatar?.formats?.small?.url {
                             AsyncImage(url: URL(string: url)) { image in
@@ -63,6 +83,9 @@ struct HomeView: View {
                     }
                     .overlay(Circle().stroke(Color.cForeground, lineWidth: 2))
                     .padding(1)
+                    .onTapGesture {
+                        AuthenticationManager.shared.logout()
+                    }
                 }
                 
                 // MARK: - Search
@@ -101,47 +124,69 @@ struct HomeView: View {
                         .style(textStyle: .textSmall(.regular), color: .cForeground)
                     }
                     
-                }
-                
-                Button {
-                    Task {
-                        do {
+                    
+                    VStack(spacing: 13) {
+                        let isLoading = vm.isLoadingUpcomingEvents.getBool()
+                        
+                        //MARK: Loading placeholders
+                        if isLoading {
+                            ForEach(0...2, id: \.self) { _ in
+                                EventCard(event: Event())
+                                    .loadingEffect(.isLoading)
+                            }
+                        }
+                        
+                        if !isLoading {
+                            //MARK: Upcoming events array
+                            ForEach(vm.upcomingEvents, id: \.documentId) { event in
+                                EventCard(event: event)
+                            }
                             
-                            let result = try await Strapi.contentManager
-                                .collection("events")
-                                .populate("image")
-                                .populate("minBudget") { minBudget in
-                                    minBudget.populate("currency")
+                            //MARK: No upcoming events
+                            if vm.upcomingEvents.isEmpty {
+                                VStack(spacing: 25) {
+                                    Image("event")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 120)
+                                    
+                                    Text("No upcoming events planned — why not plan something fun?")
+                                        .style(textStyle: .text(.regular), color: .cForeground)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, 25)
+                                    
+                                    NavigationLink {
+                                        EventsView()
+                                    } label: {
+                                        HStack {
+                                            Image(systemName: "plus.circle")
+                                            
+                                            Text("Add new event")
+                                        }
+                                        .style(textStyle: .text(.regular), color: .cOrange)
+                                    }
+
                                 }
-                                .populate("maxBudget") { maxBudget in
-                                    maxBudget.populate("currency")
-                                }
-                                .populate("gifts")
-                                .populate("eventParticipants")
-                                .populate("giftClaims")
-                                .populate("eventAssignments")
-                                .populate("eventInvites")
-                                .getDocuments(as: [Event].self)
-                            
-                            print("Result \(result)")
-                        } catch {
-                            print(error)
+                                .padding(.top, 15)
+                            }
                         }
                     }
-                } label: {
-                    Text("GET")
+                    
                 }
-                
-                
-                Button {
-                    AuthenticationManager.shared.logout()
-                } label: {
-                    Text("Logout")
+                .onAppear {
+                    Task {
+                        await vm.getUpcomingEvents(isLoading: $vm.isLoadingUpcomingEvents)
+                    }
                 }
                 
             }
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
+        .refreshable {
+            Task {
+                await vm.getUpcomingEvents(isLoading: $vm.isLoadingUpcomingEvents)
+            }
+        }
         .background(Color.cBackground.ignoresSafeArea())
     }
 }
