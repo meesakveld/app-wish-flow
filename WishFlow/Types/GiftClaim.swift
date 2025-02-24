@@ -1,55 +1,64 @@
 //
-//  Role.swift
+//  GiftClaim.swift
 //  WishFlow
 //
-//  Created by Mees Akveld on 23/02/2025.
+//  Created by Mees Akveld on 24/02/2025.
 //
 
 import Foundation
 
-struct Role: Codable {
+struct GiftClaim: Codable {
     var id: Int
     var documentId: String
-    var name: String
-    var description: String
-    var type: String
+    var user: User?
+    var gift: Gift?
+    var event: Event?
+    var giftStatus: GiftStatus
     var createdAt: Date
     var updatedAt: Date
-    var publishedAt: Date
-    
+
     enum CodingKeys: String, CodingKey {
-        case id, documentId, name, description, type, createdAt, updatedAt, publishedAt
+        case id, documentId, giftStatus, createdAt, updatedAt, user, gift, event
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         id = try container.decode(Int.self, forKey: .id)
         documentId = try container.decode(String.self, forKey: .documentId)
-        name = try container.decode(String.self, forKey: .name)
-        description = try container.decode(String.self, forKey: .description)
-        type = try container.decode(String.self, forKey: .type)
-        
-        // Now calling the common decodeDate helper
+        giftStatus = try container.decode(GiftStatus.self, forKey: .giftStatus)
+
+        // Decode optional values
+        user = try container.decodeIfPresent(User.self, forKey: .user)
+        gift = try container.decodeIfPresent(Gift.self, forKey: .gift)
+        event = try container.decodeIfPresent(Event.self, forKey: .event)
+
         let formatter = DateFormatter.iso8601WithMilliseconds
         createdAt = try decoder.decodeDate(from: container, forKey: .createdAt, using: formatter)
         updatedAt = try decoder.decodeDate(from: container, forKey: .updatedAt, using: formatter)
-        publishedAt = try decoder.decodeDate(from: container, forKey: .publishedAt, using: formatter)
     }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        
+
         try container.encode(id, forKey: .id)
         try container.encode(documentId, forKey: .documentId)
-        try container.encode(name, forKey: .name)
-        try container.encode(description, forKey: .description)
-        try container.encode(type, forKey: .type)
-        
-        // Custom date formatter for encoding
+        try container.encode(giftStatus, forKey: .giftStatus)
+
+        // Encode optional values if they exist
+        try container.encodeIfPresent(user, forKey: .user)
+        try container.encodeIfPresent(gift, forKey: .gift)
+        try container.encodeIfPresent(event, forKey: .event)
+
         let formatter = DateFormatter.iso8601WithMilliseconds
         try container.encode(formatter.string(from: createdAt), forKey: .createdAt)
         try container.encode(formatter.string(from: updatedAt), forKey: .updatedAt)
-        try container.encode(formatter.string(from: publishedAt), forKey: .publishedAt)
     }
+}
+
+// MARK: - GiftStatus Enum
+
+enum GiftStatus: String, Codable {
+    case reserved
+    case purchased
 }

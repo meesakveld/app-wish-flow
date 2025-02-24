@@ -103,6 +103,34 @@ struct HomeView: View {
                     
                 }
                 
+                Button {
+                    Task {
+                        do {
+                            
+                            let result = try await Strapi.contentManager
+                                .collection("events")
+                                .populate("image")
+                                .populate("minBudget") { minBudget in
+                                    minBudget.populate("currency")
+                                }
+                                .populate("maxBudget") { maxBudget in
+                                    maxBudget.populate("currency")
+                                }
+                                .populate("gifts")
+                                .populate("eventParticipants")
+                                .populate("giftClaims")
+                                .populate("eventAssignments")
+                                .populate("eventInvites")
+                                .getDocuments(as: [Event].self)
+                            
+                            print("Result \(result)")
+                        } catch {
+                            print(error)
+                        }
+                    }
+                } label: {
+                    Text("GET")
+                }
                 
                 
                 Button {
