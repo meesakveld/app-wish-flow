@@ -62,29 +62,31 @@ struct HomeView: View {
                             .font(.custom("", fixedSize: 32))
                             .foregroundStyle(.cForeground)
                     }
-                    
-                    ZStack {
-                        Image("avatarPlaceholder")
-                            .resizable()
-                            .frame(width: 44, height: 44)
-                            .scaledToFill()
-                            .aspectRatio(1, contentMode: .fit)
-                        
-                        if let url = user?.avatar?.formats?.small?.url {
-                            AsyncImage(url: URL(string: url)) { image in
-                                image.resizable()
-                                    .scaledToFill()
-                            } placeholder: {
-                                ProgressView()
-                            }
-                            .frame(width: 44, height: 44)
-                            .clipShape(Circle())
+                    Menu {
+                        Button("Logout", systemImage: "rectangle.portrait.and.arrow.right", role: .destructive) {
+                            AuthenticationManager.shared.logout()
                         }
-                    }
-                    .overlay(Circle().stroke(Color.cForeground, lineWidth: 2))
-                    .padding(1)
-                    .onTapGesture {
-                        AuthenticationManager.shared.logout()
+                    } label: {
+                        ZStack {
+                            Image("avatarPlaceholder")
+                                .resizable()
+                                .frame(width: 44, height: 44)
+                                .scaledToFill()
+                                .aspectRatio(1, contentMode: .fit)
+                            
+                            if let url = user?.avatar?.formats?.small?.url {
+                                AsyncImage(url: URL(string: url)) { image in
+                                    image.resizable()
+                                        .scaledToFill()
+                                } placeholder: {
+                                    ProgressView()
+                                }
+                                .frame(width: 44, height: 44)
+                                .clipShape(Circle())
+                            }
+                        }
+                        .overlay(Circle().stroke(Color.cForeground, lineWidth: 2))
+                        .padding(1)
                     }
                 }
                 
