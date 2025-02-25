@@ -11,7 +11,7 @@ import SwiftUI
 @MainActor
 class HomeViewModel: ObservableObject {
     @Published var upcomingEvents: [Event] = []
-    @Published var upcomingEventsIsLoading: LoadingState = .readyToLoad
+    @Published var upcomingEventsIsLoading: LoadingState = .preparingToLoad
     @Published var upcomingEventsHasError: Bool = false
     
     let user: User? = AuthenticationManager.shared.user

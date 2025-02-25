@@ -48,8 +48,9 @@ final class EventManager: ObservableObject, Sendable {
         return response.data
     }
     
-    func getUpcomingEventsWithUserIdSortedByEventDateAndPagination(
+    func getUpcomingEventsWithUserIdWithSearchSortedByEventDateAndPagination(
         userId: Int,
+        search: String,
         sortEventDate: SortOperator,
         page: Int,
         pageSize: Int
@@ -57,6 +58,7 @@ final class EventManager: ObservableObject, Sendable {
         let response = try await eventCollection
             .populate("image")
             .filter("[eventParticipants][user][id]", operator: .includedIn, value: userId)
+            .filter("[title]", operator: .containsInsensitive, value: search)
             .sort(by: "eventDate", order: sortEventDate)
             .paginate(page: page, pageSize: pageSize)
             .getDocuments(as: [Event].self)

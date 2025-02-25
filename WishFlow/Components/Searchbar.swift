@@ -6,10 +6,31 @@
 //
 
 import SwiftUI
+import Combine
+
+class SearchbarViewModel: ObservableObject {
+    @Published var searchDebounce: String = ""
+    private var cancellable: AnyCancellable?
+
+    init(searchBinding: Binding<String>) {
+        cancellable = $searchDebounce
+            .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
+            .removeDuplicates()
+            .sink { newValue in
+                searchBinding.wrappedValue = newValue
+            }
+    }
+}
 
 struct Searchbar: View {
     @Binding var search: String
-    
+    @StateObject private var viewModel: SearchbarViewModel
+
+    init(search: Binding<String>) {
+        self._search = search
+        self._viewModel = StateObject(wrappedValue: SearchbarViewModel(searchBinding: search))
+    }
+
     var body: some View {
         DropEffect {
             HStack(spacing: 0) {
@@ -20,8 +41,8 @@ struct Searchbar: View {
                     .padding(.horizontal, 12)
                     .background(Color.cGreen)
                     .border(Color.black)
-                
-                TextField("Search an event", text: $search)
+
+                TextField("Search an event", text: $viewModel.searchDebounce)
                     .style(textStyle: .text(.regular), color: .black)
                     .frame(maxWidth: .infinity, minHeight: 48)
                     .padding(.horizontal, 10)
