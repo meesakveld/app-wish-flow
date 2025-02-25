@@ -60,7 +60,7 @@ func setLoading(value: Binding<LoadingState>, _ to: LoadingState, _ delay: TimeI
         value.wrappedValue = .preparingToLoad
     case .isLoading:
         // Reset value
-        if value.wrappedValue == .finished {
+        if value.wrappedValue == .readyToLoad || value.wrappedValue == .finished {
             value.wrappedValue = .preparingToLoad
         }
         

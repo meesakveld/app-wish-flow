@@ -109,17 +109,15 @@ struct HomeView: View {
                     
                     
                     VStack(spacing: 13) {
-                        let isLoading = vm.upcomingEventsIsLoading.isLoading()
-                        
                         //MARK: Loading placeholders
-                        if isLoading {
+                        if vm.upcomingEventsIsLoading.isLoading() {
                             ForEach(0...2, id: \.self) { _ in
                                 EventCard(event: Event())
                                     .loadingEffect(.isLoading)
                             }
                         }
                         
-                        if !isLoading && !vm.upcomingEventsHasError {
+                        if !vm.upcomingEventsIsLoading.isInLoadingState() && !vm.upcomingEventsHasError {
                             //MARK: Upcoming events array
                             ForEach(vm.upcomingEvents, id: \.documentId) { event in
                                 EventCard(event: event)

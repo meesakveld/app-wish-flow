@@ -109,17 +109,15 @@ struct EventsView: View {
                 VStack {
                     
                     LazyVStack(spacing: 13) {
-                        let isLoading = vm.eventsIsLoading.isLoading()
-                        
                         //MARK: Loading placeholders
-                        if isLoading {
+                        if vm.eventsIsLoading.isLoading() {
                             ForEach(0...2, id: \.self) { _ in
                                 EventCard(event: Event())
                                     .loadingEffect(.isLoading)
                             }
                         }
                         
-                        if !isLoading && !vm.eventsHasError {
+                        if !vm.eventsIsLoading.isInLoadingState() && !vm.eventsHasError {
                             //MARK: Upcoming events array
                             ForEach(vm.events, id: \.documentId) { event in
                                 EventCard(event: event)
