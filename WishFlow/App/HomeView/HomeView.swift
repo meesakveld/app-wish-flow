@@ -11,15 +11,18 @@ import StrapiSwift
 @MainActor
 class HomeViewModel: ObservableObject {
     @Published var upcomingEvents: [Event] = []
-    @Published var isLoadingUpcomingEvents: LoadingState = .readyToLoad
+    @Published var upcomingEventsIsLoading: LoadingState = .readyToLoad
+    @Published var upcomingEventsHasError: Bool = false
     
     @AppStorageData("user") var user: User?
     
     func getUpcomingEvents(isLoading: Binding<LoadingState>) async {
+        upcomingEventsHasError = false
         setLoading(value: isLoading, .isLoading)
         do {
             upcomingEvents = try await EventManager.shared.getUpcomingEvents(userId: user!.id)
         } catch {
+            upcomingEventsHasError = true
             print(error)
         }
         setLoading(value: isLoading, .finished)
@@ -129,7 +132,7 @@ struct HomeView: View {
                     
                     
                     VStack(spacing: 13) {
-                        let isLoading = vm.isLoadingUpcomingEvents.getBool()
+                        let isLoading = vm.upcomingEventsIsLoading.getBool()
                         
                         //MARK: Loading placeholders
                         if isLoading {
@@ -139,7 +142,7 @@ struct HomeView: View {
                             }
                         }
                         
-                        if !isLoading {
+                        if !isLoading && !vm.upcomingEventsHasError {
                             //MARK: Upcoming events array
                             ForEach(vm.upcomingEvents, id: \.documentId) { event in
                                 EventCard(event: event)
@@ -147,17 +150,10 @@ struct HomeView: View {
                             
                             //MARK: No upcoming events
                             if vm.upcomingEvents.isEmpty {
-                                VStack(spacing: 25) {
-                                    Image("event")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 120)
-                                    
-                                    Text("No upcoming events planned — why not plan something fun?")
-                                        .style(textStyle: .text(.regular), color: .cForeground)
-                                        .multilineTextAlignment(.center)
-                                        .padding(.horizontal, 25)
-                                    
+                                FeedbackMessage(
+                                    image: "event",
+                                    text: "No upcoming events planned — why not plan something fun?"
+                                ) {
                                     NavigationLink {
                                         EventsView()
                                     } label: {
@@ -168,9 +164,28 @@ struct HomeView: View {
                                         }
                                         .style(textStyle: .text(.regular), color: .cOrange)
                                     }
-
                                 }
-                                .padding(.top, 15)
+                            }
+                        }
+                        
+                        //MARK: Error message
+                        if vm.upcomingEventsHasError {
+                            FeedbackMessage(
+                                image: "error",
+                                text: "Whoops! That didn’t work—try again later!"
+                            ) {
+                                Button {
+                                    Task {
+                                        await vm.getUpcomingEvents(isLoading: $vm.upcomingEventsIsLoading)
+                                    }
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "arrow.clockwise.circle")
+                                        
+                                        Text("Refresh")
+                                    }
+                                    .style(textStyle: .text(.regular), color: .cOrange)
+                                }
                             }
                         }
                     }
@@ -178,7 +193,7 @@ struct HomeView: View {
                 }
                 .onAppear {
                     Task {
-                        await vm.getUpcomingEvents(isLoading: $vm.isLoadingUpcomingEvents)
+                        await vm.getUpcomingEvents(isLoading: $vm.upcomingEventsIsLoading)
                     }
                 }
                 
@@ -187,7 +202,7 @@ struct HomeView: View {
         }
         .refreshable {
             Task {
-                await vm.getUpcomingEvents(isLoading: $vm.isLoadingUpcomingEvents)
+                await vm.getUpcomingEvents(isLoading: $vm.upcomingEventsIsLoading)
             }
         }
         .background(Color.cBackground.ignoresSafeArea())
