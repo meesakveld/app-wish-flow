@@ -75,7 +75,7 @@ struct HomeView: View {
                 
                 // MARK: - Search
                 NavigationLink {
-                    EventsView()
+                    EventsView(searchActivated: true)
                 } label: {
                     Searchbar(search: .constant(""))
                         .disabled(true)

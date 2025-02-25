@@ -25,10 +25,13 @@ class SearchbarViewModel: ObservableObject {
 struct Searchbar: View {
     @Binding var search: String
     @StateObject private var viewModel: SearchbarViewModel
+    @FocusState private var isFocused: Bool
+    let autoFocus: Bool
 
-    init(search: Binding<String>) {
+    init(search: Binding<String>, autoFocus: Bool = false) {
         self._search = search
         self._viewModel = StateObject(wrappedValue: SearchbarViewModel(searchBinding: search))
+        self.autoFocus = autoFocus
     }
 
     var body: some View {
@@ -41,6 +44,9 @@ struct Searchbar: View {
                     .padding(.horizontal, 12)
                     .background(Color.cGreen)
                     .border(Color.black)
+                    .onTapGesture {
+                        isFocused = true
+                    }
 
                 TextField("Search an event", text: $viewModel.searchDebounce)
                     .style(textStyle: .text(.regular), color: .black)
@@ -48,6 +54,17 @@ struct Searchbar: View {
                     .padding(.horizontal, 10)
                     .background(Color.cWhite)
                     .multilineTextAlignment(.leading)
+                    .focused($isFocused)
+                    .onAppear {
+                        if autoFocus {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                isFocused = true
+                            }
+                        }
+                    }
+                    .onSubmit {
+                        isFocused = false
+                    }
             }
         }
     }

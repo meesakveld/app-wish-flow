@@ -48,6 +48,13 @@ class EventsViewModel: ObservableObject {
 struct EventsView: View {
     @ObservedObject var vm: EventsViewModel = EventsViewModel()
     let user: User? = AuthenticationManager.shared.user
+    var searchActivated: Bool = false
+    
+    init() { }
+    
+    init(searchActivated: Bool) {
+        self.searchActivated = searchActivated
+    }
     
     var body: some View {
         VStack(spacing: 40) {
@@ -61,7 +68,7 @@ struct EventsView: View {
             
             // MARK: - Search
             VStack(alignment: .leading, spacing: 10) {
-                Searchbar(search: $vm.search)
+                Searchbar(search: $vm.search, autoFocus: searchActivated)
                     .onChange(of: vm.search, { _, _ in
                         Task {
                             await vm.getEvents(isLoading: $vm.eventsIsLoading)
