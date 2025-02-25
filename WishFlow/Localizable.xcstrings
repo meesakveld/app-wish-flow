@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "Add new event" : {
 
     },
@@ -10,7 +13,7 @@
     "Create an account to manage your wish lists and gift groups. Sign up now and start planning the perfect gifts!" : {
 
     },
-    "Hello, World!" : {
+    "Events" : {
 
     },
     "Login" : {
@@ -22,7 +25,7 @@
     "Logout" : {
 
     },
-    "No upcoming events planned — why not plan something fun?" : {
+    "Refresh" : {
 
     },
     "Register" : {

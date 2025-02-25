@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var vm: HomeViewModel = HomeViewModel()
+    @EnvironmentObject private var navigationManager: NavigationManager
     
     let user: User? = AuthenticationManager.shared.user
     @State var search = ""
@@ -46,6 +47,7 @@ struct HomeView: View {
                     Menu {
                         Button("Logout", systemImage: "rectangle.portrait.and.arrow.right", role: .destructive) {
                             AuthenticationManager.shared.logout()
+                            navigationManager.navigate(to: .welcome)
                         }
                     } label: {
                         ZStack {
@@ -186,4 +188,5 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
+        .environmentObject(NavigationManager())
 }
