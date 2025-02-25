@@ -17,5 +17,15 @@ extension Decoder {
         }
         return date
     }
+    
+    func decodeDateIfPresent<T: CodingKey>(from container: KeyedDecodingContainer<T>, forKey key: T, using formatter: DateFormatter) throws -> Date? {
+        if let dateString = try container.decodeIfPresent(String.self, forKey: key) {
+            guard let date = formatter.date(from: dateString) else {
+                throw DecodingError.dataCorruptedError(forKey: key, in: container, debugDescription: "Invalid date format: \(dateString)")
+            }
+            return date
+        }
+        return nil
+    }
 }
 

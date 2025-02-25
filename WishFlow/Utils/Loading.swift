@@ -8,18 +8,45 @@
 import Foundation
 import SwiftUI
 
+/// An enum representing the different stages of a loading process.
+/// The possible states are:
+/// - `readyToLoad`: The data is ready to be loaded, but the loading process hasn't started yet.
+/// - `preparingToLoad`: Preparations are being made before the actual loading begins.
+/// - `isLoading`: The data is currently being loaded.
+/// - `finished`: The loading process has been completed.
 enum LoadingState {
-    case readyToLoad
-    case isLoading
-    case finished
+    case readyToLoad, preparingToLoad, isLoading, finished
     
-    func getBool() -> Bool {
+    /// Returns a boolean value indicating if the loading process is ongoing.
+    /// - Returns: `true` if the state is `isLoading`, otherwise `false`.
+    ///
+    /// Example:
+    /// ```
+    /// let state = LoadingState.isLoading
+    /// print(state.getBool()) // true
+    /// ```
+    func isLoading() -> Bool {
         switch self {
-        case .readyToLoad:
-            return false
         case .isLoading:
             return true
-        case .finished:
+        default:
+            return false
+        }
+    }
+    
+    /// Checks if the current state is one of the loading states (`preparingToLoad` or `isLoading`).
+    /// - Returns: `true` if the state is either `preparingToLoad` or `isLoading`, otherwise `false`.
+    ///
+    /// Example:
+    /// ```
+    /// let state = LoadingState.preparingToLoad
+    /// print(state.isLoadingState()) // true
+    /// ```
+    func isInLoadingState() -> Bool {
+        switch self {
+        case .preparingToLoad, .isLoading:
+            return true
+        default:
             return false
         }
     }
@@ -29,10 +56,12 @@ func setLoading(value: Binding<LoadingState>, _ to: LoadingState, _ delay: TimeI
     switch to {
     case .readyToLoad:
         value.wrappedValue = .readyToLoad
+    case .preparingToLoad:
+        value.wrappedValue = .preparingToLoad
     case .isLoading:
         // Reset value
         if value.wrappedValue == .finished {
-            value.wrappedValue = .readyToLoad
+            value.wrappedValue = .preparingToLoad
         }
         
         // Set timer to update value to .isLoading
@@ -51,7 +80,7 @@ func setLoading(value: Binding<LoadingState>, _ to: LoadingState, _ delay: TimeI
 extension View {
     func loadingEffect(_ loadingState: LoadingState) -> some View {
         return self
-            .optModifiers(loadingState.getBool()) { VStack in
+            .optModifiers(loadingState.isLoading()) { VStack in
                 VStack
                     .redacted(reason: .placeholder)
                     .opacityPulseEffect()

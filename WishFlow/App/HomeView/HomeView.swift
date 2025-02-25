@@ -109,7 +109,7 @@ struct HomeView: View {
                     
                     
                     VStack(spacing: 13) {
-                        let isLoading = vm.upcomingEventsIsLoading.getBool()
+                        let isLoading = vm.upcomingEventsIsLoading.isLoading()
                         
                         //MARK: Loading placeholders
                         if isLoading {

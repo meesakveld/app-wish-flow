@@ -44,6 +44,7 @@ struct DropEffect<Content: View>: View {
                 .cornerRadius(7.5)
                 .padding(.trailing, 5)
         }
+        .padding(.bottom, 5)
     }
 }
 

@@ -55,7 +55,7 @@ struct FormWrapper<TextEntries: View, Submit: View>: View {
                 )
                 
             }
-            .disabled(loadingState.getBool())
+            .disabled(loadingState.isInLoadingState())
         }
     }
 }

@@ -14,8 +14,8 @@ struct Event: Codable, Identifiable {
     var title: String
     var description: String
     var eventDate: Date
-    var giftDeadline: Date
-    var claimDeadline: Date
+    var giftDeadline: Date?
+    var claimDeadline: Date?
     var eventType: EventType
     var image: StrapiImage?
     var minBudget: Price?
@@ -35,8 +35,8 @@ struct Event: Codable, Identifiable {
         self.title = "Test Event titel feest"
         self.description = "Test Event Description"
         self.eventDate = Date()
-        self.giftDeadline = Date()
-        self.claimDeadline = Date()
+        self.giftDeadline = nil
+        self.claimDeadline = nil
         self.eventType = .singleRecipient
         self.image = nil
         self.minBudget = nil
@@ -74,8 +74,8 @@ struct Event: Codable, Identifiable {
         
         let shortDateFormatter = DateFormatter.shortDate
         eventDate = try decoder.decodeDate(from: container, forKey: .eventDate, using: shortDateFormatter)
-        giftDeadline = try decoder.decodeDate(from: container, forKey: .giftDeadline, using: shortDateFormatter)
-        claimDeadline = try decoder.decodeDate(from: container, forKey: .claimDeadline, using: shortDateFormatter)
+        giftDeadline = try decoder.decodeDateIfPresent(from: container, forKey: .giftDeadline, using: shortDateFormatter)
+        claimDeadline = try decoder.decodeDateIfPresent(from: container, forKey: .claimDeadline, using: shortDateFormatter)
 
         let iso8601WithMillisecondsFormatter = DateFormatter.iso8601WithMilliseconds
         createdAt = try decoder.decodeDate(from: container, forKey: .createdAt, using: iso8601WithMillisecondsFormatter)

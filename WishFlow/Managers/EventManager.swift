@@ -35,7 +35,7 @@ final class EventManager: ObservableObject, Sendable {
             .populate("eventInvites")
     }
     
-    func getUpcomingEvents(userId: Int) async throws -> [Event] {
+    func getUpcomingEventsWithUserId(userId: Int) async throws -> [Event] {
         let currentDate = Date().dateToStringFormatter(DateFormat: .yyyy_MM_dd)
         
         let response = try await eventCollection
@@ -46,5 +46,21 @@ final class EventManager: ObservableObject, Sendable {
             .getDocuments(as: [Event].self)
         
         return response.data
+    }
+    
+    func getUpcomingEventsWithUserIdSortedByEventDateAndPagination(
+        userId: Int,
+        sortEventDate: SortOperator,
+        page: Int,
+        pageSize: Int
+    ) async throws -> StrapiResponse<[Event]> {
+        let response = try await eventCollection
+            .populate("image")
+            .filter("[eventParticipants][user][id]", operator: .includedIn, value: userId)
+            .sort(by: "eventDate", order: sortEventDate)
+            .paginate(page: page, pageSize: pageSize)
+            .getDocuments(as: [Event].self)
+        
+        return response
     }
 }
