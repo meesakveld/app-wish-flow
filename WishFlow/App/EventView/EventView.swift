@@ -105,6 +105,7 @@ struct EventView: View {
                     
                     
                     // MARK: - Menu Switcher
+                    // TODO: Make dynamic based on role (owner is also an receiver)
                     DropEffect {
                         HStack(spacing: 0) {
                             Text("Info")
@@ -168,6 +169,7 @@ struct EventView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         
                         // Eventdate
+                        // TODO: Klik? Zet in agenda
                         HStack(alignment: .center) {
                             Text("Eventdate:")
                                 .style(textStyle: .text(.medium), color: .cBlack)
@@ -190,6 +192,8 @@ struct EventView: View {
                         }
                         
                         // Deadline adding wishes
+                        // TODO: Klik? Zet in agenda
+                        // TODO: Dynamicly shown based on role
                         HStack(alignment: .center) {
                             Text("Deadline adding wishes:")
                                 .style(textStyle: .text(.medium), color: .cBlack)
@@ -200,7 +204,8 @@ struct EventView: View {
                             Spacer()
                         }
                         
-                        // Deadline adding wishes
+                        // Deadline selecting wishes
+                        // TODO: Klik? Zet in agenda
                         HStack(alignment: .center) {
                             Text("Deadline selecting wishes:")
                                 .style(textStyle: .text(.medium), color: .cBlack)
@@ -265,6 +270,7 @@ struct EventView: View {
                 await vm.getEvent(documentId: documentId, isLoading: $vm.eventIsLoading)
             }
             .toolbar {
+                // TODO: MENU -> Zet event in agenda
                 Button {
                     print("add event")
                 } label: {

@@ -1,7 +1,17 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "€10 - €20" : {
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
+    "+%lld" : {
 
     },
     "Add new event" : {
@@ -14,6 +24,12 @@
 
     },
     "Create an account to manage your wish lists and gift groups. Sign up now and start planning the perfect gifts!" : {
+
+    },
+    "Deadline adding wishes:" : {
+
+    },
+    "Deadline selecting wishes:" : {
 
     },
     "Eventdate:" : {
