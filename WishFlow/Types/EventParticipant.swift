@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct EventParticipant: Codable {
+struct EventParticipant: Codable, Identifiable {
     var id: Int
     var documentId: String
     var user: User?

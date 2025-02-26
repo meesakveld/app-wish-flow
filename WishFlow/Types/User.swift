@@ -8,7 +8,7 @@
 import Foundation
 import StrapiSwift
 
-struct User: Codable {
+struct User: Codable, Identifiable {
     let id: Int
     let documentId: String
     let firstname: String?

@@ -70,6 +70,17 @@ final class EventManager: ObservableObject, Sendable {
         let response = try await eventCollection
             .withDocumentId(documentId)
             .populate("image")
+            .populate("minBudget") { minBudget in
+                minBudget.populate("currency")
+            }
+            .populate("maxBudget") { maxBudget in
+                maxBudget.populate("currency")
+            }
+            .populate("eventParticipants") { eventParticipants in
+                eventParticipants.populate("user") { user in
+                    user.populate("avatar")
+                }
+            }
             .getDocument(as: Event.self)
         
         return response.data

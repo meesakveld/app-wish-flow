@@ -1,7 +1,13 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "€10 - €20" : {
+
+    },
     "Add new event" : {
+
+    },
+    "Budget:" : {
 
     },
     "Create an account" : {
@@ -10,7 +16,16 @@
     "Create an account to manage your wish lists and gift groups. Sign up now and start planning the perfect gifts!" : {
 
     },
+    "Eventdate:" : {
+
+    },
     "Events" : {
+
+    },
+    "Gifties" : {
+
+    },
+    "Info" : {
 
     },
     "Login" : {
@@ -20,6 +35,9 @@
 
     },
     "Logout" : {
+
+    },
+    "My wishes" : {
 
     },
     "Refresh" : {
