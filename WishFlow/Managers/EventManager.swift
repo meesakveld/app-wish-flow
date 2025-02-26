@@ -48,7 +48,7 @@ final class EventManager: ObservableObject, Sendable {
         return response.data
     }
     
-    func getUpcomingEventsWithUserIdWithSearchSortedByEventDateAndPagination(
+    func getEventsWithUserIdWithSearchSortedByEventDateAndPagination(
         userId: Int,
         search: String,
         sortEventDate: SortOperator,
@@ -65,4 +65,14 @@ final class EventManager: ObservableObject, Sendable {
         
         return response
     }
+    
+    func getEventByDocumentId(documentId: String) async throws -> Event {
+        let response = try await eventCollection
+            .withDocumentId(documentId)
+            .populate("image")
+            .getDocument(as: Event.self)
+        
+        return response.data
+    }
+    
 }

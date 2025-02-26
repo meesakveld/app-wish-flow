@@ -86,14 +86,18 @@ struct EventsView: View {
                     if vm.eventsIsLoading.isLoading() {
                         ForEach(0...2, id: \.self) { _ in
                             EventCard(event: Event())
-                                .loadingEffect(.isLoading)
+                                .loadingEffect(true)
                         }
                     }
                     
                     if (vm.events.isEmpty ? !vm.eventsIsLoading.isInLoadingState() : !vm.eventsIsLoading.isLoading()) && !vm.eventsHasError {
                         //MARK: Events array
                         ForEach(vm.events, id: \.documentId) { event in
-                            EventCard(event: event)
+                            NavigationLink {
+                                EventView(documentId: event.documentId)
+                            } label: {
+                                EventCard(event: event)
+                            }
                         }
                         
                         //MARK: No events

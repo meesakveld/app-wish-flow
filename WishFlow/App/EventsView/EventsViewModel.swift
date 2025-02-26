@@ -29,7 +29,7 @@ class EventsViewModel: ObservableObject {
         eventsHasError = false
         setLoading(value: isLoading, .isLoading)
         do {
-            let strapiResponse = try await EventManager.shared.getUpcomingEventsWithUserIdWithSearchSortedByEventDateAndPagination(
+            let strapiResponse = try await EventManager.shared.getEventsWithUserIdWithSearchSortedByEventDateAndPagination(
                 userId: user!.id,
                 search: search,
                 sortEventDate: sortEventDate,

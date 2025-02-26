@@ -10,9 +10,7 @@ import SwiftUI
 struct HomeView: View {
     @ObservedObject var vm: HomeViewModel = HomeViewModel()
     @EnvironmentObject private var navigationManager: NavigationManager
-    
     let user: User? = AuthenticationManager.shared.user
-    @State var search = ""
     
     var body: some View {
         ScrollView {
@@ -115,14 +113,18 @@ struct HomeView: View {
                         if vm.upcomingEventsIsLoading.isLoading() {
                             ForEach(0...2, id: \.self) { _ in
                                 EventCard(event: Event())
-                                    .loadingEffect(.isLoading)
+                                    .loadingEffect(true)
                             }
                         }
                         
                         if !vm.upcomingEventsIsLoading.isInLoadingState() && !vm.upcomingEventsHasError {
                             //MARK: Upcoming events array
                             ForEach(vm.upcomingEvents, id: \.documentId) { event in
-                                EventCard(event: event)
+                                NavigationLink {
+                                    EventView(documentId: event.documentId)
+                                } label: {
+                                    EventCard(event: event)
+                                }
                             }
                             
                             //MARK: No upcoming events

@@ -78,10 +78,11 @@ func setLoading(value: Binding<LoadingState>, _ to: LoadingState, _ delay: TimeI
 }
 
 extension View {
-    func loadingEffect(_ loadingState: LoadingState) -> some View {
+    func loadingEffect(_ isLoading: Bool) -> some View {
         return self
-            .optModifiers(loadingState.isLoading()) { VStack in
+            .optModifiers(isLoading) { VStack in
                 VStack
+                    .disabled(true)
                     .redacted(reason: .placeholder)
                     .opacityPulseEffect()
             }

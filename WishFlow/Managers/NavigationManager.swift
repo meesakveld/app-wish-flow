@@ -26,14 +26,14 @@ class NavigationManager: ObservableObject {
             HomeView().navigationBarBackButtonHidden()
         case .welcome:
             WelcomeView().navigationBarBackButtonHidden()
-//        case .detail(let id):
-//            DetailView(id: id).navigationBarBackButtonHidden()
+        case .event(let documentId):
+            EventView(documentId: documentId)
         }
     }
     
     enum NavigationDestination: Hashable {
         case home
         case welcome
-        // case detail(id: Int)
+        case event(documentId: String)
     }
 }

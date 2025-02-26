@@ -45,7 +45,7 @@ struct FormWrapper<TextEntries: View, Submit: View>: View {
                         isShowingInputsErrors
                     )
                 }
-                .loadingEffect(loadingState)
+                .loadingEffect(loadingState.isLoading())
                 
                 submit(
                     { newLoadingState in setLoading(value: $loadingState, newLoadingState) },
