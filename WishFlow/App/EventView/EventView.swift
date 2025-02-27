@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 class EventViewModel: ObservableObject {
     @Published var event: Event? = nil
     @Published var eventIsLoading: LoadingState = .preparingToLoad
@@ -20,7 +21,6 @@ class EventViewModel: ObservableObject {
         do {
             //            try await Task.sleep(nanoseconds: 20_000_000_000)
             let strapiResponse = try await EventManager.shared.getEventByDocumentId(documentId: documentId)
-            print(strapiResponse)
             event = strapiResponse
         } catch {
             eventHasError = true
@@ -58,6 +58,23 @@ class EventViewModel: ObservableObject {
         }
         
         return nil
+    }
+    
+    func addCalendarEvent(title: String, date: Date, description: String, url: URL?) {
+        // TODO: Handle error and succes
+        CalendarManager.shared.addCalendarEvent(CalendarEvent(
+            title: title,
+            date: date,
+            description: description,
+            url: url
+        )) { result in
+            switch result {
+            case .success:
+                print("Event successfully added to your calendar!")
+            case .failure(let error):
+                print("❌ Error: \(error.localizedDescription)")
+            }
+        }
     }
 }
 
@@ -158,111 +175,118 @@ struct EventView: View {
                 }
                 
                 // MARK: - Info
-                VStack(spacing: 40) {
-                    // MARK: Description
-                    Text(
-                        vm.event?.description ?? "Lorem ipsum dolor sit amet consectetur. Eros fusce ut ipsum in velit eu eros. Consectetur id enim eleifend eget sit lacus. Laoreet at elit id sodales. Amet viverra Amet viverra amet ipsum suspendisse eget urna hendrerit ac."
-                    )
-                    .style(textStyle: .text(.regular), color: .cForeground)
-                    
-                    // MARK: Details
-                    VStack(alignment: .leading, spacing: 10) {
+                if vm.eventViewSubpage == .info {
+                    VStack(spacing: 40) {
+                        // MARK: Description
+                        Text(
+                            vm.event?.description ?? "Lorem ipsum dolor sit amet consectetur. Eros fusce ut ipsum in velit eu eros. Consectetur id enim eleifend eget sit lacus. Laoreet at elit id sodales. Amet viverra Amet viverra amet ipsum suspendisse eget urna."
+                        )
+                        .style(textStyle: .text(.regular), color: .cForeground)
                         
-                        // Eventdate
-                        // TODO: Klik? Zet in agenda
-                        HStack(alignment: .center) {
-                            Text("Eventdate:")
-                                .style(textStyle: .text(.medium), color: .cBlack)
+                        // MARK: Details
+                        VStack(alignment: .leading, spacing: 10) {
                             
-                            Text((vm.event?.eventDate ?? Date()).dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
-                                .style(textStyle: .text(.regular), color: .cBlack)
+                            // Eventdate
+                            // TODO: Klik? Zet in agenda
+                            HStack(alignment: .center) {
+                                Text("Eventdate:")
+                                    .style(textStyle: .text(.medium), color: .cBlack)
+                                
+                                Text((vm.event?.eventDate ?? Date()).dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
+                                    .style(textStyle: .text(.regular), color: .cBlack)
+                                
+                                Spacer()
+                            }
                             
-                            Spacer()
-                        }
-                        
-                        // Budget
-                        HStack(alignment: .center) {
-                            Text("Budget:")
-                                .style(textStyle: .text(.medium), color: .cBlack)
+                            // Budget
+                            HStack(alignment: .center) {
+                                Text("Budget:")
+                                    .style(textStyle: .text(.medium), color: .cBlack)
+                                
+                                Text(vm.getBudgetText(event: vm.event) ?? "€10 - €20")
+                                    .style(textStyle: .text(.regular), color: .cBlack)
+                                
+                                Spacer()
+                            }
                             
-                            Text(vm.getBudgetText(event: vm.event) ?? "€10 - €20")
-                                .style(textStyle: .text(.regular), color: .cBlack)
+                            // Deadline adding wishes
+                            // TODO: Klik? Zet in agenda
+                            // TODO: Dynamicly shown based on role
+                            HStack(alignment: .center) {
+                                Text("Deadline adding wishes:")
+                                    .style(textStyle: .text(.medium), color: .cBlack)
+                                
+                                Text((vm.event?.giftDeadline ?? Date()).dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
+                                    .style(textStyle: .text(.regular), color: .cBlack)
+                                
+                                Spacer()
+                            }
                             
-                            Spacer()
-                        }
-                        
-                        // Deadline adding wishes
-                        // TODO: Klik? Zet in agenda
-                        // TODO: Dynamicly shown based on role
-                        HStack(alignment: .center) {
-                            Text("Deadline adding wishes:")
-                                .style(textStyle: .text(.medium), color: .cBlack)
-                            
-                            Text((vm.event?.giftDeadline ?? Date()).dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
-                                .style(textStyle: .text(.regular), color: .cBlack)
-                            
-                            Spacer()
-                        }
-                        
-                        // Deadline selecting wishes
-                        // TODO: Klik? Zet in agenda
-                        HStack(alignment: .center) {
-                            Text("Deadline selecting wishes:")
-                                .style(textStyle: .text(.medium), color: .cBlack)
-                            
-                            Text((vm.event?.claimDeadline ?? Date()).dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
-                                .style(textStyle: .text(.regular), color: .cBlack)
-                            
-                            Spacer()
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    
-                    // MARK: Participants
-                    VStack(alignment: .leading) {
-                        if let eventParticipants = vm.event?.eventParticipants {
-                            if showAllParticipants {
-                                LazyVGrid(columns: [GridItem(.adaptive(minimum: 44), spacing: 15)], spacing: 15) {
-                                    ForEach(eventParticipants) { participant in
-                                        Menu {
-                                            Label("\(participant.user?.firstname ?? "") \(participant.user?.lastname ?? "")", image: "")
-                                        } label: {
-                                            Avatar(image: participant.user?.avatar)
-                                        }
-                                    }
-                                }
-                                .transition(.opacity)
-                            } else {
-                                HStack(spacing: spacingParticipants) {
-                                    ForEach(eventParticipants.prefix(4)) { participant in
-                                        Avatar(image: participant.user?.avatar)
-                                    }
-                                    if eventParticipants.count > 4 {
-                                        Text("+\(eventParticipants.count - 4)")
-                                            .frame(width: 44, height: 44)
-                                            .background(Color.cOrange)
-                                            .style(textStyle: .text(.regular), color: .cBlack)
-                                            .clipShape(Circle())
-                                            .overlay(Circle().stroke(Color.cForeground, lineWidth: 2))
-                                    }
-                                    
-                                    Spacer()
-                                }
-                                .transition(.opacity)
+                            // Deadline selecting wishes
+                            // TODO: Klik? Zet in agenda
+                            HStack(alignment: .center) {
+                                Text("Deadline selecting wishes:")
+                                    .style(textStyle: .text(.medium), color: .cBlack)
+                                
+                                Text((vm.event?.claimDeadline ?? Date()).dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
+                                    .style(textStyle: .text(.regular), color: .cBlack)
+                                
+                                Spacer()
                             }
                         }
-                    }
-                    .animation(.smooth, value: showAllParticipants)
-                    .onTapGesture {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            spacingParticipants = showAllParticipants ? -15 : 20
+                        .frame(maxWidth: .infinity)
+                        
+                        // MARK: Participants
+                        VStack(alignment: .leading) {
+                            if let eventParticipants = vm.event?.eventParticipants {
+                                if showAllParticipants {
+                                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 44), spacing: 15)], spacing: 15) {
+                                        ForEach(eventParticipants) { participant in
+                                            Menu {
+                                                Text("\(participant.user?.firstname ?? "") \(participant.user?.lastname ?? "")")
+                                            } label: {
+                                                Avatar(image: participant.user?.avatar)
+                                            }
+                                        }
+                                    }
+                                    .transition(.opacity)
+                                } else {
+                                    HStack(spacing: spacingParticipants) {
+                                        ForEach(eventParticipants.prefix(4)) { participant in
+                                            Avatar(image: participant.user?.avatar)
+                                        }
+                                        if eventParticipants.count > 4 {
+                                            Text("+\(eventParticipants.count - 4)")
+                                                .frame(width: 44, height: 44)
+                                                .background(Color.cOrange)
+                                                .style(textStyle: .text(.regular), color: .cBlack)
+                                                .clipShape(Circle())
+                                                .overlay(Circle().stroke(Color.cForeground, lineWidth: 2))
+                                        }
+                                        
+                                        Spacer()
+                                    }
+                                    .transition(.opacity)
+                                }
+                            }
                         }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: {
-                            showAllParticipants = true
-                        })
+                        .animation(.smooth, value: showAllParticipants)
+                        .onTapGesture {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                spacingParticipants = 20
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: {
+                                showAllParticipants = true
+                            })
+                        }
+                        .onDisappear {
+                            // Reset participants view
+                            showAllParticipants = false
+                            spacingParticipants = -15
+                        }
                     }
+                    .frame(maxHeight: .infinity)
                 }
-                .frame(maxHeight: .infinity)
             }
             .loadingEffect(vm.eventIsLoading.isInLoadingState())
             .padding(.horizontal)
@@ -270,12 +294,26 @@ struct EventView: View {
                 await vm.getEvent(documentId: documentId, isLoading: $vm.eventIsLoading)
             }
             .toolbar {
-                // TODO: MENU -> Zet event in agenda
-                Button {
-                    print("add event")
+                Menu {
+                    
+                    // MARK: Add event to calendar
+                    Button {
+                        if let event = vm.event {
+                            vm.addCalendarEvent(
+                                title: event.title,
+                                date: event.eventDate,
+                                description: event.title + "\n\n" + event.description,
+                                url: URL(string: "wishflow://events/\(event.documentId)")
+                            )
+                        }
+                    } label: {
+                        Label("Add event to calendar", systemImage: "calendar")
+                    }
+                    
                 } label: {
                     Image(systemName: "ellipsis.circle")
                 }
+                .disabled(vm.event == nil)
             }
         }
         .refreshable {

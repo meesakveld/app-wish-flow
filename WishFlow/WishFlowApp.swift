@@ -16,6 +16,9 @@ struct WishFlowApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(navigationManager)
+                .onOpenURL { url in
+                    print(url)
+                }
         }
     }
 }

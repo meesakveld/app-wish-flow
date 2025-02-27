@@ -16,11 +16,17 @@ class HomeViewModel: ObservableObject {
     
     let user: User? = AuthenticationManager.shared.user
     
+    init() {
+        if user == nil { AuthenticationManager.shared.logout() }
+    }
+    
     func getUpcomingEvents(isLoading: Binding<LoadingState>) async {
         upcomingEventsHasError = false
         setLoading(value: isLoading, .isLoading)
         do {
-            upcomingEvents = try await EventManager.shared.getUpcomingEventsWithUserId(userId: user!.id)
+            if let userId = user?.id {
+                upcomingEvents = try await EventManager.shared.getUpcomingEventsWithUserId(userId: userId)
+            }
         } catch {
             upcomingEventsHasError = true
             print(error)
