@@ -11,11 +11,13 @@ import SwiftUI
 struct WishFlowApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var navigationManager = NavigationManager()
+    @StateObject private var alertManager = AlertManager()
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(navigationManager)
+                .environmentObject(alertManager)
                 .onOpenURL { url in
                     print(url)
                 }

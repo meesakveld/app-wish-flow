@@ -60,7 +60,9 @@ class EventViewModel: ObservableObject {
         return nil
     }
     
-    func addCalendarEvent(title: String, date: Date, description: String, url: URL?) {
+    func addCalendarEvent(title: String, date: Date, description: String, url: URL?) throws {
+        var error: CalendarError?
+        
         // TODO: Handle error and succes
         CalendarManager.shared.addCalendarEvent(CalendarEvent(
             title: title,
@@ -71,15 +73,21 @@ class EventViewModel: ObservableObject {
             switch result {
             case .success:
                 print("Event successfully added to your calendar!")
-            case .failure(let error):
-                print("❌ Error: \(error.localizedDescription)")
+            case .failure(let errorAddingCalendarEvent):
+                print("❌ Error: \(errorAddingCalendarEvent.localizedDescription)")
+                error = errorAddingCalendarEvent
             }
+        }
+        
+        if let error = error {
+            throw error
         }
     }
 }
 
 struct EventView: View {
     let documentId: String
+    @EnvironmentObject var alertManager: AlertManager
     @ObservedObject var vm: EventViewModel = EventViewModel()
     
     @State var showAllParticipants: Bool = false
@@ -299,12 +307,23 @@ struct EventView: View {
                     // MARK: Add event to calendar
                     Button {
                         if let event = vm.event {
-                            vm.addCalendarEvent(
-                                title: event.title,
-                                date: event.eventDate,
-                                description: event.title + "\n\n" + event.description,
-                                url: URL(string: "wishflow://events/\(event.documentId)")
-                            )
+                            do {
+                                try vm.addCalendarEvent(
+                                    title: event.title,
+                                    date: event.eventDate,
+                                    description: event.title + "\n\n" + event.description,
+                                    url: URL(string: "wishflow://events/\(event.documentId)")
+                                )
+                                alertManager.present(Alert(
+                                    title: "Succes!",
+                                    message: "\(event.title) was successfully added to your calendar on \(event.eventDate.dateToStringFormatter(DateFormat: .EEEE_comma_dd_MMMM_yyyy))!"
+                                ))
+                            } catch (let error) {
+                                alertManager.present(Alert(
+                                    title: "Something went wrong!",
+                                    message: error.localizedDescription
+                                ))
+                            }
                         }
                     } label: {
                         Label("Add event to calendar", systemImage: "calendar")
@@ -330,6 +349,7 @@ struct EventView: View {
         NavigationLink("", value: true)
             .navigationDestination(isPresented: .constant(true)) {
                 EventView(documentId: "yyi02rmev5oqpgxllz903avf")
+                    .environmentObject(AlertManager())
             }
     }
 }
