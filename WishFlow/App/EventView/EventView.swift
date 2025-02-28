@@ -12,7 +12,7 @@ class EventViewModel: ObservableObject {
     @Published var event: Event? = nil
     @Published var eventIsLoading: LoadingState = .preparingToLoad
     @Published var eventHasError: Bool = false
-    @Published var eventViewSubpage: eventViewSubpage = .info
+    @Published var eventViewSubpage: eventViewSubpage = .gifties
     
     let user: User? = AuthenticationManager.shared.user
     
@@ -98,6 +98,7 @@ struct EventView: View {
     
     var body: some View {
         ScrollView {
+            // MARK: - Error handling for when event is not found
             if vm.eventHasError {
                 VStack {
                     Spacer()
@@ -128,8 +129,9 @@ struct EventView: View {
                 .frame(width: .infinity ,height: .infinity)
             }
             
+            // MARK: - Event
             if !vm.eventHasError {
-                VStack(spacing: 40) {
+                VStack(spacing: 30) {
                     
                     // MARK: - Title
                     HStack(alignment: .center) {
@@ -218,7 +220,7 @@ struct EventView: View {
                     
                     // MARK: - Info
                     if vm.eventViewSubpage == .info {
-                        VStack(spacing: 40) {
+                        VStack(spacing: 30) {
                             // MARK: Description
                             Text(
                                 vm.event?.description ?? "Lorem ipsum dolor sit amet consectetur. Eros fusce ut ipsum in velit eu eros. Consectetur id enim eleifend eget sit lacus. Laoreet at elit id sodales. Amet viverra Amet viverra amet ipsum suspendisse eget urna."
@@ -327,6 +329,86 @@ struct EventView: View {
                             }
                         }
                         .frame(maxHeight: .infinity)
+                    }
+                    
+                    
+                    // MARK: - My Wishes
+                    if vm.eventViewSubpage == .myWishes {
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("My wishes")
+                                    .style(textStyle: .text(.bold), color: .cForeground)
+                                
+                                Text("You haven't added any wishes")
+                                    .style(textStyle: .textSmall(.regular), color: .cForeground)
+                            }
+                            
+                            Spacer()
+                            
+                            HStack {
+                                Text("Select wishes")
+                                Image(systemName: "arrow.up.right")
+                            }
+                            .style(textStyle: .textSmall(.regular), color: .cForeground)
+                        }
+                    }
+                    
+                    
+                    // MARK: - Gifties
+                    if vm.eventViewSubpage == .gifties {
+                        VStack(spacing: 30) {
+                            HStack(alignment: .top) {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Gifties")
+                                        .style(textStyle: .text(.bold), color: .cForeground)
+                                    
+                                    Text("Select the gift(s) you will give.")
+                                        .style(textStyle: .textSmall(.regular), color: .cForeground)
+                                }
+                                
+                                Spacer()
+                            }
+                            
+                            if let participants = vm.event?.eventParticipants {
+                                ForEach(participants, id: \.documentId) { participant in
+                                    ZStack {
+                                        DropEffect {
+                                            Text("dfsgdh")
+                                                .frame(height: 200)
+                                                .frame(maxWidth: .infinity)
+                                                .background { Color.cBlue }
+                                        }
+                                        
+                                        VStack {
+                                            HStack {
+                                                HStack(spacing: 5) {
+                                                    Avatar(
+                                                        image: participant.user?.avatar,
+                                                        width: 22
+                                                    )
+                                                    .padding(4)
+
+                                                    Text("\(participant.user?.firstname ?? "") \(participant.user?.lastname ?? "")")
+                                                        .style(textStyle: .textSmall(.regular), color: .cBlack)
+                                                        .padding(.trailing, 10)
+                                                }
+                                                .padding(1)
+                                                .background(Color.cOrange)
+                                                .cornerRadius(25)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 25)
+                                                        .stroke(Color.cBlack, lineWidth: 1.5)
+                                                )
+                                                
+                                                Spacer()
+                                            }
+                                            Spacer()
+                                        }
+                                        .offset(x: 15, y: -10)
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 .loadingEffect(vm.eventIsLoading.isInLoadingState())

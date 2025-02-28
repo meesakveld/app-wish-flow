@@ -10,12 +10,22 @@ import StrapiSwift
 
 struct Avatar: View {
     let image: StrapiImage?
+    var width: CGFloat = 44
+    
+    init(image: StrapiImage?) {
+        self.image = image
+    }
+    
+    init(image: StrapiImage?, width: CGFloat) {
+        self.image = image
+        self.width = width
+    }
     
     var body: some View {
         ZStack {
             Image("avatarPlaceholder")
                 .resizable()
-                .frame(width: 44, height: 44)
+                .frame(width: width, height: width)
                 .scaledToFill()
                 .aspectRatio(1, contentMode: .fit)
             
@@ -26,7 +36,7 @@ struct Avatar: View {
                 } placeholder: {
                     ProgressView()
                 }
-                .frame(width: 44, height: 44)
+                .frame(width: width, height: width)
                 .clipShape(Circle())
             }
         }
