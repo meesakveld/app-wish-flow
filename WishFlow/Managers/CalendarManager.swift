@@ -108,7 +108,6 @@ final class CalendarManager: ObservableObject, Sendable {
         
         do {
             try eventStore.save(calendarEvent, span: .thisEvent)
-            print("✅ Full-day event added to calendar.")
         } catch {
             throw CalendarError.failedToSave(error.localizedDescription)
         }

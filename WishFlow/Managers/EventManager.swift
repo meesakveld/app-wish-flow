@@ -66,9 +66,10 @@ final class EventManager: ObservableObject, Sendable {
         return response
     }
     
-    func getEventByDocumentId(documentId: String) async throws -> Event {
+    func getEventByDocumentId(documentId: String, userId: Int) async throws -> Event {
         let response = try await eventCollection
             .withDocumentId(documentId)
+            .filter("[eventParticipants][user][id]", operator: .equal, value: userId)
             .populate("image")
             .populate("minBudget") { minBudget in
                 minBudget.populate("currency")
