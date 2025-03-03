@@ -41,7 +41,7 @@ class EventViewModel: ObservableObject {
     }
     
     enum eventViewSubpage {
-        case info, myWishes, gifties
+        case info, myWishes, giftees
     }
     
     func addCalendarEvent(title: String, date: Date, description: String, url: URL?) throws {
@@ -181,19 +181,19 @@ struct EventView: View {
                                 
                                 // Visible when the user has the role participant or eventType equals to oneToOne (everyone receives and gives gifts)
                                 if vm.eventUserRole == .participant || vm.event?.eventType == .oneToOne {
-                                    Text("Gifties")
+                                    Text(vm.event?.eventType != .singleRecipient ? "Giftees" : "Giftee")
                                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                                         .background(Color.cGreen)
                                         .border(Color.cBlack)
                                         .overlay {
-                                            if vm.eventViewSubpage == .gifties {
+                                            if vm.eventViewSubpage == .giftees {
                                                 RoundedRectangle(cornerRadius: 5)
                                                     .stroke(Color.cBlack, lineWidth: 1.5)
                                                     .background(Color.clear)
                                                     .padding(4)
                                             }
                                         }
-                                        .onTapGesture { vm.eventViewSubpage = .gifties }
+                                        .onTapGesture { vm.eventViewSubpage = .giftees }
                                         .onAppear {
                                             print(vm.event?.eventType == .oneToOne)
                                         }
@@ -345,12 +345,12 @@ struct EventView: View {
                     }
                     
                     
-                    // MARK: - Gifties
-                    if vm.eventViewSubpage == .gifties {
+                    // MARK: - Giftees
+                    if vm.eventViewSubpage == .giftees {
                         VStack(spacing: 30) {
                             HStack(alignment: .top) {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    Text("Gifties")
+                                    Text(vm.event?.eventType != .singleRecipient ? "Giftees" : "Giftee")
                                         .style(textStyle: .text(.bold), color: .cForeground)
                                     
                                     Text("Select the gift(s) you will give.")
@@ -360,7 +360,7 @@ struct EventView: View {
                                 Spacer()
                             }
                             
-                            if let participants = vm.event?.eventParticipants {
+                            if let participants = vm.event?.getGiftees() {
                                 ForEach(participants, id: \.documentId) { participant in
                                     ZStack {
                                         DropEffect {

@@ -130,6 +130,26 @@ struct Event: Codable, Identifiable {
         
         return nil
     }
+    
+    func getGiftees() -> [EventParticipant] {
+        var participants: [EventParticipant] = []
+        
+        guard let eventParticipants = eventParticipants else {
+            return participants
+        }
+        
+        // Filter on participantRole
+        participants = eventParticipants.filter({ $0.role == .owner || $0.role == .recipient })
+        
+        // Filter on eventAssignment when eventType equels oneToOne
+        if eventType == .oneToOne, let eventAssignments = eventAssignments {
+            participants = participants.filter { participant in
+                eventAssignments.contains { $0.receiver?.id == participant.user?.id }
+            }
+        }
+
+        return participants
+    }
 }
 
 // MARK: - EventType Enum
