@@ -35,6 +35,9 @@
     "Deadline selecting wishes:" : {
 
     },
+    "dfsgdh" : {
+
+    },
     "Eventdate:" : {
 
     },
@@ -71,6 +74,12 @@
     "See all" : {
 
     },
+    "Select the gift(s) you will give." : {
+
+    },
+    "Select wishes" : {
+
+    },
     "Upcoming Events" : {
 
     },
@@ -81,6 +90,9 @@
 
     },
     "WishFlow makes it easy to manage wish lists and gift groups for any occasion. With features like visibility settings and gift assignments, users can prevent duplicate presents and ensure a smooth gifting experience." : {
+
+    },
+    "You haven't added any wishes" : {
 
     }
   },

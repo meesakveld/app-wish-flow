@@ -15,6 +15,8 @@ final class EventManager: ObservableObject, Sendable {
     
     private init () { }
     
+    // MARK: - Requests
+    
     private let eventCollection: CollectionQuery = Strapi.contentManager.collection("events")
     
     private func eventsCollectionQueryWithAllPopulations() async throws -> CollectionQuery {
@@ -85,6 +87,16 @@ final class EventManager: ObservableObject, Sendable {
             .getDocument(as: Event.self)
         
         return response.data
+    }
+    
+    // MARK: - Utils
+    func getUserParticipantRole(event: Event, userId: Int) -> EventParticipantRole? {
+        guard let participants = event.eventParticipants else { return nil }
+        
+        if let participant = participants.first(where: { $0.user?.id == userId }) {
+            return participant.role
+        }
+        return nil
     }
     
 }

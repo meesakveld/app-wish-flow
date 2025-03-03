@@ -9,10 +9,17 @@ import SwiftUI
 
 @MainActor
 class EventViewModel: ObservableObject {
-    @Published var event: Event? = nil
+    @Published var event: Event? = nil {
+        didSet { if let event = event {
+            eventUserRole = EventManager.shared.getUserParticipantRole(event: event, userId: user?.id ?? 1)
+        } }
+    }
+    @Published var eventUserRole: EventParticipantRole? = .participant
+    
     @Published var eventIsLoading: LoadingState = .preparingToLoad
     @Published var eventHasError: Bool = false
-    @Published var eventViewSubpage: eventViewSubpage = .gifties
+    
+    @Published var eventViewSubpage: eventViewSubpage = .info
     
     let user: User? = AuthenticationManager.shared.user
     
@@ -37,37 +44,9 @@ class EventViewModel: ObservableObject {
         case info, myWishes, gifties
     }
     
-    func getBudgetText(event: Event?) -> String? {
-        guard let event = event else { return nil }
-        
-        let minBudgetAmount = event.minBudget?.amount
-        let minBudgetCurrency = event.minBudget?.currency?.symbol
-        
-        let maxBudgetAmount = event.maxBudget?.amount
-        let maxBudgetCurrency = event.maxBudget?.currency?.symbol
-        
-        // MARK: minBudget and maxBudget are available
-        if let minBudgetAmount, let minBudgetCurrency, let maxBudgetAmount, let maxBudgetCurrency {
-            return "\(minBudgetCurrency) \(minBudgetAmount) - \(maxBudgetCurrency) \(maxBudgetAmount)"
-        }
-        
-        // MARK: Only minBudget is available
-        if let minBudgetAmount, let minBudgetCurrency {
-            return "\(minBudgetCurrency) \(minBudgetAmount) +"
-        }
-        
-        // MARK: Only maxBudget is available
-        if let maxBudgetAmount, let maxBudgetCurrency {
-            return "\(maxBudgetCurrency) 0 - \(maxBudgetCurrency) \(maxBudgetAmount)"
-        }
-        
-        return nil
-    }
-    
     func addCalendarEvent(title: String, date: Date, description: String, url: URL?) throws {
         var error: CalendarError?
         
-        // TODO: Handle error and succes
         CalendarManager.shared.addCalendarEvent(CalendarEvent(
             title: title,
             date: date,
@@ -166,9 +145,9 @@ struct EventView: View {
                         
                         
                         // MARK: - Menu Switcher
-                        // TODO: Make dynamic based on role (owner is also an receiver)
                         DropEffect {
                             HStack(spacing: 0) {
+                                // Always visible
                                 Text("Info")
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                                     .background(Color.cPurple)
@@ -183,33 +162,42 @@ struct EventView: View {
                                     }
                                     .onTapGesture { vm.eventViewSubpage = .info }
                                 
-                                Text("My wishes")
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    .background(Color.cYellow)
-                                    .border(Color.cBlack)
-                                    .overlay {
-                                        if vm.eventViewSubpage == .myWishes {
-                                            RoundedRectangle(cornerRadius: 5)
-                                                .stroke(Color.cBlack, lineWidth: 1.5)
-                                                .background(Color.clear)
-                                                .padding(4)
+                                // Visible when the user has the role repicient or owner (also receives gifts)
+                                if vm.eventUserRole == .owner || vm.eventUserRole == .recipient {
+                                    Text("My wishes")
+                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                        .background(Color.cYellow)
+                                        .border(Color.cBlack)
+                                        .overlay {
+                                            if vm.eventViewSubpage == .myWishes {
+                                                RoundedRectangle(cornerRadius: 5)
+                                                    .stroke(Color.cBlack, lineWidth: 1.5)
+                                                    .background(Color.clear)
+                                                    .padding(4)
+                                            }
                                         }
-                                    }
-                                    .onTapGesture { vm.eventViewSubpage = .myWishes }
+                                        .onTapGesture { vm.eventViewSubpage = .myWishes }
+                                }
                                 
-                                Text("Gifties")
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    .background(Color.cGreen)
-                                    .border(Color.cBlack)
-                                    .overlay {
-                                        if vm.eventViewSubpage == .gifties {
-                                            RoundedRectangle(cornerRadius: 5)
-                                                .stroke(Color.cBlack, lineWidth: 1.5)
-                                                .background(Color.clear)
-                                                .padding(4)
+                                // Visible when the user has the role participant or eventType equals to oneToOne (everyone receives and gives gifts)
+                                if vm.eventUserRole == .participant || vm.event?.eventType == .oneToOne {
+                                    Text("Gifties")
+                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                        .background(Color.cGreen)
+                                        .border(Color.cBlack)
+                                        .overlay {
+                                            if vm.eventViewSubpage == .gifties {
+                                                RoundedRectangle(cornerRadius: 5)
+                                                    .stroke(Color.cBlack, lineWidth: 1.5)
+                                                    .background(Color.clear)
+                                                    .padding(4)
+                                            }
                                         }
-                                    }
-                                    .onTapGesture { vm.eventViewSubpage = .gifties }
+                                        .onTapGesture { vm.eventViewSubpage = .gifties }
+                                        .onAppear {
+                                            print(vm.event?.eventType == .oneToOne)
+                                        }
+                                }
                             }
                             .style(textStyle: .text(.medium), color: .cBlack)
                             .frame(maxWidth: .infinity)
@@ -231,7 +219,6 @@ struct EventView: View {
                             VStack(alignment: .leading, spacing: 10) {
                                 
                                 // Eventdate
-                                // TODO: Klik? Zet in agenda
                                 HStack(alignment: .center) {
                                     Text("Eventdate:")
                                         .style(textStyle: .text(.medium), color: .cBlack)
@@ -247,34 +234,38 @@ struct EventView: View {
                                     Text("Budget:")
                                         .style(textStyle: .text(.medium), color: .cBlack)
                                     
-                                    Text(vm.getBudgetText(event: vm.event) ?? "€10 - €20")
+                                    Text(vm.event?.getMinMaxBudgetText() ?? "€10 - €20")
                                         .style(textStyle: .text(.regular), color: .cBlack)
                                     
                                     Spacer()
                                 }
                                 
-                                // Deadline adding wishes
-                                // TODO: Klik? Zet in agenda
-                                // TODO: Dynamicly shown based on role
-                                HStack(alignment: .center) {
-                                    Text("Deadline adding wishes:")
-                                        .style(textStyle: .text(.medium), color: .cBlack)
-                                    
-                                    Text((vm.event?.giftDeadline ?? Date()).dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
-                                        .style(textStyle: .text(.regular), color: .cBlack)
-                                    
-                                    Spacer()
+                                // MARK: Deadline adding wishes
+                                // Visible when the user has the role repicient or owner (also receives gifts)
+                                if vm.eventUserRole == .owner || vm.eventUserRole == .recipient {
+                                    HStack(alignment: .center) {
+                                        Text("Deadline adding wishes:")
+                                            .style(textStyle: .text(.medium), color: .cBlack)
+                                        
+                                        Text((vm.event?.giftDeadline ?? Date()).dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
+                                            .style(textStyle: .text(.regular), color: .cBlack)
+                                        
+                                        Spacer()
+                                    }
                                 }
                                 
-                                // Deadline selecting wishes
-                                HStack(alignment: .center) {
-                                    Text("Deadline selecting wishes:")
-                                        .style(textStyle: .text(.medium), color: .cBlack)
-                                    
-                                    Text((vm.event?.claimDeadline ?? Date()).dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
-                                        .style(textStyle: .text(.regular), color: .cBlack)
-                                    
-                                    Spacer()
+                                // MARK: Deadline selecting wishes
+                                // Visible when the user has the role participant or eventType equals to oneToOne (everyone receives and gives gifts)
+                                if vm.eventUserRole == .owner || vm.eventUserRole == .participant || vm.event?.eventType == .oneToOne {
+                                    HStack(alignment: .center) {
+                                        Text("Deadline selecting wishes:")
+                                            .style(textStyle: .text(.medium), color: .cBlack)
+                                        
+                                        Text((vm.event?.claimDeadline ?? Date()).dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
+                                            .style(textStyle: .text(.regular), color: .cBlack)
+                                        
+                                        Spacer()
+                                    }
                                 }
                             }
                             .frame(maxWidth: .infinity)

@@ -11,4 +11,9 @@ struct Price: Codable {
     var id: Int
     var amount: Double
     var currency: Currency?
+    
+    func formatted() -> String {
+        let currency: String? = currency?.symbol
+        return (currency != nil) ? "\(currency ?? "") \(amount)" : "\(amount)"
+    }
 }

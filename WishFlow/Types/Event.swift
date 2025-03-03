@@ -108,6 +108,28 @@ struct Event: Codable, Identifiable {
         try container.encode(formatter.string(from: updatedAt), forKey: .updatedAt)
         try container.encode(formatter.string(from: publishedAt), forKey: .publishedAt)
     }
+    
+    // MARK: - Utils
+    func getMinMaxBudgetText() -> String? {
+        let maxBudgetCurrency = maxBudget?.currency?.symbol
+        
+        // MARK: minBudget and maxBudget are available
+        if let minBudget = maxBudget?.formatted(), let maxBudget = maxBudget?.formatted() {
+            return "\(minBudget) - \(maxBudget)"
+        }
+        
+        // MARK: Only minBudget is available
+        if let minBudget = maxBudget?.formatted() {
+            return "\(minBudget) +"
+        }
+        
+        // MARK: Only maxBudget is available
+        if let maxBudgetAmount = maxBudget?.formatted(), let maxBudgetCurrency {
+            return "\(maxBudgetCurrency) 0 - \(maxBudgetCurrency) \(maxBudgetAmount)"
+        }
+        
+        return nil
+    }
 }
 
 // MARK: - EventType Enum
