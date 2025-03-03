@@ -181,7 +181,7 @@ struct EventView: View {
                                 
                                 // Visible when the user has the role participant or eventType equals to oneToOne (everyone receives and gives gifts)
                                 if vm.eventUserRole == .participant || vm.event?.eventType == .oneToOne {
-                                    Text(vm.event?.eventType != .singleRecipient ? "Giftees" : "Giftee")
+                                    Text(vm.event?.eventType == .groupGifting ? "Giftees" : "Giftee")
                                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                                         .background(Color.cGreen)
                                         .border(Color.cBlack)
@@ -350,7 +350,7 @@ struct EventView: View {
                         VStack(spacing: 30) {
                             HStack(alignment: .top) {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    Text(vm.event?.eventType != .singleRecipient ? "Giftees" : "Giftee")
+                                    Text(vm.event?.eventType == .groupGifting ? "Giftees" : "Giftee")
                                         .style(textStyle: .text(.bold), color: .cForeground)
                                     
                                     Text("Select the gift(s) you will give.")
