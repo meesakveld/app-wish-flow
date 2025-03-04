@@ -19,13 +19,29 @@ final class GiftManager: ObservableObject, Sendable {
     
     private let giftCollection: CollectionQuery = Strapi.contentManager.collection("gifts")
     
-    func getGiftsWithUserId(userId: Int) async throws -> [Gift] {
-        let response = try await giftCollection
+    func getGiftsWithUserIdWithSearchAndFilterBasedOnDateAndPrice(
+        userId: Int,
+        search: String,
+        sortGiftDate: SortOperator?,
+        sortGiftPrice: SortOperator?
+    ) async throws -> [Gift] {
+        var query = giftCollection
             .populate("image")
             .populate("price") { price in
                 price.populate("currency")
             }
             .filter("[user][id]", operator: .includedIn, value: userId)
+            .filter("[title]", operator: .containsInsensitive, value: search)
+        
+        if let sortGiftDate = sortGiftDate {
+            query = query.sort(by: "createdAt", order: sortGiftDate)
+        }
+        
+        if let sortGiftPrice = sortGiftPrice {
+            query = query.sort(by: "[price][amount]", order: sortGiftPrice)
+        }
+
+        let response = try await query
             .getDocuments(as: [Gift].self)
         
         return response.data

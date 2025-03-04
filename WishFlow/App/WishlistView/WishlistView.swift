@@ -29,7 +29,12 @@ class WishlistViewModel: ObservableObject {
         wishesHasError = false
         setLoading(value: isLoading, .isLoading)
         do {
-            wishes = try await GiftManager.shared.getGiftsWithUserId(userId: user?.id ?? 1)
+            wishes = try await GiftManager.shared.getGiftsWithUserIdWithSearchAndFilterBasedOnDateAndPrice(
+                userId: user?.id ?? 1,
+                search: search,
+                sortGiftDate: activeSort == .date ? sortWishesDate : nil,
+                sortGiftPrice: activeSort == .price ? sortWishesPrice : nil
+            )
         } catch {
             wishesHasError = true
             print(error)
@@ -77,21 +82,22 @@ struct WishlistView: View {
                             }
                             .disabled(vm.wishesIsLoading.isInLoadingState())
                             .opacity(vm.activeSort == .date ? 1 : 0.7)
+                            .onChange(of: vm.sortWishesDate) { _, _ in
+                                Task { await vm.getWishes(isLoading: $vm.wishesIsLoading) }
+                            }
                             
                             SortLabel(icon: "eurosign", state: vm.sortWishesPrice, filterOn: "Filter on price") {
                                 vm.sortWishesPrice.toggle()
                             }
                             .disabled(vm.wishesIsLoading.isInLoadingState())
                             .opacity(vm.activeSort == .price ? 1 : 0.7)
+                            .onChange(of: vm.sortWishesPrice) { _, _ in
+                                Task { await vm.getWishes(isLoading: $vm.wishesIsLoading) }
+                            }
                         }
                         .padding(.horizontal)
                     }
                     .fixedSize(horizontal: false, vertical: true)
-                    .onChange(of: vm.sortWishesDate) { _, _ in
-                        Task {
-                            await vm.getWishes(isLoading: $vm.wishesIsLoading)
-                        }
-                    }
                 }
                 
                 
