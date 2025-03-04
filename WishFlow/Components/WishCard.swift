@@ -19,7 +19,7 @@ struct WishCard: View {
                     
                     GeometryReader { geometry in
                         let size = geometry.size.width
-                        if let url = wish.image?.getSmallestFormat() {
+                        if let url = wish.image?.getURL(size: .small)  {
                             AsyncImage(url: URL(string: url)) { image in
                                 image.resizable()
                                     .scaledToFill()
