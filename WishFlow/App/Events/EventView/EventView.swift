@@ -153,6 +153,7 @@ struct EventView: View {
                             Text(
                                 vm.event?.description ?? "Lorem ipsum dolor sit amet consectetur. Eros fusce ut ipsum in velit eu eros. Consectetur id enim eleifend eget sit lacus. Laoreet at elit id sodales. Amet viverra Amet viverra amet ipsum suspendisse eget urna."
                             )
+                            .textSelection(.enabled)
                             .style(textStyle: .text(.regular), color: .cForeground)
                             
                             // MARK: Details
