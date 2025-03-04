@@ -57,14 +57,18 @@ struct HomeView: View {
                 NavigationLink {
                     EventsView(searchActivated: true)
                 } label: {
-                    Searchbar(search: .constant(""))
+                    Searchbar(search: .constant(""), searchString: "Search an event")
                         .disabled(true)
                 }
                 
                 
                 // MARK: - Wistlist & Buylist
                 HStack {
-                    Card(title: "Wish\nlist", image: "giftWithStars", bgColor: .cBlue)
+                    NavigationLink {
+                        WishlistView()
+                    } label: {
+                        Card(title: "Wish\nlist", image: "giftWithStars", bgColor: .cBlue)
+                    }
                     
                     Card(title: "Buy\nlist", image: "giftlist", bgColor: .cOrange)
                 }
@@ -171,6 +175,8 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView()
-        .environmentObject(NavigationManager())
+    NavigationStack {
+        HomeView()
+            .environmentObject(NavigationManager())
+    }
 }

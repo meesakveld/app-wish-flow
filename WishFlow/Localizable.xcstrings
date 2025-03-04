@@ -20,6 +20,9 @@
     "Add new event" : {
 
     },
+    "Add new wish" : {
+
+    },
     "Budget:" : {
 
     },
@@ -44,7 +47,10 @@
     "Events" : {
 
     },
-    "Gifties" : {
+    "Giftee" : {
+
+    },
+    "Giftees" : {
 
     },
     "Info" : {
@@ -68,9 +74,6 @@
     "Register" : {
 
     },
-    "Search an event" : {
-
-    },
     "See all" : {
 
     },
@@ -90,6 +93,9 @@
 
     },
     "WishFlow makes it easy to manage wish lists and gift groups for any occasion. With features like visibility settings and gift assignments, users can prevent duplicate presents and ensure a smooth gifting experience." : {
+
+    },
+    "Wishlist" : {
 
     },
     "You haven't added any wishes" : {

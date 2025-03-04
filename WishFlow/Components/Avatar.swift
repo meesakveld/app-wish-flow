@@ -29,7 +29,7 @@ struct Avatar: View {
                 .scaledToFill()
                 .aspectRatio(1, contentMode: .fit)
             
-            if let url = image?.formats?.thumbnail?.url {
+            if let url = image?.getSmallestFormat() {
                 AsyncImage(url: URL(string: url)) { image in
                     image.resizable()
                         .scaledToFill()

@@ -20,6 +20,17 @@ struct Currency: Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id, documentId, code, name, symbol, createdAt, updatedAt, publishedAt
     }
+    
+    init() {
+        self.id = 1
+        self.documentId = UUID().uuidString
+        self.code = "EUR"
+        self.name = "Euro"
+        self.symbol = "€"
+        self.createdAt = Date()
+        self.updatedAt = Date()
+        self.publishedAt = Date()
+    }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

@@ -24,14 +24,17 @@ class SearchbarViewModel: ObservableObject {
 
 struct Searchbar: View {
     @Binding var search: String
+    let searchString: String
+    
     @StateObject private var viewModel: SearchbarViewModel
     @FocusState private var isFocused: Bool
     let autoFocus: Bool
 
-    init(search: Binding<String>, autoFocus: Bool = false) {
+    init(search: Binding<String>, searchString: String, autoFocus: Bool = false) {
         self._search = search
         self._viewModel = StateObject(wrappedValue: SearchbarViewModel(searchBinding: search))
         self.autoFocus = autoFocus
+        self.searchString = searchString
     }
 
     var body: some View {
@@ -48,7 +51,7 @@ struct Searchbar: View {
                         isFocused = true
                     }
 
-                TextField("Search an event", text: $viewModel.searchDebounce)
+                TextField(searchString, text: $viewModel.searchDebounce)
                     .style(textStyle: .text(.regular), color: .black)
                     .frame(maxWidth: .infinity, minHeight: 48)
                     .padding(.horizontal, 10)
@@ -71,5 +74,5 @@ struct Searchbar: View {
 }
 
 #Preview {
-    Searchbar(search: .constant(""))
+    Searchbar(search: .constant(""), searchString: "Search an event")
 }

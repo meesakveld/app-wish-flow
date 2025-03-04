@@ -26,6 +26,22 @@ struct Gift: Codable {
     enum CodingKeys: String, CodingKey {
         case id, documentId, title, description, image, url, giftLimit, price, event, giftClaims, createdAt, updatedAt, publishedAt
     }
+    
+    init() {
+        self.id = 1
+        self.documentId = UUID().uuidString
+        self.title = "Cadeau"
+        self.description = "Cadeau description about the gift"
+        self.image = nil
+        self.url = "https://www.google.com"
+        self.giftLimit = 1
+        self.price = Price(id: 1, amount: 10.5, currency: Currency())
+        self.event = nil
+        self.giftClaims = nil
+        self.createdAt = Date()
+        self.updatedAt = Date()
+        self.publishedAt = Date()
+    }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

@@ -30,7 +30,7 @@ struct EventsView: View {
             
             // MARK: - Search
             VStack(alignment: .leading, spacing: 10) {
-                Searchbar(search: $vm.search, autoFocus: searchActivated)
+                Searchbar(search: $vm.search, searchString: "Search an event", autoFocus: searchActivated)
                     .onChange(of: vm.search, { _, _ in
                         Task {
                             await vm.getEvents(isLoading: $vm.eventsIsLoading)
@@ -41,29 +41,8 @@ struct EventsView: View {
                 // MARK: Sort & filter
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
-                        Button {
+                        SortLabel(icon: "calendar", state: vm.sortEventDate, filterOn: "Filter on event date") {
                             vm.sortEventDate.toggle()
-                        } label: {
-                            DropEffect {
-                                HStack(alignment: .center) {
-                                    VStack {
-                                        Image(systemName: "calendar")
-                                            .resizable()
-                                            .scaledToFit()
-                                    }
-                                    .padding(10)
-                                    .background(Color.cOrange)
-                                    .border(Color.cBlack)
-                                    .frame(maxWidth: 35)
-                                    
-                                    HStack {
-                                        Image(systemName: vm.sortEventDate.getSFSymbol())
-                                        Text(vm.sortEventDate.getFullName())
-                                    }
-                                    .style(textStyle: .textSmall(.regular), color: .cBlack)
-                                    .padding(.trailing, 10)
-                                }
-                            }
                         }
                         .disabled(vm.eventsIsLoading.isInLoadingState())
                     }
