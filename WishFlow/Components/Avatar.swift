@@ -28,6 +28,7 @@ struct Avatar: View {
                 .frame(width: width, height: width)
                 .scaledToFill()
                 .aspectRatio(1, contentMode: .fit)
+                .clipShape(Circle())
             
             if let url = image?.getURL(size: .thumbnail)  {
                 AsyncImage(url: URL(string: url)) { image in
