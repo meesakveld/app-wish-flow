@@ -82,7 +82,7 @@ struct WishlistView: View {
                         LazyVGrid(columns: columns, spacing: 15) {
                             ForEach(vm.wishes, id: \.documentId) { wish in
                                 NavigationLink {
-                                    // EventView(documentId: event.documentId)
+                                    WishView(documentId: wish.documentId)
                                 } label: {
                                     WishCard(wish: wish)
                                 }
