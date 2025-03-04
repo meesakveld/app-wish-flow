@@ -11,6 +11,16 @@
         }
       }
     },
+    "%@ would like to receive this gift **%lld times**. Currently, **%lld %@** have stated they will buy it." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ would like to receive this gift **%2$lld times**. Currently, **%3$lld %4$@** have stated they will buy it."
+          }
+        }
+      }
+    },
     "+%lld" : {
 
     },
@@ -68,6 +78,9 @@
     "My wishes" : {
 
     },
+    "Price:" : {
+
+    },
     "Refresh" : {
 
     },
@@ -84,6 +97,9 @@
 
     },
     "Upcoming Events" : {
+
+    },
+    "URL:" : {
 
     },
     "Welcome back to WishFlow! Log in to manage your wish lists, join gift groups, and stay updated on your gifting plans." : {
