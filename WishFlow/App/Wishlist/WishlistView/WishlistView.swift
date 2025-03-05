@@ -154,8 +154,8 @@ struct WishlistView: View {
             await vm.getWishes(isLoading: $vm.wishesIsLoading)
         }
         .toolbar {
-            Button {
-                print("add event")
+            NavigationLink {
+                AddWishView()
             } label: {
                 Image(systemName: "plus.circle")
             }
