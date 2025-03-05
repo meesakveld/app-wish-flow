@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8F3DE8372D785F2F00D991E3 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 8F3DE8362D785F2F00D991E3 /* SwiftSoup */; };
 		8F61BEC52D67441800395280 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 8F61BEC42D67441800395280 /* SwiftKeychainWrapper */; };
 		8F91F1762D517EDA00DA8891 /* StrapiSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8F91F1752D517EDA00DA8891 /* StrapiSwift */; };
 /* End PBXBuildFile section */
@@ -44,6 +45,7 @@
 			files = (
 				8F61BEC52D67441800395280 /* SwiftKeychainWrapper in Frameworks */,
 				8F91F1762D517EDA00DA8891 /* StrapiSwift in Frameworks */,
+				8F3DE8372D785F2F00D991E3 /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,6 +99,7 @@
 			packageProductDependencies = (
 				8F91F1752D517EDA00DA8891 /* StrapiSwift */,
 				8F61BEC42D67441800395280 /* SwiftKeychainWrapper */,
+				8F3DE8362D785F2F00D991E3 /* SwiftSoup */,
 			);
 			productName = WishFlow;
 			productReference = 8FE1FBFF2D51746B0086A51D /* WishFlow.app */;
@@ -128,6 +131,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				8F61BEC32D67441800395280 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
+				8F3DE8352D785F2F00D991E3 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8FE1FC002D51746B0086A51D /* Products */;
@@ -383,6 +387,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		8F3DE8352D785F2F00D991E3 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.8.5;
+			};
+		};
 		8F61BEC32D67441800395280 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jrendel/SwiftKeychainWrapper";
@@ -394,6 +406,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8F3DE8362D785F2F00D991E3 /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8F3DE8352D785F2F00D991E3 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
+		};
 		8F61BEC42D67441800395280 /* SwiftKeychainWrapper */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8F61BEC32D67441800395280 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */;
