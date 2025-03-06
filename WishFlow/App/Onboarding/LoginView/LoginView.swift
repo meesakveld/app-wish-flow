@@ -53,7 +53,7 @@ struct LoginView: View {
                                     placeholder: "Enter password",
                                     errors: inputsErrors,
                                     isShowingErrors: isShowingInputsErrors,
-                                    isSecureField: true
+                                    entryType: .secureField
                                 )
                             }
                         } submit: { setIsLoading, setFormError, inputsErrors, isShowingInputsErrors in

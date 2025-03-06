@@ -24,7 +24,13 @@
     "+%lld" : {
 
     },
+    "Add a wish" : {
+
+    },
     "Add event to calendar" : {
+
+    },
+    "Add manual" : {
 
     },
     "Add new event" : {
@@ -33,7 +39,13 @@
     "Add new wish" : {
 
     },
+    "Asked for in events" : {
+
+    },
     "Budget:" : {
+
+    },
+    "Cancel" : {
 
     },
     "Create an account" : {
@@ -49,6 +61,9 @@
 
     },
     "dfsgdh" : {
+
+    },
+    "Enter the details of your wish and add it to your wishlist." : {
 
     },
     "Eventdate:" : {
@@ -76,6 +91,9 @@
 
     },
     "My wishes" : {
+
+    },
+    "Next" : {
 
     },
     "Price:" : {
@@ -108,6 +126,9 @@
     "Welcome to Wishflow" : {
 
     },
+    "Wish information" : {
+
+    },
     "WishFlow makes it easy to manage wish lists and gift groups for any occasion. With features like visibility settings and gift assignments, users can prevent duplicate presents and ensure a smooth gifting experience." : {
 
     },
@@ -115,6 +136,9 @@
 
     },
     "You haven't added any wishes" : {
+
+    },
+    "You haven't added this wish to any events." : {
 
     }
   },

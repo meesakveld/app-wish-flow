@@ -19,5 +19,17 @@ extension View {
     func optModifiers<Content: View>(@ViewBuilder _ modifiers: (Self) -> Content) -> some View {
         modifiers(self)
     }
-    
+ 
+    func readSize(onChange: @escaping (_ height: Double, _ width: Double) -> Void) -> some View {
+        background(
+            GeometryReader { geometryProxy in
+                Color.clear
+                    .onAppear {
+                        let width = Double(geometryProxy.size.width)
+                        let height = Double(geometryProxy.size.height)
+                        onChange(height, width)
+                    }
+            }
+        )
+    }
 }

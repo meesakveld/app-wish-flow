@@ -79,7 +79,7 @@ struct RegisterView: View {
                             placeholder: "Enter password",
                             errors: inputsErrors,
                             isShowingErrors: isShowingInputsErrors,
-                            isSecureField: true
+                            entryType: .secureField
                         )
                         
                         TextEntry(
@@ -89,7 +89,7 @@ struct RegisterView: View {
                             placeholder: "Enter password again",
                             errors: inputsErrors,
                             isShowingErrors: isShowingInputsErrors,
-                            isSecureField: true
+                            entryType: .secureField
                         )
                     }
                 } submit: { setIsLoading, setFormError, inputsErrors, isShowingInputsErrors in

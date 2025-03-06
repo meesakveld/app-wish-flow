@@ -18,21 +18,33 @@ struct TextEntry: View {
     @Binding var errors: [TextEntryError]
     let isShowingErrors: Bool
     
-    let isSecureField: Bool
+    let entryType: TextEntryType
     let isOptionalField: Bool
     
     @State private var isSecure: Bool
+    @FocusState private var isFocused: Bool
     
-    init(identifier: String, value: Binding<String>, title: String, placeholder: String, errors: Binding<[TextEntryError]>? = nil, isShowingErrors: Bool = false, isSecureField: Bool = false, isOptionalField: Bool = false) {
+    init(identifier: String, value: Binding<String>, title: String, placeholder: String, errors: Binding<[TextEntryError]>? = nil, isShowingErrors: Bool = false, entryType: TextEntryType = .textField, isOptionalField: Bool = false) {
         self.identifier = identifier
         self._value = value
         self.title = title
         self.placeholder = placeholder
         self._errors = errors ?? .constant([])
         self.isShowingErrors = isShowingErrors
-        self.isSecureField = isSecureField
+        self.entryType = entryType
         self.isOptionalField = isOptionalField
-        self._isSecure = State(initialValue: isSecureField)
+        self._isSecure = State(initialValue: entryType.isSecureField)
+    }
+    
+    enum TextEntryType {
+        case textField
+        case secureField
+        case textEditor(lineLimit: CGFloat)
+        
+        var isSecureField: Bool {
+            if case .secureField = self { return true }
+            return false
+        }
     }
     
     var body: some View {
@@ -44,18 +56,32 @@ struct TextEntry: View {
             
             // MARK: - TextField + SecureField Toggle
             HStack {
-                if isSecure {
-                    SecureField(placeholder, text: $value)
-                        .style(textStyle: .text(.regular), color: .cBlack)
-                        .textInputAutocapitalization(.never)
-                } else {
+                switch entryType {
+                case .textField:
                     TextField(placeholder, text: $value)
                         .style(textStyle: .text(.regular), color: .cBlack)
                         .textInputAutocapitalization(.never)
+                        .frame(height: 44)
+                case .secureField:
+                    SecureField(placeholder, text: $value)
+                        .style(textStyle: .text(.regular), color: .cBlack)
+                        .textInputAutocapitalization(.never)
+                        .frame(height: 44)
+                case .textEditor(let lineLimit):
+                    TextEditor(text: $value)
+                        .style(textStyle: .text(.regular), color: value == placeholder ? .cBlack.opacity(0.3) : .cBlack)
+                        .frame(height: 5 + (lineLimit * 33) + 5)
+                        .onAppear { if value.isEmpty { value = placeholder } }
+                        .focused($isFocused)
+                        .onChange(of: isFocused) { _, _ in
+                            withAnimation {
+                                if value == placeholder { value = "" } else if value.isEmpty { value = placeholder }
+                            }
+                        }
                 }
                 
                 // Switch between secure en normal textfield.
-                if isSecureField {
+                if entryType.isSecureField {
                     Button(action: {
                         isSecure.toggle()
                     }) {
@@ -66,7 +92,6 @@ struct TextEntry: View {
                 }
             }
             .foregroundStyle(Color.cBlack)
-            .frame(height: 44)
             .padding(.horizontal, 15)
             .background(Color.cWhite)
             .cornerRadius(7.5)
@@ -117,7 +142,15 @@ struct TextEntry: View {
             errors: .constant([
                 TextEntryError(identifier: "email", message: "Email is required")
             ]),
-            isSecureField: true
+            entryType: .secureField
+        )
+        TextEntry(
+            identifier: "description",
+            value: .constant(""),
+            title: "Description",
+            placeholder: "Enter description",
+            errors: .constant([]),
+            entryType: .textEditor(lineLimit: 5)
         )
     }
     .padding()

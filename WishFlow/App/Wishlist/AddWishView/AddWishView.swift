@@ -8,7 +8,11 @@
 import SwiftUI
 
 class AddWishViewModel: ObservableObject {
-    @Published var tabViewIndex: Int = 1
+    @Published var tabViewIndex: Int = 0
+    @Published var newTabViewIndex: Int = 0 {
+        didSet { withAnimation { tabViewIndex = newTabViewIndex }}
+    }
+    
 }
 
 struct AddWishView: View {
@@ -33,77 +37,10 @@ struct AddWishView: View {
                     .multilineTextAlignment(.center)
                     .style(textStyle: .title(.h1), color: .cForeground)
             }
-            
+            .padding(.horizontal)
+
             TabView(selection: $vm.tabViewIndex) {
                 // MARK: - Add via URL or manual
-                ScrollView {
-                    VStack(spacing: 40) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Add via URL or manual")
-                                    .style(textStyle: .text(.bold), color: .cForeground)
-                                
-                                Text("Paste the link to the gift you want and add it to your wishlist.")
-                                    .style(textStyle: .textSmall(.regular), color: .cForeground)
-                            }
-                            Spacer()
-                        }
-                        
-                        FormWrapper { inputsErrors, isShowingInputsErrors in
-                            Group {
-                                TextEntry(
-                                    identifier: "url",
-                                    value: $url,
-                                    title: "URL",
-                                    placeholder: "Enter enter",
-                                    errors: inputsErrors,
-                                    isShowingErrors: isShowingInputsErrors
-                                )
-                            }
-                        } submit: { setIsLoading, setFormError, inputsErrors, isShowingInputsErrors in
-                            Button {
-                                Task {
-                                    setIsLoading(.isLoading)
-                                    setFormError(nil)
-                                    isShowingInputsErrors.wrappedValue = true
-
-
-                                    if inputsErrors.isEmpty {
-                                        do {
-//                                            try await vm.login(identifier: identifier, password: password)
-//                                            navigationManager.navigate(to: .home)
-                                        } catch {
-                                            print(error)
-                                            setFormError("Something went wrong")
-                                        }
-                                    }
-                                    setIsLoading(.finished)
-                                }
-                            } label: {
-                                DropEffect {
-                                    HStack {
-                                        Text("Next")
-                                            .style(textStyle: .text(.medium), color: .cBlack)
-                                            .padding(15)
-                                    }
-                                    .frame(maxWidth: .infinity, maxHeight: 50)
-                                    .background(Color.cGreen)
-                                }
-                            }
-                        }
-                        
-                        Button {
-                            print("")
-                        } label: {
-                            Text("Add manual")
-                                .underline()
-                                .style(textStyle: .text(.medium), color: .cForeground.opacity(0.7))
-                        }
-                    }
-                    .padding(.horizontal)
-                }
-                .tag(1)
-                
                 ScrollView {
                     VStack(spacing: 40) {
                         HStack {
@@ -123,7 +60,7 @@ struct AddWishView: View {
                                     identifier: "url",
                                     value: $url,
                                     title: "URL",
-                                    placeholder: "Enter enter",
+                                    placeholder: "Enter the product url",
                                     errors: inputsErrors,
                                     isShowingErrors: isShowingInputsErrors
                                 )
@@ -134,12 +71,125 @@ struct AddWishView: View {
                                     setIsLoading(.isLoading)
                                     setFormError(nil)
                                     isShowingInputsErrors.wrappedValue = true
-
-
+                                    
                                     if inputsErrors.isEmpty {
                                         do {
-//                                            try await vm.login(identifier: identifier, password: password)
-//                                            navigationManager.navigate(to: .home)
+                                            let url = try validatedHttpsUrl(from: url)
+                                            let data = await url.getPageData()
+                                            print(data)
+                                            
+                                            if let title = data.getValue(.title) { self.title = title }
+                                            if let description = data.getValue(.description) { self.description = description }
+                                            print(data.getValue(.image))
+                                            print(data.getValue(.price))
+                                            print(data.getValue(.currency))
+                                            vm.newTabViewIndex = 1
+                                        } catch {
+                                            print(error)
+                                            setFormError(error.localizedDescription)
+                                        }
+                                    }
+                                    setIsLoading(.finished)
+                                }
+                            } label: {
+                                DropEffect {
+                                    HStack {
+                                        Text("Next")
+                                            .style(textStyle: .text(.medium), color: .cBlack)
+                                            .padding(15)
+                                    }
+                                    .frame(maxWidth: .infinity, maxHeight: 50)
+                                    .background(Color.cGreen)
+                                }
+                            }
+                        }
+                        
+                        Button {
+                            vm.newTabViewIndex = 1
+                        } label: {
+                            Text("Add manual")
+                                .underline()
+                                .style(textStyle: .text(.medium), color: .cForeground.opacity(0.7))
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                .tag(0)
+                
+                ScrollView {
+                    VStack(spacing: 40) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Wish information")
+                                    .style(textStyle: .text(.bold), color: .cForeground)
+                                
+                                Text("Enter the details of your wish and add it to your wishlist.")
+                                    .style(textStyle: .textSmall(.regular), color: .cForeground)
+                            }
+                            Spacer()
+                        }
+                        
+                        FormWrapper { inputsErrors, isShowingInputsErrors in
+                            Group {
+                                TextEntry(
+                                    identifier: "title",
+                                    value: $title,
+                                    title: "Title",
+                                    placeholder: "Enter title",
+                                    errors: inputsErrors,
+                                    isShowingErrors: isShowingInputsErrors
+                                )
+                                
+                                TextEntry(
+                                    identifier: "description",
+                                    value: $description,
+                                    title: "Description",
+                                    placeholder: "Enter description",
+                                    errors: inputsErrors,
+                                    isShowingErrors: isShowingInputsErrors,
+                                    entryType: .textEditor(lineLimit: 5)
+                                )
+                                
+                                TextEntry(
+                                    identifier: "url",
+                                    value: $url,
+                                    title: "URL",
+                                    placeholder: "Enter enter",
+                                    errors: inputsErrors,
+                                    isShowingErrors: isShowingInputsErrors
+                                )
+                                
+                                TextEntry(
+                                    identifier: "image",
+                                    value: $url,
+                                    title: "Image",
+                                    placeholder: "Enter image",
+                                    errors: inputsErrors,
+                                    isShowingErrors: isShowingInputsErrors
+                                )
+                                
+                                TextEntry(
+                                    identifier: "url",
+                                    value: $url,
+                                    title: "URL",
+                                    placeholder: "Enter enter",
+                                    errors: inputsErrors,
+                                    isShowingErrors: isShowingInputsErrors,
+                                    isOptionalField: true
+                                )
+                            }
+                        } submit: { setIsLoading, setFormError, inputsErrors, isShowingInputsErrors in
+                            Button {
+                                Task {
+                                    setIsLoading(.isLoading)
+                                    setFormError(nil)
+                                    isShowingInputsErrors.wrappedValue = true
+                                    
+                                    
+                                    if inputsErrors.isEmpty {
+                                        do {
+                                            //                                            try await vm.login(identifier: identifier, password: password)
+                                            //                                            navigationManager.navigate(to: .home)
                                         } catch {
                                             print(error)
                                             setFormError("Something went wrong")
@@ -169,23 +219,31 @@ struct AddWishView: View {
                         }
                     }
                     .padding(.horizontal)
+                    .ignoresSafeArea(edges: [.bottom])
                 }
-                .tag(2)
+                .tag(1)
                 
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            
-            Spacer()
-            
+            .onAppear {
+                UIScrollView.appearance().isScrollEnabled = false
+            }
+            .onDisappear {
+                UIScrollView.appearance().isScrollEnabled = true
+            }
         }
         .background(Color.cBackground)
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: Button(action : {
-            self.mode.wrappedValue.dismiss()
+            if vm.tabViewIndex == 1 {
+                vm.newTabViewIndex = 0
+            } else {
+                self.mode.wrappedValue.dismiss()
+            }
         }){
             HStack {
                 Image(systemName: "chevron.left")
-                Text("Back")
+                Text("Cancel")
             }
         })
     }
