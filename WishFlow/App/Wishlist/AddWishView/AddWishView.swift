@@ -180,17 +180,20 @@ struct AddWishView: View {
                                     selectedCurrencyCode: priceCurrencyCode
                                 )
                                 
-                                Toggle("May be given more then once", isOn: $mayBeGivenMoreThenOne)
-                                    .style(textStyle: .text(.medium), color: .cForeground)
-                                    .tint(.cOrange)
-                                
-                                if mayBeGivenMoreThenOne {
-                                    HStack(spacing: 20) {
-                                        Stepper("Receive limit", value: $giftLimit, in: 1...999)
-                                        
-                                        Text(giftLimit.description)
+                                // MayBeGivenMoreThenOneEntry
+                                Group {
+                                    Toggle("May be given more then once", isOn: $mayBeGivenMoreThenOne)
+                                        .style(textStyle: .text(.medium), color: .cForeground)
+                                        .tint(.cOrange)
+                                    
+                                    if mayBeGivenMoreThenOne {
+                                        HStack(spacing: 20) {
+                                            Stepper("Receive limit", value: $giftLimit, in: 1...999)
+                                            
+                                            Text(giftLimit.description)
+                                        }
+                                        .style(textStyle: .text(.medium), color: .cForeground)
                                     }
-                                    .style(textStyle: .text(.medium), color: .cForeground)
                                 }
                             }
                         } submit: { setIsLoading, setFormError, inputsErrors, isShowingInputsErrors in
