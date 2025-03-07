@@ -29,20 +29,31 @@ class PriceEntryViewModel: ObservableObject {
 struct PriceEntry: View {
     @ObservedObject var vm: PriceEntryViewModel = PriceEntryViewModel()
     
-    let title: String = "Price"
+    let title: String
     @Binding var selectedCurrency: Currency
     @Binding var priceValue: Double
     @State private var price: String
     
     var selectedCurrencyCode: String? = nil
     
-    init(selectedCurrency: Binding<Currency>, price: Binding<Double>) {
+    init(
+        title: String = "Price",
+        selectedCurrency: Binding<Currency>,
+        price: Binding<Double>
+    ) {
+        self.title = title
         self._selectedCurrency = selectedCurrency
         self._priceValue = price
         self.price = price.wrappedValue.description
     }
     
-    init(selectedCurrency: Binding<Currency>, price: Binding<Double>, selectedCurrencyCode: String?) {
+    init(
+        title: String = "Price",
+        selectedCurrency: Binding<Currency>,
+        price: Binding<Double>,
+        selectedCurrencyCode: String?
+    ) {
+        self.title = title
         self._selectedCurrency = selectedCurrency
         self._priceValue = price
         self.price = price.wrappedValue.description
