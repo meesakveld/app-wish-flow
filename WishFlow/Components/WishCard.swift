@@ -32,7 +32,7 @@ struct WishCard: View {
                         }
                     }
                 }
-                .aspectRatio(1, contentMode: .fit) // Zorgt ervoor dat items vierkant blijven
+                .aspectRatio(1, contentMode: .fit)
                 .overlay {
                     RoundedRectangle(cornerRadius: 5)
                         .stroke(Color.cForeground, lineWidth: 2)
@@ -42,6 +42,8 @@ struct WishCard: View {
                     VStack(alignment: .leading) {
                         Text(wish.title)
                             .style(textStyle: .text(.medium), color: .cBlack)
+                            .lineLimit(1)
+                            .multilineTextAlignment(.leading)
                         
                         Text(wish.price?.formatted() ?? "€ 30")
                             .style(textStyle: .textSmall(.regular), color: .cBlack)
