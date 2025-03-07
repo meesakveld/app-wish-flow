@@ -15,6 +15,12 @@ class NavigationManager: ObservableObject {
         navigationPath = NavigationPath() // Navigatiepad leegmaken
     }
     
+    func back() {
+        if !navigationPath.isEmpty {
+            navigationPath.removeLast()
+        }
+    }
+    
     func navigate(to destination: NavigationDestination) {
         navigationPath.append(destination)
     }
@@ -28,6 +34,8 @@ class NavigationManager: ObservableObject {
             WelcomeView().navigationBarBackButtonHidden()
         case .event(let documentId):
             EventView(documentId: documentId)
+        case .wish(let documentId):
+            WishView(documentId: documentId)
         }
     }
     
@@ -35,5 +43,6 @@ class NavigationManager: ObservableObject {
         case home
         case welcome
         case event(documentId: String)
+        case wish(documentId: String)
     }
 }
