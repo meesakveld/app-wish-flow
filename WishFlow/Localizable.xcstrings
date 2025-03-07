@@ -103,6 +103,9 @@
     "Logout" : {
 
     },
+    "May be given more then once" : {
+
+    },
     "My wishes" : {
 
     },
@@ -110,6 +113,9 @@
 
     },
     "Price:" : {
+
+    },
+    "Receive limit" : {
 
     },
     "Refresh" : {

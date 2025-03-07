@@ -31,6 +31,7 @@ struct AddWishView: View {
     @State var currency: Currency = Currency()
     @State private var priceCurrencyCode: String? = nil
     
+    @State private var mayBeGivenMoreThenOne: Bool = false
     @State var giftLimit: Int = 1
     
     var body: some View {
@@ -178,6 +179,19 @@ struct AddWishView: View {
                                     price: $price,
                                     selectedCurrencyCode: priceCurrencyCode
                                 )
+                                
+                                Toggle("May be given more then once", isOn: $mayBeGivenMoreThenOne)
+                                    .style(textStyle: .text(.medium), color: .cForeground)
+                                    .tint(.cOrange)
+                                
+                                if mayBeGivenMoreThenOne {
+                                    HStack(spacing: 20) {
+                                        Stepper("Receive limit", value: $giftLimit, in: 1...999)
+                                        
+                                        Text(giftLimit.description)
+                                    }
+                                    .style(textStyle: .text(.medium), color: .cForeground)
+                                }
                             }
                         } submit: { setIsLoading, setFormError, inputsErrors, isShowingInputsErrors in
                             Button {
