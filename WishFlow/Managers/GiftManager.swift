@@ -15,7 +15,7 @@ final class GiftManager: ObservableObject, Sendable {
     
     private init () { }
     
-    // MARK: - Requests
+    // MARK: - GET REQUESTS
     
     private let giftCollection: CollectionQuery = Strapi.contentManager.collection("gifts")
     
@@ -40,7 +40,7 @@ final class GiftManager: ObservableObject, Sendable {
         if let sortGiftPrice = sortGiftPrice {
             query = query.sort(by: "[price][amount]", order: sortGiftPrice)
         }
-
+        
         let response = try await query
             .getDocuments(as: [Gift].self)
         
@@ -66,6 +66,36 @@ final class GiftManager: ObservableObject, Sendable {
             })
             .getDocument(as: Gift.self)
         
+        return response.data
+    }
+    
+    
+    // MARK: - POST REQUESTS
+    
+    func addGift(
+        title: String,
+        description: String,
+        url: String,
+        imageId: Int,
+        giftLimit: Int,
+        priceAmount: Double,
+        priceCurrencyDocumentId: String,
+        userId: Int
+    ) async throws -> Gift {
+        let data: StrapiRequestBody = StrapiRequestBody([
+            "title": .string(title),
+            "description": .string(description),
+            "url": .string(url),
+            "image": .int(imageId),
+            "giftLimit": .int(giftLimit),
+            "price": .dictionary([
+                "amount": .double(priceAmount),
+                "currency": .string(priceCurrencyDocumentId)
+            ]),
+            "user": .int(userId)
+        ])
+        
+        let response = try await giftCollection.postData(data, as: Gift.self)
         return response.data
     }
     
