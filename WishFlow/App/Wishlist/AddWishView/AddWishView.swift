@@ -18,14 +18,19 @@ class AddWishViewModel: ObservableObject {
 struct AddWishView: View {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     @EnvironmentObject private var alertManager: AlertManager
-    
     @ObservedObject var vm: AddWishViewModel = AddWishViewModel()
-    
+
+    // FORM VALUES
     @State var title: String = ""
     @State var description: String = ""
-    @State var image: Data? = nil
+    @State var image: UIImage? = nil
+    @State var imageURL: String? = nil
     @State var url: String = ""
-    @State var price: Double = 0
+    
+    @State var price: Double = 0.0
+    @State var currency: Currency = Currency()
+    @State private var priceCurrencyCode: String? = nil
+    
     @State var giftLimit: Int = 1
     
     var body: some View {
@@ -76,13 +81,13 @@ struct AddWishView: View {
                                         do {
                                             let url = try validatedHttpsUrl(from: url)
                                             let data = await url.getPageData()
-                                            print(data)
                                             
                                             if let title = data.getValue(.title) { self.title = title }
                                             if let description = data.getValue(.description) { self.description = description }
-                                            print(data.getValue(.image))
-                                            print(data.getValue(.price))
-                                            print(data.getValue(.currency))
+                                            if let imageURL = data.getValue(.image) { self.imageURL = imageURL }
+                                            if let price = data.getValue(.price) { if let price = Double(price) { self.price = price } }
+                                            if let currencyCode = data.getValue(.currency) { self.priceCurrencyCode = currencyCode }
+                                            
                                             vm.newTabViewIndex = 1
                                         } catch {
                                             print(error)
@@ -150,20 +155,11 @@ struct AddWishView: View {
                                     entryType: .textEditor(lineLimit: 5)
                                 )
                                 
-                                TextEntry(
-                                    identifier: "url",
-                                    value: $url,
-                                    title: "URL",
-                                    placeholder: "Enter enter",
-                                    errors: inputsErrors,
-                                    isShowingErrors: isShowingInputsErrors
-                                )
-                                
-                                TextEntry(
+                                ImageEntry(
                                     identifier: "image",
-                                    value: $url,
                                     title: "Image",
-                                    placeholder: "Enter image",
+                                    value: $image,
+                                    valueURL: imageURL,
                                     errors: inputsErrors,
                                     isShowingErrors: isShowingInputsErrors
                                 )
@@ -174,8 +170,13 @@ struct AddWishView: View {
                                     title: "URL",
                                     placeholder: "Enter enter",
                                     errors: inputsErrors,
-                                    isShowingErrors: isShowingInputsErrors,
-                                    isOptionalField: true
+                                    isShowingErrors: isShowingInputsErrors
+                                )
+                                
+                                PriceEntry(
+                                    selectedCurrency: $currency,
+                                    price: $price,
+                                    selectedCurrencyCode: priceCurrencyCode
                                 )
                             }
                         } submit: { setIsLoading, setFormError, inputsErrors, isShowingInputsErrors in
@@ -210,13 +211,6 @@ struct AddWishView: View {
                             }
                         }
                         
-                        Button {
-                            print("")
-                        } label: {
-                            Text("Add manual")
-                                .underline()
-                                .style(textStyle: .text(.medium), color: .cForeground.opacity(0.7))
-                        }
                     }
                     .padding(.horizontal)
                     .ignoresSafeArea(edges: [.bottom])
