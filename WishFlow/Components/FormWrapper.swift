@@ -127,5 +127,8 @@ struct FormWrapper<TextEntries: View, Submit: View>: View {
             }
             .disabled(loadingState.isInLoadingState())
         }
+        .onTapGesture {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        }
     }
 }
