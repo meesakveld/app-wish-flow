@@ -77,6 +77,18 @@ struct AddWishView: View {
     @State private var mayBeGivenMoreThenOne: Bool = false
     @State var giftLimit: Int = 1
     
+    func reset() {
+        title = ""
+        description = ""
+        image = nil
+        imageURL = nil
+        url = ""
+        price = 0.0
+        priceCurrencyCode = nil
+        mayBeGivenMoreThenOne = false
+        giftLimit = 1
+    }
+    
     var body: some View {
         VStack(spacing: 40) {
             
@@ -273,7 +285,7 @@ struct AddWishView: View {
                             } label: {
                                 DropEffect {
                                     HStack {
-                                        Text("Next")
+                                        Text("Save")
                                             .style(textStyle: .text(.medium), color: .cBlack)
                                             .padding(15)
                                     }
@@ -302,6 +314,7 @@ struct AddWishView: View {
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: Button(action : {
             if vm.tabViewIndex == 1 {
+                reset()
                 vm.newTabViewIndex = 0
             } else {
                 self.mode.wrappedValue.dismiss()
