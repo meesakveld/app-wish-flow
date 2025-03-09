@@ -69,6 +69,24 @@ final class GiftManager: ObservableObject, Sendable {
         return response.data
     }
     
+    func deleteGiftByDocumentId(documentId: String, userId: Int) async throws {
+        // GE
+        let gift = try await giftCollection
+            .withDocumentId(documentId)
+            .populate("image")
+            .getDocument(as: Gift.self)
+        
+        // Delete gift
+        try await giftCollection
+            .withDocumentId(documentId)
+            .delete()
+        
+        // Delete image
+        if let imageId = gift.data.image?.id {
+            try await Strapi.mediaLibrary.files.withId(imageId).delete(as: StrapiImage.self)
+        }
+    }
+    
     
     // MARK: - POST REQUESTS
     

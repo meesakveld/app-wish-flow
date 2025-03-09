@@ -34,6 +34,8 @@ class NavigationManager: ObservableObject {
             WelcomeView().navigationBarBackButtonHidden()
         case .event(let documentId):
             EventView(documentId: documentId)
+        case .wishList:
+            WishlistView()
         case .wish(let documentId):
             WishView(documentId: documentId)
         }
@@ -43,6 +45,7 @@ class NavigationManager: ObservableObject {
         case home
         case welcome
         case event(documentId: String)
+        case wishList
         case wish(documentId: String)
     }
 }

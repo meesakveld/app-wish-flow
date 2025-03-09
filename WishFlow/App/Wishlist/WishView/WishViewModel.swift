@@ -32,4 +32,15 @@ class WishViewModel: ObservableObject {
         }
         setLoading(value: isLoading, .finished)
     }
+    
+    func deleteWish(documentId: String, isLoading: Binding<LoadingState>) async throws {
+        setLoading(value: isLoading, .isLoading)
+        do {
+            try await GiftManager.shared.deleteGiftByDocumentId(documentId: documentId, userId: user?.id ?? 1)
+        } catch {
+            setLoading(value: isLoading, .finished)
+            throw error
+        }
+        setLoading(value: isLoading, .finished)
+    }
 }

@@ -9,7 +9,9 @@ import SwiftUI
 
 struct WishView: View {
     let documentId: String
+    
     @ObservedObject var vm: WishViewModel = WishViewModel()
+    @EnvironmentObject var navigationManager: NavigationManager
     
     @State var showAllParticipants: Bool = false
     @State var spacingParticipants: CGFloat = -15
@@ -44,7 +46,7 @@ struct WishView: View {
                     
                     Spacer()
                 }
-                .frame(width: .infinity ,height: .infinity)
+                .frame(maxWidth: .infinity ,maxHeight: .infinity)
             }
             
             // MARK: - Wish
@@ -175,12 +177,40 @@ struct WishView: View {
                 .padding(.horizontal)
                 .task { await vm.getWish(documentId: documentId, isLoading: $vm.wishIsLoading) }
                 .toolbar {
-                    Menu {
-                       
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
+                    if let wishUserId = vm.wish?.user?.id, let userId = vm.user?.id, wishUserId == userId {
+                        Menu {
+                            
+                            Button("Add wish to event", systemImage: "checkmark.circle") {
+                                print("Add wish to event")
+                            }
+                            
+                            Button("Share wish", systemImage: "square.and.arrow.up") {
+                                print("Share")
+                            }
+                            
+                            Divider()
+                            
+                            Button("Edit wish", systemImage: "pencil") {
+                                print("Edit")
+                            }
+                            
+                            Button("Delete wish", systemImage: "trash") {
+                                Task {
+                                    do {
+                                        try await vm.deleteWish(documentId: documentId, isLoading: $vm.wishIsLoading)
+                                        navigationManager.back()
+                                        navigationManager.navigate(to: .wishList)
+                                    } catch {
+                                        print(error)
+                                    }
+                                }
+                            }
+                            
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                        }
+                        .disabled(vm.wish == nil)
                     }
-                    .disabled(vm.wish == nil)
                 }
             }
         }
@@ -197,6 +227,7 @@ struct WishView: View {
         NavigationLink("", value: true)
             .navigationDestination(isPresented: .constant(true)) {
                 WishView(documentId: "j7u00k3sajkspg36gw0srngk")
+                    .environmentObject(NavigationManager())
             }
     }
 }

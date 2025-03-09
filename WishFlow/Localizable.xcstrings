@@ -52,6 +52,9 @@
     "Add new wish" : {
 
     },
+    "Add wish to event" : {
+
+    },
     "Asked for in events" : {
 
     },
@@ -73,7 +76,13 @@
     "Deadline selecting wishes:" : {
 
     },
+    "Delete wish" : {
+
+    },
     "dfsgdh" : {
+
+    },
+    "Edit wish" : {
 
     },
     "Enter the details of your wish and add it to your wishlist." : {
@@ -140,6 +149,9 @@
 
     },
     "Select wishes" : {
+
+    },
+    "Share wish" : {
 
     },
     "Upcoming Events" : {
