@@ -11,53 +11,62 @@ import StrapiSwift
 @MainActor
 class PriceEntryViewModel: ObservableObject {
     @Published var currencies: [Currency] = []
-    @Published var loadingState: LoadingState = .readyToLoad
+    @Published var selectedCurrency: Currency? {
+        didSet {
+            if let selectedCurrency = selectedCurrency {
+                onCurrencyChange?(selectedCurrency)
+            }
+        }
+    }
     
-    func getCurrencies() async {
+    @Published var loadingState: LoadingState = .readyToLoad
+    var onCurrencyChange: ((Currency) -> Void)?
+    
+    func getCurrencies(selectedCurrencyCode: String?) async {
         loadingState = .isLoading
         do {
             let response = try await Strapi.contentManager.collection("currencies").getDocuments(as: [Currency].self)
-            currencies = response.data
+            
+            self.currencies = response.data
+            self.loadingState = .finished
+            
+            if let selectedCode = selectedCurrencyCode,
+               let foundCurrency = self.currencies.first(where: { $0.code == selectedCode }) {
+                self.selectedCurrency = foundCurrency
+            } else {
+                self.selectedCurrency = self.currencies.first
+            }
         } catch {
-            currencies = []
+            self.currencies = []
+            self.selectedCurrency = nil
+            self.loadingState = .finished
             print(error)
         }
-        loadingState = .finished
     }
 }
 
+
 struct PriceEntry: View {
-    @ObservedObject var vm: PriceEntryViewModel = PriceEntryViewModel()
+    @StateObject private var vm = PriceEntryViewModel()
     
     let title: String
     @Binding var selectedCurrency: Currency
     @Binding var priceValue: Double
+    let selectedCurrencyCode: String?
+    
     @State private var price: String
-    
-    var selectedCurrencyCode: String? = nil
-    
-    init(
-        title: String = "Price",
-        selectedCurrency: Binding<Currency>,
-        price: Binding<Double>
-    ) {
-        self.title = title
-        self._selectedCurrency = selectedCurrency
-        self._priceValue = price
-        self.price = price.wrappedValue.description
-    }
-    
+
     init(
         title: String = "Price",
         selectedCurrency: Binding<Currency>,
         price: Binding<Double>,
-        selectedCurrencyCode: String?
+        selectedCurrencyCode: String? = nil
     ) {
         self.title = title
         self._selectedCurrency = selectedCurrency
         self._priceValue = price
-        self.price = price.wrappedValue.description
         self.selectedCurrencyCode = selectedCurrencyCode
+        self.price = price.wrappedValue.description == "0.0" ? "" : price.wrappedValue.description
     }
     
     var body: some View {
@@ -69,16 +78,21 @@ struct PriceEntry: View {
             
             HStack(alignment: .center) {
                 Menu {
-                    ForEach(vm.currencies, id: \.documentId) { currency in
-                        Button {
-                            selectedCurrency = currency
-                        } label: {
-                            Text("\(currency.symbol) - \(currency.name)")
+                    if vm.loadingState == .isLoading {
+                        ProgressView()
+                    } else if !vm.currencies.isEmpty {
+                        ForEach(vm.currencies, id: \.documentId) { currency in
+                            Button {
+                                vm.selectedCurrency = currency
+                            } label: {
+                                Text("\(currency.symbol) - \(currency.name)")
+                            }
                         }
-
+                    } else {
+                        Text("No currencies available")
                     }
                 } label: {
-                    Text(selectedCurrency.symbol)
+                    Text(vm.selectedCurrency?.symbol ?? "...")
                         .frame(height: 40)
                         .padding(.horizontal, 15)
                         .background(Color.cWhite)
@@ -109,13 +123,10 @@ struct PriceEntry: View {
             .loadingEffect(vm.loadingState.isInLoadingState())
         }
         .task {
-            await vm.getCurrencies()
-            if !vm.currencies.isEmpty, let selectedCurrencyCode = selectedCurrencyCode {
-                let foundCurrency = vm.currencies.first(where: { $0.code == selectedCurrencyCode })
-                if let foundCurrency = foundCurrency {
-                    selectedCurrency = foundCurrency
-                }
+            vm.onCurrencyChange = { currency in
+                selectedCurrency = currency
             }
+            await vm.getCurrencies(selectedCurrencyCode: selectedCurrencyCode)
         }
     }
 }
