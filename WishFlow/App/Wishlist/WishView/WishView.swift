@@ -104,6 +104,19 @@ struct WishView: View {
                         // MARK: Details
                         VStack(alignment: .leading, spacing: 10) {
                             
+                            if let wishUserId = vm.wish?.user?.id, let userId = vm.user?.id, wishUserId == userId {
+                                // Receive limit
+                                HStack(alignment: .center) {
+                                    Text("Receive limit:")
+                                        .style(textStyle: .text(.medium), color: .cBlack)
+                                    
+                                    Text("\(vm.wish?.giftLimit.description ?? "1") time\((vm.wish?.giftLimit ?? 1) > 1 ? "s" : "")")
+                                        .style(textStyle: .text(.regular), color: .cBlack)
+                                    
+                                    Spacer()
+                                }
+                            }
+                            
                             // Price
                             HStack(alignment: .center) {
                                 Text("Price:")
@@ -135,15 +148,17 @@ struct WishView: View {
                         }
                         .frame(maxWidth: .infinity)
                         
-                        if (vm.wish?.giftLimit ?? 0) > 1 {
-                            HStack {
-                                Text("""
+                        if let wishUserId = vm.wish?.user?.id, let userId = vm.user?.id, wishUserId != userId {
+                            if (vm.wish?.giftLimit ?? 0) > 1 {
+                                HStack {
+                                    Text("""
                                     \(vm.wish?.user?.firstname ?? "") would like to receive this gift **\(vm.wish?.giftLimit ?? 999) times**. Currently, **\(vm.wish?.giftClaims?.count ?? 0) \((vm.wish?.giftClaims?.count ?? 0) == 1 ? "person" : "people")** have stated they will buy it.
                                     """)
-                                .style(textStyle: .text(.regular), color: .cForeground)
-                                .multilineTextAlignment(.leading)
-                                
-                                Spacer()
+                                    .style(textStyle: .text(.regular), color: .cForeground)
+                                    .multilineTextAlignment(.leading)
+                                    
+                                    Spacer()
+                                }
                             }
                         }
                     }
