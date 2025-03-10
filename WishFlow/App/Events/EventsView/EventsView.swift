@@ -138,14 +138,14 @@ struct EventsView: View {
             
         }
         .toolbar {
-            Button {
-                print("add event")
+            NavigationLink {
+                AddEventView()
             } label: {
                 Image(systemName: "plus.circle")
             }
             
             Button {
-                print("add event")
+                print("edit event")
             } label: {
                 Image(systemName: "ellipsis.circle")
             }
