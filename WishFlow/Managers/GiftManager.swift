@@ -102,13 +102,14 @@ final class GiftManager: ObservableObject, Sendable {
     @discardableResult
     func updateGiftByDocumentId(
         documentId: String,
-        title: String?,
-        description: String?,
-        url: String?,
-        imageId: Int?,
-        giftLimit: Int?,
-        priceAmount: Double?,
-        priceCurrencyDocumentId: String?
+        title: String? = nil,
+        description: String? = nil,
+        url: String? = nil,
+        imageId: Int? = nil,
+        giftLimit: Int? = nil,
+        priceAmount: Double? = nil,
+        priceCurrencyDocumentId: String? = nil,
+        events: [String]? = nil
     ) async throws -> Gift {
         var data: [String: AnyCodable] = [:]
         if let title = title { data["title"] = .string(title) }
@@ -129,6 +130,7 @@ final class GiftManager: ObservableObject, Sendable {
             data["price"] = .dictionary([ "currency": .string(priceCurrencyDocumentId) ])
             print("data: \(priceCurrencyDocumentId)")
         }
+        if let events = events { data["events"] = .array(events.map({ return .string($0) })) }
         
         let response = try await giftCollection
             .withDocumentId(documentId)
