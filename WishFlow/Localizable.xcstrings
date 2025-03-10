@@ -21,6 +21,9 @@
         }
       }
     },
+    "%@ | Wishflow" : {
+
+    },
     "%@ would like to receive this gift **%lld times**. Currently, **%lld %@** have stated they will buy it." : {
       "localizations" : {
         "en" : {
@@ -62,6 +65,9 @@
 
     },
     "Cancel" : {
+
+    },
+    "Check out this wish!" : {
 
     },
     "Create an account" : {

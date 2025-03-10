@@ -185,9 +185,17 @@ struct WishView: View {
                                 print("Add wish to event")
                             }
                             
-                            Button("Share wish", systemImage: "square.and.arrow.up") {
-                                print("Share")
+                            ShareLink(
+                                item: URL(string: "wishflow://wishlist/\(documentId)")!,
+                                message: Text("Check out this wish!"),
+                                preview: SharePreview(
+                                    "\(vm.wish?.title ?? "Wish") | Wishflow",
+                                    image: Image("giftWithStars")
+                                )
+                            ) {
+                                Label("Share wish", systemImage: "square.and.arrow.up")
                             }
+
                             
                             Divider()
                             
