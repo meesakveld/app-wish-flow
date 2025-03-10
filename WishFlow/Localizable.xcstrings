@@ -24,6 +24,16 @@
     "%@ | Wishflow" : {
 
     },
+    "%@ time%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ time%2$@"
+          }
+        }
+      }
+    },
     "%@ would like to receive this gift **%lld times**. Currently, **%lld %@** have stated they will buy it." : {
       "localizations" : {
         "en" : {
@@ -109,9 +119,6 @@
     "Giftees" : {
 
     },
-    "Hello, World!" : {
-
-    },
     "Info" : {
 
     },
@@ -142,6 +149,9 @@
     "Receive limit" : {
 
     },
+    "Receive limit:" : {
+
+    },
     "Refresh" : {
 
     },
@@ -167,6 +177,9 @@
 
     },
     "Upcoming Events" : {
+
+    },
+    "Update here the details of your wish." : {
 
     },
     "URL:" : {

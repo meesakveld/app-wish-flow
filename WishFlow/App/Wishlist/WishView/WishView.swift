@@ -19,7 +19,7 @@ struct WishView: View {
     
     var body: some View {
         ScrollView {
-            // MARK: - Error handling for when event is not found
+            // MARK: - Error handling for when wish is not found
             if vm.wishHasError {
                 VStack {
                     Spacer()

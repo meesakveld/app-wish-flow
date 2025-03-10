@@ -69,24 +69,6 @@ final class GiftManager: ObservableObject, Sendable {
         return response.data
     }
     
-    func deleteGiftByDocumentId(documentId: String, userId: Int) async throws {
-        // GE
-        let gift = try await giftCollection
-            .withDocumentId(documentId)
-            .populate("image")
-            .getDocument(as: Gift.self)
-        
-        // Delete gift
-        try await giftCollection
-            .withDocumentId(documentId)
-            .delete()
-        
-        // Delete image
-        if let imageId = gift.data.image?.id {
-            try await Strapi.mediaLibrary.files.withId(imageId).delete(as: StrapiImage.self)
-        }
-    }
-    
     
     // MARK: - POST REQUESTS
     
@@ -115,6 +97,61 @@ final class GiftManager: ObservableObject, Sendable {
         
         let response = try await giftCollection.postData(data, as: Gift.self)
         return response.data
+    }
+    
+    @discardableResult
+    func updateGiftByDocumentId(
+        documentId: String,
+        title: String?,
+        description: String?,
+        url: String?,
+        imageId: Int?,
+        giftLimit: Int?,
+        priceAmount: Double?,
+        priceCurrencyDocumentId: String?
+    ) async throws -> Gift {
+        var data: [String: AnyCodable] = [:]
+        if let title = title { data["title"] = .string(title) }
+        if let description = description { data["description"] = .string(description) }
+        if let url = url { data["url"] = .string(url) }
+        if let imageId = imageId { data["image"] = .int(imageId) }
+        if let giftLimit = giftLimit { data["giftLimit"] = .int(giftLimit) }
+        if let priceAmount = priceAmount, let priceCurrencyDocumentId = priceCurrencyDocumentId {
+            data["price"] = .dictionary([
+                "amount": .double(priceAmount),
+                "currency": .string(priceCurrencyDocumentId)
+            ])
+            print("data: \(priceAmount) \(priceCurrencyDocumentId)")
+        } else if let priceAmount = priceAmount {
+            data["price"] = .dictionary([ "amount": .double(priceAmount) ])
+            print("data: \(priceAmount)")
+        } else if let priceCurrencyDocumentId = priceCurrencyDocumentId {
+            data["price"] = .dictionary([ "currency": .string(priceCurrencyDocumentId) ])
+            print("data: \(priceCurrencyDocumentId)")
+        }
+        
+        let response = try await giftCollection
+            .withDocumentId(documentId)
+            .putData(StrapiRequestBody(data), as: Gift.self)
+        return response.data
+    }
+    
+    func deleteGiftByDocumentId(documentId: String, userId: Int) async throws {
+        let gift = try await giftCollection
+            .withDocumentId(documentId)
+            .filter("[user][id]", operator: .equal, value: userId)
+            .populate("image")
+            .getDocument(as: Gift.self)
+        
+        // Delete gift
+        try await giftCollection
+            .withDocumentId(documentId)
+            .delete()
+        
+        // Delete image
+        if let imageId = gift.data.image?.id {
+            try await Strapi.mediaLibrary.files.withId(imageId).delete(as: StrapiImage.self)
+        }
     }
     
 }
