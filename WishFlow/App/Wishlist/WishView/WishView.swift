@@ -13,9 +13,8 @@ struct WishView: View {
     @ObservedObject var vm: WishViewModel = WishViewModel()
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var alertManager: AlertManager
-    
-    @State var showAllParticipants: Bool = false
-    @State var spacingParticipants: CGFloat = -15
+
+    @State var isShowingSheetAddWishToEvents: Bool = false
     
     var body: some View {
         ScrollView {
@@ -197,7 +196,7 @@ struct WishView: View {
                         Menu {
                             
                             Button("Add wish to event", systemImage: "checkmark.circle") {
-                                print("Add wish to event")
+                                isShowingSheetAddWishToEvents = true
                             }
                             
                             ShareLink(
@@ -251,6 +250,16 @@ struct WishView: View {
                             Image(systemName: "ellipsis.circle")
                         }
                         .disabled(vm.wish == nil)
+                    }
+                }
+                .sheet(isPresented: $isShowingSheetAddWishToEvents) {
+                    AddWishToEventsView(wishDocumentId: documentId)
+                }
+                .onChange(of: isShowingSheetAddWishToEvents) { _, nv in
+                    if !nv {
+                        Task {
+                            await vm.getWish(documentId: documentId, isLoading: $vm.wishIsLoading)
+                        }
                     }
                 }
             }
