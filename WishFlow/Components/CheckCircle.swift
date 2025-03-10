@@ -8,11 +8,29 @@
 import SwiftUI
 
 struct CheckCircle: View {
+    let isChecked: Bool
+    let action: () -> Void
+    
+    init(isChecked: Bool, _ action: @escaping () -> Void) {
+        self.isChecked = isChecked
+        self.action = action
+    }
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Button {
+            action()
+        } label: {
+            Image(systemName: isChecked ? "checkmark.circle.fill" : "circle")
+                .resizable()
+                .frame(width: 25, height: 25)
+                .foregroundColor(isChecked ? .cOrange : .gray)
+                .animation(.easeInOut(duration: 0.1), value: isChecked)
+        }
     }
 }
 
 #Preview {
-    CheckCircle()
+    CheckCircle(isChecked: true) {
+        print("dsfdsfsd")
+    }
 }
