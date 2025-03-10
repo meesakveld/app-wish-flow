@@ -37,14 +37,14 @@ final class EventManager: ObservableObject, Sendable {
             .populate("eventInvites")
     }
     
-    func getUpcomingEventsWithUserId(userId: Int) async throws -> [Event] {
+    func getUpcomingEventsWithUserId(userId: Int, limit: Int = 3) async throws -> [Event] {
         let currentDate = Date().dateToStringFormatter(DateFormat: .yyyy_MM_dd)
         
         let response = try await eventCollection
             .populate("image")
             .filter("[eventParticipants][user][id]", operator: .includedIn, value: userId)
             .filter("[eventDate]", operator: .greaterThanOrEqual, value: currentDate)
-            .paginate(limit: 3)
+            .paginate(limit: limit)
             .getDocuments(as: [Event].self)
         
         return response.data
