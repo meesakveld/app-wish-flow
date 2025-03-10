@@ -60,6 +60,15 @@
     "12,99" : {
 
     },
+    "A gifting format where **multiple people** exchange gifts within a group." : {
+
+    },
+    "A gifting occasion where **one person** receives gifts from others." : {
+
+    },
+    "A gifting system where pairings are **randomly assigned**, each person gives a gift to one person within a group." : {
+
+    },
     "Add a wish" : {
 
     },
@@ -81,6 +90,9 @@
     "Asked for in events" : {
 
     },
+    "Budget" : {
+
+    },
     "Budget:" : {
 
     },
@@ -90,13 +102,25 @@
     "Check out this wish!" : {
 
     },
+    "Choose an event type based on the kind of event you want to organize." : {
+
+    },
     "Create an account" : {
 
     },
     "Create an account to manage your wish lists and gift groups. Sign up now and start planning the perfect gifts!" : {
 
     },
+    "Create an event" : {
+
+    },
+    "Deadline adding wishes" : {
+
+    },
     "Deadline adding wishes:" : {
+
+    },
+    "Deadline gift selecting" : {
 
     },
     "Deadline selecting wishes:" : {
@@ -115,6 +139,12 @@
 
     },
     "Enter the details of your wish and add it to your wishlist." : {
+
+    },
+    "Event date" : {
+
+    },
+    "Event type" : {
 
     },
     "Eventdate:" : {
@@ -187,6 +217,9 @@
 
     },
     "Share wish" : {
+
+    },
+    "Timing" : {
 
     },
     "Upcoming Events" : {

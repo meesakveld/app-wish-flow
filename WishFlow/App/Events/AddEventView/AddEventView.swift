@@ -9,8 +9,8 @@ import SwiftUI
 
 @MainActor
 class AddEventViewModel: ObservableObject {
-    @Published var tabViewIndex: Int = 0
-    @Published var newTabViewIndex: Int = 0 {
+    @Published var tabViewIndex: Int = 1
+    @Published var newTabViewIndex: Int = 1 {
         didSet { withAnimation { tabViewIndex = newTabViewIndex }}
     }
     
@@ -29,29 +29,24 @@ struct AddEventView: View {
     @ObservedObject var vm: AddEventViewModel = AddEventViewModel()
     
     // FORM VALUES
+    @State var eventType: EventType = .singleRecipient
     @State var title: String = ""
     @State var description: String = ""
     @State var image: UIImage? = nil
-    @State var imageURL: String? = nil
-    @State var url: String = ""
+    @State var eventDate: Date = Date()
+    @State var giftDeadline: Date = Date()
+    @State var claimDeadline: Date = Date()
     
-    @State var price: Double = 0.0
+    @State var minPrice: Double = 0.0
+    @State var maxPrice: Double = 0.0
     @State var currency: Currency = Currency()
-    @State private var priceCurrencyCode: String? = nil
-    
-    @State private var mayBeGivenMoreThenOne: Bool = false
-    @State var giftLimit: Int = 1
     
     func reset() {
         title = ""
         description = ""
         image = nil
-        imageURL = nil
-        url = ""
-        price = 0.0
-        priceCurrencyCode = nil
-        mayBeGivenMoreThenOne = false
-        giftLimit = 1
+        minPrice = 0.0
+        maxPrice = 0.0
     }
     
     var body: some View {
@@ -81,72 +76,46 @@ struct AddEventView: View {
                         }
                         
                         VStack(alignment: .leading, spacing: 20) {
-                            DropEffect {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 15) {
-                                        VStack(alignment: .leading, spacing: 10) {
-                                            Text("Single Recipient")
-                                                .style(textStyle: .title(.h3), color: .cBlack)
-                                            
-                                            Text("A gifting occasion where **one person** receives gifts from others.")
-                                                .style(textStyle: .textSmall(.medium), color: .cBlack)
-                                        }
-                                        
-                                        Text("E.g. Birthday, Graduation")
-                                            .style(textStyle: .textSmall(.regular), color: .cBlack)
-                                    }
-                                    Spacer()
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(15)
-                                .background(Color.cGreen)
+                            Button {
+                                eventType = .singleRecipient
+                                vm.newTabViewIndex = 1
+                            } label: {
+                                EventTypeCard(
+                                    title: "Single Recipient",
+                                    description: "A gifting occasion where **one person** receives gifts from others.",
+                                    example: "E.g. Birthday, Baby Shower",
+                                    backgroundColor: .cGreen
+                                )
                             }
                             
-                            DropEffect {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 15) {
-                                        VStack(alignment: .leading, spacing: 10) {
-                                            Text("Group Gifting")
-                                                .style(textStyle: .title(.h3), color: .cBlack)
-                                            
-                                            Text("A gifting format where **multiple people** contribute to or exchange gifts within a group.")
-                                                .style(textStyle: .textSmall(.medium), color: .cBlack)
-                                        }
-                                        
-                                        Text("E.g. Christmas, Baby Shower")
-                                            .style(textStyle: .textSmall(.regular), color: .cBlack)
-                                    }
-                                    Spacer()
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(15)
-                                .background(Color.cBlue)
+                            Button {
+                                eventType = .groupGifting
+                                vm.newTabViewIndex = 1
+                            } label: {
+                                EventTypeCard(
+                                    title: "Group Gifting",
+                                    description: "A gifting format where **multiple people** exchange gifts within a group.",
+                                    example: "E.g. Christmas",
+                                    backgroundColor: .cBlue
+                                )
                             }
                             
-                            DropEffect {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 15) {
-                                        VStack(alignment: .leading, spacing: 10) {
-                                            Text("One to one")
-                                                .style(textStyle: .title(.h3), color: .cBlack)
-                                            
-                                            Text("A gifting system where one person gives a gift to one person, **randomly assigned**.")
-                                                .style(textStyle: .textSmall(.medium), color: .cBlack)
-                                        }
-                                        
-                                        Text("E.g. Secret Santa, Valentine’s Day")
-                                            .style(textStyle: .textSmall(.regular), color: .cBlack)
-                                    }
-                                    Spacer()
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(15)
-                                .background(Color.cOrange)
+                            Button {
+                                eventType = .oneToOne
+                                vm.newTabViewIndex = 1
+                            } label: {
+                                EventTypeCard(
+                                    title: "One to one",
+                                    description: "A gifting system where pairings are **randomly assigned**, each person gives a gift to one person within a group.",
+                                    example: "E.g. Secret Santa, Valentine’s Day",
+                                    backgroundColor: .cOrange
+                                )
                             }
                         }
                     
                     }
                     .padding(.horizontal)
+                    
                 }
                 .tag(0)
                 
@@ -188,41 +157,69 @@ struct AddEventView: View {
                                     identifier: "image",
                                     title: "Image",
                                     value: $image,
-                                    valueURL: imageURL,
                                     errors: inputsErrors,
                                     isShowingErrors: isShowingInputsErrors
                                 )
                                 
-                                TextEntry(
-                                    identifier: "url",
-                                    value: $url,
-                                    title: "URL",
-                                    placeholder: "Enter enter",
-                                    errors: inputsErrors,
-                                    isShowingErrors: isShowingInputsErrors
-                                )
-                                
-                                PriceEntry(
-                                    selectedCurrency: $currency,
-                                    price: $price,
-                                    selectedCurrencyCode: priceCurrencyCode
-                                )
-                                
-                                // MayBeGivenMoreThenOneEntry
-                                Group {
-                                    Toggle("May be given more then once", isOn: $mayBeGivenMoreThenOne)
+                                DatePicker(selection: $eventDate, in: Date()..., displayedComponents: [.date]) {
+                                    Text("Event date")
                                         .style(textStyle: .text(.medium), color: .cForeground)
-                                        .tint(.cOrange)
+                                }
+                                
+                                Text("Budget")
+                                    .style(textStyle: .text(.bold), color: .cForeground)
+                                    .padding(.top, 10)
+                                
+                                HStack {
+                                    CheckCircle(isChecked: false) {
+                                        //
+                                    }
                                     
-                                    if mayBeGivenMoreThenOne {
-                                        HStack(spacing: 20) {
-                                            Stepper("Receive limit", value: $giftLimit, in: 1...999)
-                                            
-                                            Text(giftLimit.description)
-                                        }
-                                        .style(textStyle: .text(.medium), color: .cForeground)
+                                    PriceEntry(
+                                        title: "Minimal budget",
+                                        selectedCurrency: $currency,
+                                        price: $minPrice
+                                    )
+                                }
+                                
+                                HStack {
+                                    CheckCircle(isChecked: false) {
+                                        //
+                                    }
+                                    
+                                    PriceEntry(
+                                        title: "Maximum budget",
+                                        selectedCurrency: $currency,
+                                        price: $maxPrice
+                                    )
+                                }
+                                
+                                Text("Timing")
+                                    .style(textStyle: .text(.bold), color: .cForeground)
+                                    .padding(.top, 10)
+                                
+                                HStack {
+                                    CheckCircle(isChecked: false) {
+                                        //
+                                    }
+                                    
+                                    DatePicker(selection: $giftDeadline, in: Date()...eventDate.addFifteenMinutes(), displayedComponents: [.date]) {
+                                        Text("Deadline adding wishes")
+                                            .style(textStyle: .text(.medium), color: .cForeground)
                                     }
                                 }
+                                
+                                HStack {
+                                    CheckCircle(isChecked: false) {
+                                        //
+                                    }
+                                    
+                                    DatePicker(selection: $claimDeadline, in: Date()...eventDate.addFifteenMinutes(), displayedComponents: [.date]) {
+                                        Text("Deadline gift selecting")
+                                            .style(textStyle: .text(.medium), color: .cForeground)
+                                    }
+                                }
+                                
                             }
                         } submit: { setIsLoading, setFormError, inputsErrors, isShowingInputsErrors in
                             Button {
@@ -234,20 +231,20 @@ struct AddEventView: View {
                                     
                                     if inputsErrors.isEmpty {
                                         do {
-                                            //                                            let wish = try await vm.addWish(
-                                            //                                                title: title,
-                                            //                                                description: description,
-                                            //                                                url: url,
-                                            //                                                imageURL: imageURL,
-                                            //                                                imageUIImage: image,
-                                            //                                                giftLimit: giftLimit,
-                                            //                                                priceAmount: price,
-                                            //                                                priceCurrencyDocumentId: currency.documentId
-                                            //                                            )
-                                            //                                            navigationManager.back()
-                                            //                                            if let wish = wish {
-                                            //                                                navigationManager.navigate(to: .wish(documentId: wish.documentId))
-                                            //                                            }
+//                                            let wish = try await vm.addWish(
+//                                                title: title,
+//                                                description: description,
+//                                                url: url,
+//                                                imageURL: imageURL,
+//                                                imageUIImage: image,
+//                                                giftLimit: giftLimit,
+//                                                priceAmount: price,
+//                                                priceCurrencyDocumentId: currency.documentId
+//                                            )
+//                                            navigationManager.back()
+//                                            if let wish = wish {
+//                                                navigationManager.navigate(to: .wish(documentId: wish.documentId))
+//                                            }
                                         } catch {
                                             print(error)
                                             setFormError("Something went wrong")
@@ -270,11 +267,11 @@ struct AddEventView: View {
                         
                     }
                     .padding(.horizontal)
-                    .ignoresSafeArea(edges: [.bottom])
                 }
                 .tag(1)
                 
             }
+            .ignoresSafeArea(edges: [.bottom])
             .tabViewStyle(.page(indexDisplayMode: .never))
             .onAppear {
                 UIScrollView.appearance().isScrollEnabled = false
