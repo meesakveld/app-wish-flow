@@ -28,7 +28,7 @@ struct ContentView: View {
                 navigationManager.destinationView(for: destination)
             }
             .alert(alertManager.alert.title, isPresented: $alertManager.isPresenting) {
-                alertManager.alert.actions?() ?? AnyView(EmptyView())
+                alertManager.alert.actions()
             } message: {
                 Text(alertManager.alert.message)
             }

@@ -12,6 +12,7 @@ struct WishView: View {
     
     @ObservedObject var vm: WishViewModel = WishViewModel()
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var alertManager: AlertManager
     
     @State var showAllParticipants: Bool = false
     @State var spacingParticipants: CGFloat = -15
@@ -195,15 +196,31 @@ struct WishView: View {
                             }
                             
                             Button("Delete wish", systemImage: "trash") {
-                                Task {
-                                    do {
-                                        try await vm.deleteWish(documentId: documentId, isLoading: $vm.wishIsLoading)
-                                        navigationManager.back()
-                                        navigationManager.navigate(to: .wishList)
-                                    } catch {
-                                        print(error)
+                                alertManager.present(Alert(
+                                    title: "Delete wish",
+                                    message: "Are you sure that you would like to delete the wish?",
+                                    actions: {
+                                        Button("Delete", role: .destructive) {
+                                            Task {
+                                                do {
+                                                    try await vm.deleteWish(documentId: documentId, isLoading: $vm.wishIsLoading)
+                                                    navigationManager.back()
+                                                    navigationManager.navigate(to: .wishList)
+                                                } catch {
+                                                    alertManager.present(Alert(
+                                                        title: "Something went wrong!",
+                                                        message: error.localizedDescription
+                                                    ))
+                                                    print(error)
+                                                }
+                                            }
+                                        }
+                                        
+                                        Button("Cancel", role: .cancel) {
+                                            print("Cancel")
+                                        }
                                     }
-                                }
+                                ))
                             }
                             
                         } label: {
@@ -228,6 +245,7 @@ struct WishView: View {
             .navigationDestination(isPresented: .constant(true)) {
                 WishView(documentId: "j7u00k3sajkspg36gw0srngk")
                     .environmentObject(NavigationManager())
+                    .environmentObject(AlertManager())
             }
     }
 }

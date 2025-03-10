@@ -12,19 +12,19 @@ struct Alert: Identifiable {
     let id = UUID()
     let title: String
     let message: String
-    var actions: (() -> AnyView)?
+    let actions: () -> AnyView
     
     init(title: String, message: String) {
         self.title = title
         self.message = message
+        self.actions = { AnyView(EmptyView()) }
     }
     
-    init(title: String, message: String, _ actions: @escaping () -> AnyView) {
+    init(title: String, message: String, @ViewBuilder actions: @escaping () -> some View) {
         self.title = title
         self.message = message
-        self.actions = actions
+        self.actions = { AnyView(actions()) }
     }
-    
 }
 
 class AlertManager: ObservableObject {
@@ -32,7 +32,9 @@ class AlertManager: ObservableObject {
     @Published var alert: Alert = Alert(title: "", message: "")
     
     func present(_ alert: Alert) {
-        self.alert = alert
-        self.isPresenting = true
+        DispatchQueue.main.async {
+            self.alert = alert
+            self.isPresenting = true
+        }
     }
 }
