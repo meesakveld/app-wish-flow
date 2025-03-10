@@ -195,14 +195,15 @@ struct WishView: View {
                             ) {
                                 Label("Share wish", systemImage: "square.and.arrow.up")
                             }
-
                             
                             Divider()
                             
-                            Button("Edit wish", systemImage: "pencil") {
-                                print("Edit")
+                            NavigationLink {
+                                EditWishView(documentId: documentId)
+                            } label: {
+                                Label("Edit wish", systemImage: "pencil")
                             }
-                            
+
                             Button("Delete wish", systemImage: "trash") {
                                 alertManager.present(Alert(
                                     title: "Delete wish",
