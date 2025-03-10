@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Currency: Codable, Identifiable {
+struct Currency: Codable, Identifiable, Equatable {
     var id: Int
     var documentId: String
     var code: String
