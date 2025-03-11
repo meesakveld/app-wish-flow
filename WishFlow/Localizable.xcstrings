@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "%@ - %@" : {
       "localizations" : {
         "en" : {
@@ -69,6 +72,9 @@
     "A gifting system where pairings are **randomly assigned**, each person gives a gift to one person within a group." : {
 
     },
+    "Accepted" : {
+
+    },
     "Add a wish" : {
 
     },
@@ -129,10 +135,19 @@
     "Delete" : {
 
     },
+    "Delete event" : {
+
+    },
     "Delete wish" : {
 
     },
+    "Denied" : {
+
+    },
     "dfsgdh" : {
+
+    },
+    "Edit event" : {
 
     },
     "Edit wish" : {
@@ -162,6 +177,15 @@
     "Info" : {
 
     },
+    "Invite" : {
+
+    },
+    "Invite people to this event." : {
+
+    },
+    "Invited" : {
+
+    },
     "Login" : {
 
     },
@@ -169,6 +193,9 @@
 
     },
     "Logout" : {
+
+    },
+    "Manage invites" : {
 
     },
     "May be given more then once" : {
@@ -181,6 +208,9 @@
 
     },
     "No currencies available" : {
+
+    },
+    "Nobody has accepted yet." : {
 
     },
     "Price:" : {
@@ -217,6 +247,9 @@
 
     },
     "Share wish" : {
+
+    },
+    "There are no open invites." : {
 
     },
     "Timing" : {

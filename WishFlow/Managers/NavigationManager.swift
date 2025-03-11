@@ -32,8 +32,8 @@ class NavigationManager: ObservableObject {
             HomeView().navigationBarBackButtonHidden()
         case .welcome:
             WelcomeView().navigationBarBackButtonHidden()
-        case .event(let documentId):
-            EventView(documentId: documentId)
+        case .event(let documentId, let isShowingInvitesSheet):
+            EventView(documentId: documentId, isShowingInvitesSheet: isShowingInvitesSheet)
         case .wishList:
             WishlistView()
         case .wish(let documentId):
@@ -44,7 +44,7 @@ class NavigationManager: ObservableObject {
     enum NavigationDestination: Hashable {
         case home
         case welcome
-        case event(documentId: String)
+        case event(documentId: String, isShowingInvitesSheet: Bool)
         case wishList
         case wish(documentId: String)
     }

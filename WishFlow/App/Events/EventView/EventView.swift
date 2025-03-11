@@ -15,6 +15,17 @@ struct EventView: View {
     @State var showAllParticipants: Bool = false
     @State var spacingParticipants: CGFloat = -15
     
+    @State var isShowingInvitesSheet: Bool = false
+    
+    init(documentId: String) {
+        self.documentId = documentId
+    }
+    
+    init(documentId: String, isShowingInvitesSheet: Bool) {
+        self.documentId = documentId
+        _isShowingInvitesSheet = State(initialValue: isShowingInvitesSheet)
+    }
+    
     var body: some View {
         ScrollView {
             // MARK: - Error handling for when event is not found
@@ -378,10 +389,29 @@ struct EventView: View {
                             Label("Add event to calendar", systemImage: "calendar")
                         }
                         
+                        Divider()
+                        
+                        Button("Manage invites", systemImage: "person.crop.circle.badge.plus") {
+                            isShowingInvitesSheet.toggle()
+                        }
+                        
+                        Divider()
+                        
+                        Button("Edit event", systemImage: "pencil") {
+                            
+                        }
+                        
+                        Button("Delete event", systemImage: "trash") {
+                            
+                        }
+                        
                     } label: {
                         Image(systemName: "ellipsis.circle")
                     }
                     .disabled(vm.event == nil)
+                }
+                .sheet(isPresented: $isShowingInvitesSheet) {
+                    InvitePeopleToEventView(eventDocumentId: documentId)
                 }
             }
         }

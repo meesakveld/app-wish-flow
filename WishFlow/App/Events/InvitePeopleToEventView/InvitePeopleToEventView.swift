@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import StrapiSwift
 
 @MainActor
 class InvitePeopleToEventViewModel: ObservableObject {
@@ -15,28 +16,55 @@ class InvitePeopleToEventViewModel: ObservableObject {
     @Published var eventIsLoading: LoadingState = .preparingToLoad
     @Published var eventHasError: Bool = false
     
-    @Published var selectedEventsIds: [String] = []
+    @Published var participants: [EventParticipant] = []
+    @Published var eventInvites: [EventInvite] = []
+    
+    @Published var eventInvitesIsLoading: [String : LoadingState] = [:]
+    @Published var eventInvitesHasError: [String : Bool] = [:]
     
     func initEvent(documentId: String, isLoading: Binding<LoadingState>) async {
         eventHasError = false
         setLoading(value: isLoading, .isLoading)
         do {
-            // Get wish
-//            let strapiResponse = try await GiftManager.shared.getGiftByDocumentId(documentId: documentId, userId: user?.id ?? 1)
-//            event = strapiResponse
+            // Get Event
+            let strapiResponse = try await EventManager.shared.getEventByDocumentId(documentId: documentId, userId: user?.id ?? 0)
+            event = strapiResponse
             
-            // Add selectEventsId
-//            if let events = event?.events {
-//                selectedEventsIds = []
-//                for event in events {
-//                    selectedEventsIds.append(event.documentId)
-//                }
-//            }
+            // Event participants
+            if let participants = strapiResponse.eventParticipants {
+                self.participants = participants
+            }
+            
+            // Event invites
+            if let invites = strapiResponse.eventInvites {
+                self.eventInvites = invites
+            }
         } catch {
             eventHasError = true
             print(error)
         }
         setLoading(value: isLoading, .finished)
+    }
+    
+    func addEventInvite(email: String, eventDocumentId: String) async throws -> EventInvite {
+        let result = try await Strapi.contentManager.collection("event-invites")
+            .postData(StrapiRequestBody([
+                "invitedUserEmail": .string(email),
+                "event": .string(eventDocumentId)
+            ]), as: EventInvite.self)
+        return result.data
+    }
+    
+    func deleteEventInvite(inviteDocumentId: String) async {
+        eventInvitesIsLoading[inviteDocumentId] = .isLoading
+        do {
+            try await Strapi.contentManager.collection("event-invites")
+                .withDocumentId(inviteDocumentId)
+                .delete()
+        } catch {
+            print(error)
+        }
+        eventInvitesIsLoading[inviteDocumentId] = .finished
     }
     
 }
@@ -46,6 +74,8 @@ struct InvitePeopleToEventView: View {
     @StateObject var vm: InvitePeopleToEventViewModel = InvitePeopleToEventViewModel()
     
     let eventDocumentId: String
+    
+    @State var email: String = ""
     
     var body: some View {
         VStack {
@@ -96,11 +126,152 @@ struct InvitePeopleToEventView: View {
                     }
                     .padding(.top, 10)
 
+                    ScrollView {
+                        LazyVStack(spacing: 40) {
+                            FormWrapper { inputsErrors, isShowingInputsErrors in
+                                Group {
+                                    TextEntry(
+                                        identifier: "email",
+                                        value: $email,
+                                        title: "Email",
+                                        placeholder: "Enter the user's email",
+                                        errors: inputsErrors,
+                                        isShowingErrors: isShowingInputsErrors
+                                    )
+                                }
+                            } submit: { setIsLoading, setFormError, inputsErrors, isShowingInputsErrors in
+                                Button {
+                                    Task {
+                                        setIsLoading(.isLoading)
+                                        setFormError(nil)
+                                        isShowingInputsErrors.wrappedValue = true
+                                        
+                                        if inputsErrors.isEmpty {
+                                            do {
+                                                let result = try await vm.addEventInvite(email: email, eventDocumentId: eventDocumentId)
+                                                vm.eventInvites.append(result)
+                                                email = ""
+                                                
+                                                isShowingInputsErrors.wrappedValue = false
+                                            } catch {
+                                                print(error)
+                                                setFormError(error.localizedDescription)
+                                            }
+                                        }
+                                        setIsLoading(.finished)
+                                    }
+                                } label: {
+                                    DropEffect {
+                                        HStack {
+                                            Text("Invite")
+                                                .style(textStyle: .text(.medium), color: .cBlack)
+                                                .padding(15)
+                                        }
+                                        .frame(maxWidth: .infinity, maxHeight: 50)
+                                        .background(Color.cGreen)
+                                    }
+                                }
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("Invited")
+                                    .style(textStyle: .text(.bold), color: .cForeground)
+                                
+                                VStack(spacing: 12) {
+                                    ForEach(vm.eventInvites.filter({ $0.eventInviteStatus == .pending }), id: \.documentId) { invite in
+                                        HStack(spacing: 15) {
+                                            Avatar(image: nil, width: 30)
+                                                .padding(.leading, 1)
+                                            
+                                            Text(invite.invitedUserEmail)
+                                            
+                                            Spacer()
+                                            
+                                            Button {
+                                                Task {
+                                                    await vm.deleteEventInvite(inviteDocumentId: invite.documentId)
+                                                    vm.eventInvites = vm.eventInvites.filter({ $0.documentId != invite.documentId })
+                                                }
+                                            } label: {
+                                                Image(systemName: "xmark")
+                                            }
+                                        }
+                                        .loadingEffect(vm.eventInvitesIsLoading[invite.documentId]?.isInLoadingState() ?? false)
+                                    }
+                                    .style(textStyle: .text(.regular), color: .cForeground)
+                                }
+                                
+                                if vm.eventInvites.filter({ $0.eventInviteStatus == .pending }).isEmpty {
+                                    Text("There are no open invites.")
+                                        .style(textStyle: .textSmall(.regular), color: .cForeground)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                            }
+                            
+                            if !vm.eventInvites.filter({ $0.eventInviteStatus == .denied }).isEmpty {
+                                VStack(alignment: .leading, spacing: 12) {
+                                    Text("Denied")
+                                        .style(textStyle: .text(.bold), color: .cForeground)
+                                    
+                                    VStack(spacing: 12) {
+                                        ForEach(vm.eventInvites.filter({ $0.eventInviteStatus == .denied }), id: \.documentId) { invite in
+                                            HStack(spacing: 15) {
+                                                Avatar(image: nil, width: 30)
+                                                    .padding(.leading, 1)
+                                                
+                                                Text(invite.invitedUserEmail)
+                                                
+                                                Spacer()
+                                                
+                                                Button {
+                                                    Task {
+                                                        await vm.deleteEventInvite(inviteDocumentId: invite.documentId)
+                                                        vm.eventInvites = vm.eventInvites.filter({ $0.documentId != invite.documentId })
+                                                    }
+                                                } label: {
+                                                    Image(systemName: "trash")
+                                                }
+                                            }
+                                            .loadingEffect(vm.eventInvitesIsLoading[invite.documentId]?.isInLoadingState() ?? false)
+                                        }
+                                        .style(textStyle: .text(.regular), color: .cForeground)
+                                    }
+                                }
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("Accepted")
+                                    .style(textStyle: .text(.bold), color: .cForeground)
+                                
+                                VStack(spacing: 12) {
+                                    ForEach(vm.participants, id: \.documentId) { participant in
+                                        HStack(spacing: 15) {
+                                            Avatar(image: participant.user?.avatar, width: 30)
+                                                .padding(.leading, 1)
+                                            
+                                            Text("\(participant.user?.firstname ?? "") \(participant.user?.lastname ?? "")")
+                                            
+                                            Spacer()
+                                        }
+                                    }
+                                    .style(textStyle: .text(.regular), color: .cForeground)
+                                }
+                                
+                                if vm.participants.isEmpty {
+                                    Text("Nobody has accepted yet.")
+                                        .style(textStyle: .textSmall(.regular), color: .cForeground)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                            }
+                        }
+                    }
                 }
                 .loadingEffect(vm.eventIsLoading.isInLoadingState())
                 .padding([.top, .horizontal])
             }
-            
+        }
+        .task {
+            await vm.initEvent(documentId: eventDocumentId, isLoading: $vm.eventIsLoading)
         }
         .background(Color.cBackground)
     }
@@ -113,7 +284,7 @@ struct InvitePeopleToEventView: View {
                 EventView(documentId: "yyi02rmev5oqpgxllz903avf")
                     .environmentObject(AlertManager())
                     .sheet(isPresented: .constant(true)) {
-                        InvitePeopleToEventView(eventDocumentId: "xju6n62zz117tcsvqskkj430")
+                        InvitePeopleToEventView(eventDocumentId: "yyi02rmev5oqpgxllz903avf")
                     }
             }
     }

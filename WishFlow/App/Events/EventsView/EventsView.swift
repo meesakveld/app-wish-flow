@@ -143,13 +143,6 @@ struct EventsView: View {
             } label: {
                 Image(systemName: "plus.circle")
             }
-            
-            Button {
-                print("edit event")
-            } label: {
-                Image(systemName: "ellipsis.circle")
-            }
-            
         }
         .background(Color.cBackground.ignoresSafeArea())
         

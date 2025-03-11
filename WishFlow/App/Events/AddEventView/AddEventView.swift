@@ -254,7 +254,7 @@ struct AddEventView: View {
                                                 )
                                                 if let documentId = event?.documentId {
                                                     navigationManager.back()
-                                                    navigationManager.navigate(to: .event(documentId: documentId))
+                                                    navigationManager.navigate(to: .event(documentId: documentId, isShowingInvitesSheet: true))
                                                 }
                                             }
                                         } catch {
