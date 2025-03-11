@@ -171,24 +171,26 @@ struct EventView: View {
                                 }
                                 
                                 // Budget
-                                HStack(alignment: .center) {
-                                    Text("Budget:")
-                                        .style(textStyle: .text(.medium), color: .cBlack)
-                                    
-                                    Text(vm.event?.getMinMaxBudgetText() ?? "€10 - €20")
-                                        .style(textStyle: .text(.regular), color: .cBlack)
-                                    
-                                    Spacer()
+                                if let budget = vm.event?.getMinMaxBudgetText() {
+                                    HStack(alignment: .center) {
+                                        Text("Budget:")
+                                            .style(textStyle: .text(.medium), color: .cBlack)
+                                        
+                                        Text(budget)
+                                            .style(textStyle: .text(.regular), color: .cBlack)
+                                        
+                                        Spacer()
+                                    }
                                 }
                                 
                                 // MARK: Deadline adding wishes
                                 // Visible when the user has the role repicient or owner (also receives gifts)
-                                if vm.eventUserRole == .owner || vm.eventUserRole == .recipient {
+                                if vm.eventUserRole == .owner || vm.eventUserRole == .recipient, let giftDeadline = vm.event?.giftDeadline {
                                     HStack(alignment: .center) {
                                         Text("Deadline adding wishes:")
                                             .style(textStyle: .text(.medium), color: .cBlack)
                                         
-                                        Text((vm.event?.giftDeadline ?? Date()).dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
+                                        Text(giftDeadline.dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
                                             .style(textStyle: .text(.regular), color: .cBlack)
                                         
                                         Spacer()
@@ -197,12 +199,12 @@ struct EventView: View {
                                 
                                 // MARK: Deadline selecting wishes
                                 // Visible when the user has the role participant or eventType equals to oneToOne (everyone receives and gives gifts)
-                                if vm.eventUserRole == .owner || vm.eventUserRole == .participant || vm.event?.eventType == .oneToOne {
+                                if vm.eventUserRole == .owner || vm.eventUserRole == .participant || vm.event?.eventType == .oneToOne, let claimDeadline = vm.event?.claimDeadline {
                                     HStack(alignment: .center) {
                                         Text("Deadline selecting wishes:")
                                             .style(textStyle: .text(.medium), color: .cBlack)
                                         
-                                        Text((vm.event?.claimDeadline ?? Date()).dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
+                                        Text(claimDeadline.dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
                                             .style(textStyle: .text(.regular), color: .cBlack)
                                         
                                         Spacer()

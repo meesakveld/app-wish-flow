@@ -111,21 +111,19 @@ struct Event: Codable, Identifiable {
     
     // MARK: - Utils
     func getMinMaxBudgetText() -> String? {
-        let maxBudgetCurrency = maxBudget?.currency?.symbol
-        
         // MARK: minBudget and maxBudget are available
-        if let minBudget = maxBudget?.formatted(), let maxBudget = maxBudget?.formatted() {
+        if let minBudget = minBudget?.formatted(), let maxBudget = maxBudget?.formatted() {
             return "\(minBudget) - \(maxBudget)"
         }
         
         // MARK: Only minBudget is available
-        if let minBudget = maxBudget?.formatted() {
-            return "\(minBudget) +"
+        if let minBudgetFormatted = minBudget?.formatted() {
+            return "Min \(minBudgetFormatted)"
         }
         
         // MARK: Only maxBudget is available
-        if let maxBudgetAmount = maxBudget?.formatted(), let maxBudgetCurrency {
-            return "\(maxBudgetCurrency) 0 - \(maxBudgetCurrency) \(maxBudgetAmount)"
+        if let maxBudgetAmount = maxBudget?.formatted() {
+            return "Max \(maxBudgetAmount)"
         }
         
         return nil
