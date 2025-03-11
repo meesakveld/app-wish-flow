@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
+import StrapiSwift
 
 @MainActor
 class AddEventViewModel: ObservableObject {
-    @Published var tabViewIndex: Int = 1
-    @Published var newTabViewIndex: Int = 1 {
+    @Published var tabViewIndex: Int = 0
+    @Published var newTabViewIndex: Int = 0 {
         didSet { withAnimation { tabViewIndex = newTabViewIndex }}
     }
     
@@ -20,6 +21,42 @@ class AddEventViewModel: ObservableObject {
         if user == nil { AuthenticationManager.shared.logout() }
     }
     
+    func addEvent(
+        title: String,
+        description: String,
+        image: UIImage,
+        eventDate: Date,
+        eventType: EventType,
+        minBudgetAmount: Double? = nil,
+        minBudgetCurrency: Currency? = nil,
+        maxBudgetAmount: Double? = nil,
+        maxBudgetCurrency: Currency? = nil,
+        giftDeadline: Date? = nil,
+        claimDeadline: Date? = nil
+    ) async throws -> Event? {
+        // Upload image
+        let image = try await Strapi.mediaLibrary.files.uploadImage(image: image)
+        
+        var event: Event? = nil
+        if let imageId = image?.id {
+            // Upload gift
+            event = try await EventManager.shared.addEvent(
+                userId: user?.id ?? 0,
+                title: title,
+                description: description,
+                imageId: imageId,
+                eventDate: eventDate,
+                eventType: eventType,
+                minBudgetAmount: minBudgetAmount,
+                minBudgetCurrency: minBudgetCurrency,
+                maxBudgetAmount: maxBudgetAmount,
+                maxBudgetCurrency: maxBudgetCurrency,
+                giftDeadline: giftDeadline,
+                claimDeadline: claimDeadline
+            )
+        }
+        return event
+    }
     
 }
 
@@ -36,17 +73,33 @@ struct AddEventView: View {
     @State var eventDate: Date = Date()
     @State var giftDeadline: Date = Date()
     @State var claimDeadline: Date = Date()
-    
     @State var minPrice: Double = 0.0
+    @State var minPriceCurrency: Currency = Currency()
     @State var maxPrice: Double = 0.0
-    @State var currency: Currency = Currency()
+    @State var maxPriceCurrency: Currency = Currency()
+    
+    // Optional work values
+    @State var isShowingGiftDeadline: Bool = false
+    @State var isShowingClaimDeadline: Bool = false
+    @State var isShowingMinPrice: Bool = false
+    @State var isShowingMaxPrice: Bool = false
     
     func reset() {
         title = ""
         description = ""
         image = nil
+        eventDate = Date()
+        giftDeadline = Date()
+        claimDeadline = Date()
         minPrice = 0.0
+        minPriceCurrency = Currency()
         maxPrice = 0.0
+        maxPriceCurrency = Currency()
+        
+        isShowingGiftDeadline = false
+        isShowingClaimDeadline = false
+        isShowingMinPrice = false
+        isShowingMaxPrice = false
     }
     
     var body: some View {
@@ -171,27 +224,31 @@ struct AddEventView: View {
                                     .padding(.top, 10)
                                 
                                 HStack {
-                                    CheckCircle(isChecked: false) {
-                                        //
+                                    CheckCircle(isChecked: isShowingMinPrice) {
+                                        withAnimation { isShowingMinPrice.toggle() }
                                     }
                                     
                                     PriceEntry(
                                         title: "Minimal budget",
-                                        selectedCurrency: $currency,
+                                        selectedCurrency: $minPriceCurrency,
                                         price: $minPrice
                                     )
+                                    .disabled(!isShowingMinPrice)
+                                    .opacity(isShowingMinPrice ? 1 : 0.4)
                                 }
                                 
                                 HStack {
-                                    CheckCircle(isChecked: false) {
-                                        //
+                                    CheckCircle(isChecked: isShowingMaxPrice) {
+                                        withAnimation { isShowingMaxPrice.toggle() }
                                     }
                                     
                                     PriceEntry(
                                         title: "Maximum budget",
-                                        selectedCurrency: $currency,
+                                        selectedCurrency: $maxPriceCurrency,
                                         price: $maxPrice
                                     )
+                                    .disabled(!isShowingMaxPrice)
+                                    .opacity(isShowingMaxPrice ? 1 : 0.4)
                                 }
                                 
                                 Text("Timing")
@@ -199,25 +256,29 @@ struct AddEventView: View {
                                     .padding(.top, 10)
                                 
                                 HStack {
-                                    CheckCircle(isChecked: false) {
-                                        //
+                                    CheckCircle(isChecked: isShowingGiftDeadline) {
+                                        withAnimation { isShowingGiftDeadline.toggle() }
                                     }
                                     
                                     DatePicker(selection: $giftDeadline, in: Date()...eventDate.addFifteenMinutes(), displayedComponents: [.date]) {
                                         Text("Deadline adding wishes")
                                             .style(textStyle: .text(.medium), color: .cForeground)
                                     }
+                                    .disabled(!isShowingGiftDeadline)
+                                    .opacity(isShowingGiftDeadline ? 1 : 0.4)
                                 }
                                 
                                 HStack {
-                                    CheckCircle(isChecked: false) {
-                                        //
+                                    CheckCircle(isChecked: isShowingClaimDeadline) {
+                                        withAnimation { isShowingClaimDeadline.toggle() }
                                     }
                                     
-                                    DatePicker(selection: $claimDeadline, in: Date()...eventDate.addFifteenMinutes(), displayedComponents: [.date]) {
+                                    DatePicker(selection: $claimDeadline, in: giftDeadline...eventDate.addFifteenMinutes(), displayedComponents: [.date]) {
                                         Text("Deadline gift selecting")
                                             .style(textStyle: .text(.medium), color: .cForeground)
                                     }
+                                    .disabled(!isShowingClaimDeadline)
+                                    .opacity(isShowingClaimDeadline ? 1 : 0.4)
                                 }
                                 
                             }
@@ -228,23 +289,27 @@ struct AddEventView: View {
                                     setFormError(nil)
                                     isShowingInputsErrors.wrappedValue = true
                                     
-                                    
                                     if inputsErrors.isEmpty {
                                         do {
-//                                            let wish = try await vm.addWish(
-//                                                title: title,
-//                                                description: description,
-//                                                url: url,
-//                                                imageURL: imageURL,
-//                                                imageUIImage: image,
-//                                                giftLimit: giftLimit,
-//                                                priceAmount: price,
-//                                                priceCurrencyDocumentId: currency.documentId
-//                                            )
-//                                            navigationManager.back()
-//                                            if let wish = wish {
-//                                                navigationManager.navigate(to: .wish(documentId: wish.documentId))
-//                                            }
+                                            if let image = image {
+                                                let event = try await vm.addEvent(
+                                                    title: title,
+                                                    description: description,
+                                                    image: image,
+                                                    eventDate: eventDate,
+                                                    eventType: eventType,
+                                                    minBudgetAmount: isShowingMinPrice ? minPrice : nil,
+                                                    minBudgetCurrency: isShowingMinPrice ? minPriceCurrency : nil,
+                                                    maxBudgetAmount: isShowingMaxPrice ? maxPrice : nil,
+                                                    maxBudgetCurrency: isShowingMaxPrice ? maxPriceCurrency : nil,
+                                                    giftDeadline: isShowingGiftDeadline ? giftDeadline : nil,
+                                                    claimDeadline: isShowingClaimDeadline ? claimDeadline : nil
+                                                )
+                                                if let documentId = event?.documentId {
+                                                    navigationManager.back()
+                                                    navigationManager.navigate(to: .event(documentId: documentId))
+                                                }
+                                            }
                                         } catch {
                                             print(error)
                                             setFormError("Something went wrong")
