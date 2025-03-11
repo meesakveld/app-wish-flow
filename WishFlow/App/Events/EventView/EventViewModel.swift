@@ -66,4 +66,15 @@ class EventViewModel: ObservableObject {
             throw error
         }
     }
+    
+    func deleteEvent(documentId: String, isLoading: Binding<LoadingState>) async throws {
+        setLoading(value: isLoading, .isLoading)
+        do {
+            try await EventManager.shared.deleteEventByDocumentId(documentId: documentId, userId: user?.id ?? 1)
+        } catch {
+            setLoading(value: isLoading, .finished)
+            throw error
+        }
+        setLoading(value: isLoading, .finished)
+    }
 }

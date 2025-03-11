@@ -9,8 +9,10 @@ import SwiftUI
 
 struct EventView: View {
     let documentId: String
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     @EnvironmentObject var alertManager: AlertManager
     @ObservedObject var vm: EventViewModel = EventViewModel()
+    @ObservedObject var navigationManager: NavigationManager = NavigationManager()
     
     @State var showAllParticipants: Bool = false
     @State var spacingParticipants: CGFloat = -15
@@ -56,7 +58,7 @@ struct EventView: View {
                     
                     Spacer()
                 }
-                .frame(width: .infinity ,height: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             
             // MARK: - Event
@@ -161,11 +163,15 @@ struct EventView: View {
                     if vm.eventViewSubpage == .info {
                         VStack(spacing: 30) {
                             // MARK: Description
-                            Text(
-                                vm.event?.description ?? "Lorem ipsum dolor sit amet consectetur. Eros fusce ut ipsum in velit eu eros. Consectetur id enim eleifend eget sit lacus. Laoreet at elit id sodales. Amet viverra Amet viverra amet ipsum suspendisse eget urna."
-                            )
-                            .textSelection(.enabled)
-                            .style(textStyle: .text(.regular), color: .cForeground)
+                            HStack {
+                                Text(
+                                    vm.event?.description ?? "Lorem ipsum dolor sit amet consectetur. Eros fusce ut ipsum in velit eu eros. Consectetur id enim eleifend eget sit lacus. Laoreet at elit id sodales. Amet viverra Amet viverra amet ipsum suspendisse eget urna."
+                                )
+                                .textSelection(.enabled)
+                                .style(textStyle: .text(.regular), color: .cForeground)
+                                
+                                Spacer()
+                            }
                             
                             // MARK: Details
                             VStack(alignment: .leading, spacing: 10) {
@@ -401,8 +407,31 @@ struct EventView: View {
                             
                         }
                         
-                        Button("Delete event", systemImage: "trash") {
-                            
+                        Button("Delete event", systemImage: "trash", role: .destructive) {
+                            alertManager.present(Alert(
+                                title: "Delete event",
+                                message: "Are you sure that you would like to delete the event?",
+                                actions: {
+                                    Button("Delete", role: .destructive) {
+                                        Task {
+                                            do {
+                                                try await vm.deleteEvent(documentId: documentId, isLoading: $vm.eventIsLoading)
+                                                mode.wrappedValue.dismiss()
+                                            } catch {
+                                                alertManager.present(Alert(
+                                                    title: "Something went wrong!",
+                                                    message: error.localizedDescription
+                                                ))
+                                                print(error)
+                                            }
+                                        }
+                                    }
+                                    
+                                    Button("Cancel", role: .cancel) {
+                                        print("Cancel")
+                                    }
+                                }
+                            ))
                         }
                         
                     } label: {
@@ -430,6 +459,7 @@ struct EventView: View {
             .navigationDestination(isPresented: .constant(true)) {
                 EventView(documentId: "yyi02rmev5oqpgxllz903avf")
                     .environmentObject(AlertManager())
+                    .environmentObject(NavigationManager())
             }
     }
 }

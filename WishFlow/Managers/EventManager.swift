@@ -146,6 +146,56 @@ final class EventManager: ObservableObject, Sendable {
         return eventResponse.data
     }
     
+    func deleteEventByDocumentId(documentId: String, userId: Int) async throws {
+        let event = try await eventCollection
+            .withDocumentId(documentId)
+            .filter("[eventParticipants][user][id]", operator: .equal, value: userId)
+            .populate("image")
+            .populate("eventParticipants")
+            .populate("giftClaims")
+            .populate("eventAssignments")
+            .populate("eventInvites")
+            .getDocument(as: Event.self)
+        
+        // Delete event
+        try await eventCollection
+            .withDocumentId(documentId)
+            .delete()
+        
+        // Delete image
+        if let imageId = event.data.image?.id {
+            try await Strapi.mediaLibrary.files.withId(imageId).delete(as: StrapiImage.self)
+        }
+        
+        // Delete eventParticipants (if their are any)
+        if let participants = event.data.eventParticipants {
+            for participant in participants {
+                try await Strapi.contentManager.collection("event-participants").withDocumentId(participant.documentId).delete()
+            }
+        }
+        
+        // Delete giftClaims (if their are any)
+        if let claims = event.data.giftClaims {
+            for claim in claims {
+                try await Strapi.contentManager.collection("gift-claims").withDocumentId(claim.documentId).delete()
+            }
+        }
+        
+        // Delete eventAssignments (if their are any)
+        if let assignments = event.data.eventAssignments {
+            for assignment in assignments {
+                try await Strapi.contentManager.collection("event-assignments").withDocumentId(assignment.documentId).delete()
+            }
+        }
+        
+        // Delete eventInvites (if their are any)
+        if let invites = event.data.eventInvites {
+            for invite in invites {
+                try await Strapi.contentManager.collection("event-invites").withDocumentId(invite.documentId).delete()
+            }
+        }
+    }
+    
     
     // MARK: - Utils
     func getUserParticipantRole(event: Event, userId: Int) -> EventParticipantRole? {
