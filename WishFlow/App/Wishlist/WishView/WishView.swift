@@ -218,7 +218,7 @@ struct WishView: View {
                                 Label("Edit wish", systemImage: "pencil")
                             }
 
-                            Button("Delete wish", systemImage: "trash") {
+                            Button("Delete wish", systemImage: "trash", role: .destructive) {
                                 alertManager.present(Alert(
                                     title: "Delete wish",
                                     message: "Are you sure that you would like to delete the wish?",
