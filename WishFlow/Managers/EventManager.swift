@@ -84,6 +84,7 @@ final class EventManager: ObservableObject, Sendable {
                     user.populate("avatar")
                 }
             }
+            .populate("eventInvites")
             .getDocument(as: Event.self)
         
         return response.data
