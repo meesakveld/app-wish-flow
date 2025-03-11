@@ -403,8 +403,10 @@ struct EventView: View {
                         
                         Divider()
                         
-                        Button("Edit event", systemImage: "pencil") {
-                            
+                        NavigationLink {
+                            EditEventView(documentId: documentId)
+                        } label: {
+                            Label("Edit event", systemImage: "pencil")
                         }
                         
                         Button("Delete event", systemImage: "trash", role: .destructive) {

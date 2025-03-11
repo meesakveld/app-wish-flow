@@ -146,6 +146,58 @@ final class EventManager: ObservableObject, Sendable {
         return eventResponse.data
     }
     
+    @discardableResult
+    func updateEventByDocumentId(
+        documentId: String,
+        title: String? = nil,
+        description: String? = nil,
+        imageId: Int? = nil,
+        eventDate: Date? = nil,
+        minBudgetAmount: Double? = nil,
+        minBudgetCurrency: Currency? = nil,
+        maxBudgetAmount: Double? = nil,
+        maxBudgetCurrency: Currency? = nil,
+        giftDeadline: Date? = nil,
+        claimDeadline: Date? = nil
+    ) async throws -> Event {
+        var data: [String: AnyCodable] = [:]
+        if let title = title { data["title"] = .string(title) }
+        if let description = description { data["description"] = .string(description) }
+        if let imageId = imageId { data["image"] = .int(imageId) }
+        if let eventDate = eventDate {
+            data["eventDate"] = .string(eventDate.dateToStringFormatter(DateFormat: .RFC3339))
+        }
+        
+        // minBudget
+        if let minBudgetAmount = minBudgetAmount, let minBudgetCurrency = minBudgetCurrency {
+            data["minBudget"] = .dictionary([
+                "amount": .double(minBudgetAmount),
+                "currency": .string(minBudgetCurrency.documentId)
+            ])
+        } else { data["minBudget"] = .null }
+        
+        // maxBudget
+        if let maxBudgetAmount = maxBudgetAmount, let maxBudgetCurrency = maxBudgetCurrency {
+            data["maxBudget"] = .dictionary([
+                "amount": .double(maxBudgetAmount),
+                "currency": .string(maxBudgetCurrency.documentId)
+            ])
+        } else { data["maxBudget"] = .null}
+        
+        if let giftDeadline = giftDeadline {
+            data["giftDeadline"] = .string(giftDeadline.dateToStringFormatter(DateFormat: .RFC3339))
+        } else { data["giftDeadline"] = .null }
+        
+        if let claimDeadline = claimDeadline {
+            data["claimDeadline"] = .string(claimDeadline.dateToStringFormatter(DateFormat: .RFC3339))
+        } else { data["claimDeadline"] = .null }
+                
+        let response = try await eventCollection
+            .withDocumentId(documentId)
+            .putData(StrapiRequestBody(data), as: Event.self)
+        return response.data
+    }
+    
     func deleteEventByDocumentId(documentId: String, userId: Int) async throws {
         let event = try await eventCollection
             .withDocumentId(documentId)

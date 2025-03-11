@@ -28,11 +28,6 @@ struct EditWishView: View {
     @State private var mayBeGivenMoreThenOne: Bool = false
     @State var giftLimit: Int = 1
     
-    func checkForDiff<T: Equatable>(oldValue: T?, newValue: T?) -> T? {
-        if oldValue != newValue { return newValue }
-        return nil
-    }
-    
     var body: some View {
         ScrollView {
             // MARK: - Error handling for when wish is not found

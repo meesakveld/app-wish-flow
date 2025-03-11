@@ -46,13 +46,14 @@ class PriceEntryViewModel: ObservableObject {
 }
 
 
+@MainActor
 struct PriceEntry: View {
     @StateObject private var vm = PriceEntryViewModel()
     
-    let title: String
+    var title: String
     @Binding var selectedCurrency: Currency
     @Binding var priceValue: Double
-    let selectedCurrencyCode: String?
+    var selectedCurrencyCode: String?
     
     @State private var price: String
 
