@@ -47,7 +47,7 @@ struct InvitePeopleToEventView: View {
                 .frame(maxWidth: .infinity ,maxHeight: .infinity)
             }
             
-            // MARK: - Wish
+            // MARK: - Page
             if !vm.eventHasError {
                 VStack(spacing: 40) {
                     // MARK: - Title
