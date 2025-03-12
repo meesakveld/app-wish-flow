@@ -18,6 +18,12 @@ struct EventView: View {
     @State var spacingParticipants: CGFloat = -15
     
     @State var isShowingInvitesSheet: Bool = false
+    @State var isShowingSelectWishesSheet: Bool = false
+    
+    let columns = [
+        GridItem(.flexible(), spacing: 15),
+        GridItem(.flexible(), spacing: 15)
+    ]
     
     init(documentId: String) {
         self.documentId = documentId
@@ -285,22 +291,51 @@ struct EventView: View {
                     
                     // MARK: - My Wishes
                     if vm.eventViewSubpage == .myWishes {
-                        HStack(alignment: .top) {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("My wishes")
-                                    .style(textStyle: .text(.bold), color: .cForeground)
+                        VStack(spacing: 20) {
+                            HStack(alignment: .top) {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("My wishes")
+                                        .style(textStyle: .text(.bold), color: .cForeground)
+                                }
                                 
+                                Spacer()
+                                
+                                Button {
+                                    isShowingSelectWishesSheet.toggle()
+                                } label: {
+                                    HStack {
+                                        Text("Select wishes")
+                                            .underline()
+                                        
+                                        Image(systemName: "arrow.up.right")
+                                    }
+                                    .style(textStyle: .textSmall(.regular), color: .cForeground)
+                                }
+                            }
+                            .sheet(isPresented: $isShowingSelectWishesSheet) {
+                                AddWishesToEventView(eventDocumentId: documentId)
+                            }
+                            
+                            let gifts = vm.event?.gifts ?? []
+                            
+                            if !gifts.isEmpty {
+                                //MARK: Wishes array
+                                LazyVGrid(columns: columns, spacing: 15) {
+                                    ForEach(gifts, id: \.documentId) { wish in
+                                        NavigationLink {
+                                            WishView(documentId: wish.documentId)
+                                        } label: {
+                                            WishCard(wish: wish)
+                                        }
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+                            }
+                            
+                            if gifts.isEmpty {
                                 Text("You haven't added any wishes")
                                     .style(textStyle: .textSmall(.regular), color: .cForeground)
                             }
-                            
-                            Spacer()
-                            
-                            HStack {
-                                Text("Select wishes")
-                                Image(systemName: "arrow.up.right")
-                            }
-                            .style(textStyle: .textSmall(.regular), color: .cForeground)
                         }
                     }
                     

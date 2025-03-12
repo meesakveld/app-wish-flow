@@ -85,6 +85,9 @@ final class EventManager: ObservableObject, Sendable {
                 }
             }
             .populate("eventInvites")
+            .populate("gifts") { gifts in
+                gifts.populate("image")
+            }
             .getDocument(as: Event.self)
         
         return response.data
@@ -158,7 +161,8 @@ final class EventManager: ObservableObject, Sendable {
         maxBudgetAmount: Double? = nil,
         maxBudgetCurrency: Currency? = nil,
         giftDeadline: Date? = nil,
-        claimDeadline: Date? = nil
+        claimDeadline: Date? = nil,
+        gifts: [String]? = nil
     ) async throws -> Event {
         var data: [String: AnyCodable] = [:]
         if let title = title { data["title"] = .string(title) }
@@ -191,6 +195,8 @@ final class EventManager: ObservableObject, Sendable {
         if let claimDeadline = claimDeadline {
             data["claimDeadline"] = .string(claimDeadline.dateToStringFormatter(DateFormat: .RFC3339))
         } else { data["claimDeadline"] = .null }
+        
+        if let gifts = gifts { data["gifts"] = .array(gifts.map({ return .string($0) })) }
                 
         let response = try await eventCollection
             .withDocumentId(documentId)
