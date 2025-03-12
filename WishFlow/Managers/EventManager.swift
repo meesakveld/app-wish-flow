@@ -85,8 +85,13 @@ final class EventManager: ObservableObject, Sendable {
                 }
             }
             .populate("eventInvites")
+            .populate("giftClaims") { claims in
+                claims.populate("gift")
+                claims.populate("user")
+            }
             .populate("gifts") { gifts in
                 gifts.populate("image")
+                gifts.populate("user")
                 gifts.populate("price") { price in
                     price.populate("currency")
                 }

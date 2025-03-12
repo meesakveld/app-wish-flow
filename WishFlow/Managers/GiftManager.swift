@@ -69,6 +69,19 @@ final class GiftManager: ObservableObject, Sendable {
         return response.data
     }
     
+    func getGiftsAskedForEventByUserId(eventDocumentId: String, receiverUserId: Int, userId: Int) async throws -> [Gift] {
+        let response = try await giftCollection
+            .populate("image")
+            .populate("price") { price in
+                price.populate("currency")
+            }
+            .filter("[events][documentId]", operator: .includedIn, value: eventDocumentId)
+            .filter("[user][id]", operator: .equal, value: receiverUserId)
+            .filter("[events][eventParticipants][user][id]", operator: .includedIn, value: userId)
+            .getDocuments(as: [Gift].self)
+        
+        return response.data
+    }
     
     // MARK: - POST REQUESTS
     

@@ -40,6 +40,9 @@
     "%@ | Wishflow" : {
 
     },
+    "%@ has not added gifts here yet" : {
+
+    },
     "%@ time%@" : {
       "localizations" : {
         "en" : {
@@ -147,9 +150,6 @@
     "Denied" : {
 
     },
-    "dfsgdh" : {
-
-    },
     "Edit event" : {
 
     },
@@ -253,6 +253,9 @@
 
     },
     "Share wish" : {
+
+    },
+    "Show all wishes" : {
 
     },
     "There are no open invites." : {

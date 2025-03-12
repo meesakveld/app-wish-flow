@@ -19,6 +19,7 @@ struct EventView: View {
     
     @State var isShowingInvitesSheet: Bool = false
     @State var isShowingSelectWishesSheet: Bool = false
+    @State var isShowingSelectWishesToGiveSheet: Bool = false
     
     let columns = [
         GridItem(.flexible(), spacing: 15),
@@ -139,7 +140,7 @@ struct EventView: View {
                                 }
                                 
                                 // Visible when the user has the role participant or eventType equals to oneToOne (everyone receives and gives gifts)
-                                if vm.eventUserRole == .participant || vm.event?.eventType == .oneToOne {
+                                if vm.eventUserRole == .participant || vm.event?.eventType != .singleRecipient {
                                     Text(vm.event?.eventType == .groupGifting ? "Giftees" : "Giftee")
                                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                                         .background(Color.cGreen)
@@ -321,7 +322,7 @@ struct EventView: View {
                             }
 
                             
-                            let gifts = vm.event?.gifts ?? []
+                            let gifts = vm.event?.gifts?.filter({ $0.user?.id == vm.user?.id }) ?? []
                             
                             if !gifts.isEmpty {
                                 //MARK: Wishes array
@@ -347,7 +348,7 @@ struct EventView: View {
                     
                     // MARK: - Giftees
                     if vm.eventViewSubpage == .giftees {
-                        VStack(spacing: 30) {
+                        VStack(spacing: 40) {
                             HStack(alignment: .top) {
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text(vm.event?.eventType == .groupGifting ? "Giftees" : "Giftee")
@@ -360,42 +361,92 @@ struct EventView: View {
                                 Spacer()
                             }
                             
-                            if let participants = vm.event?.getGiftees() {
-                                ForEach(participants, id: \.documentId) { participant in
-                                    ZStack {
-                                        DropEffect {
-                                            Text("dfsgdh")
-                                                .frame(height: 200)
-                                                .frame(maxWidth: .infinity)
-                                                .background { Color.cBlue }
-                                        }
-                                        
-                                        VStack {
-                                            HStack {
-                                                HStack(spacing: 5) {
-                                                    Avatar(
-                                                        image: participant.user?.avatar,
-                                                        width: 22
-                                                    )
-                                                    .padding(4)
-
-                                                    Text("\(participant.user?.firstname ?? "") \(participant.user?.lastname ?? "")")
-                                                        .style(textStyle: .textSmall(.regular), color: .cBlack)
-                                                        .padding(.trailing, 10)
+                            if let participants = vm.event?.getGiftees().filter({ $0.user?.id != vm.user?.id }) {
+                                    VStack(spacing: 30) {
+                                    ForEach(participants, id: \.documentId) { participant in
+                                        ZStack {
+                                            // TODO: Fix issue with max 2
+                                            let participantsWishes = vm.event?.gifts?.filter({ $0.user?.id == participant.user?.id }) ?? []
+                                            
+                                            DropEffect {
+                                                VStack(spacing: 20) {
+                                                    // No wishes added yet
+                                                    if participantsWishes.isEmpty {
+                                                        Text("\(participant.user?.firstname ?? "User") has not added gifts here yet.")
+                                                            .style(textStyle: .textSmall(.regular), color: .cBlack)
+                                                            .frame(height: 200)
+                                                            .frame(maxWidth: .infinity)
+                                                            .padding(.horizontal, 15)
+                                                    }
+                                                    
+                                                    // Wishes
+                                                    if !participantsWishes.isEmpty {
+                                                        ScrollView(.horizontal, showsIndicators: false) {
+                                                            LazyHStack(spacing: 15) {
+                                                                ForEach(participantsWishes, id: \.documentId) { wish in
+                                                                    NavigationLink {
+                                                                        WishView(documentId: wish.documentId)
+                                                                    } label: {
+                                                                        WishCard(wish: wish)
+                                                                            .frame(width: 130, height: 200)
+                                                                    }
+                                                                }
+                                                            }
+                                                            .frame(maxWidth: .infinity)
+                                                            .padding(.leading, 15)
+                                                        }
+                                                        
+                                                        Button {
+                                                            isShowingSelectWishesToGiveSheet.toggle()
+                                                        } label: {
+                                                            Text("Select wish(es) to give")
+                                                                .style(textStyle: .text(.medium), color: .cForeground)
+                                                                .underline()
+                                                                .padding(.horizontal, 15)
+                                                        }
+                                                    }
                                                 }
-                                                .padding(1)
-                                                .background(Color.cOrange)
-                                                .cornerRadius(25)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 25)
-                                                        .stroke(Color.cBlack, lineWidth: 1.5)
-                                                )
-                                                
+                                                .padding([.top], 35)
+                                                .padding(.bottom, 15)
+                                                .background { Color.cYellow }
+                                                .sheet(isPresented: $isShowingSelectWishesToGiveSheet) {
+                                                    Task {
+                                                        await vm.getEvent(documentId: documentId, isLoading: $vm.eventIsLoading)
+                                                    }
+                                                } content: {
+                                                    SelectWishesToGiveView(eventDocumentId: documentId, receiverUserId: participant.user?.id ?? 0)
+                                                }
+
+                                            }
+                                            
+                                            VStack {
+                                                HStack {
+                                                    HStack(spacing: 5) {
+                                                        Avatar(
+                                                            image: participant.user?.avatar,
+                                                            width: 22
+                                                        )
+                                                        .padding(4)
+                                                        
+                                                        Text("\(participant.user?.firstname ?? "") \(participant.user?.lastname ?? "")")
+                                                            .style(textStyle: .textSmall(.regular), color: .cBlack)
+                                                            .padding(.trailing, 10)
+                                                    }
+                                                    .padding(1)
+                                                    .background(Color.cOrange)
+                                                    .cornerRadius(25)
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 25)
+                                                            .stroke(Color.cBlack, lineWidth: 1.5)
+                                                    )
+                                                    
+                                                    Spacer()
+                                                    
+                                                }
                                                 Spacer()
                                             }
-                                            Spacer()
+                                            .offset(x: 15, y: -10)
                                         }
-                                        .offset(x: 15, y: -10)
                                     }
                                 }
                             }
