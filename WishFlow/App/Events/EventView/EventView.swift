@@ -313,8 +313,13 @@ struct EventView: View {
                                 }
                             }
                             .sheet(isPresented: $isShowingSelectWishesSheet) {
+                                Task {
+                                    await vm.getEvent(documentId: documentId, isLoading: $vm.eventIsLoading)
+                                }
+                            } content: {
                                 AddWishesToEventView(eventDocumentId: documentId)
                             }
+
                             
                             let gifts = vm.event?.gifts ?? []
                             

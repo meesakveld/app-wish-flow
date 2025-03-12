@@ -87,6 +87,9 @@ final class EventManager: ObservableObject, Sendable {
             .populate("eventInvites")
             .populate("gifts") { gifts in
                 gifts.populate("image")
+                gifts.populate("price") { price in
+                    price.populate("currency")
+                }
             }
             .getDocument(as: Event.self)
         

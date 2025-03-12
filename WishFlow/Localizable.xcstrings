@@ -1,6 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "**Max price**: %@" : {
+
+    },
+    "**Min price**: %@" : {
+
+    },
     "%@ - %@" : {
       "localizations" : {
         "en" : {
