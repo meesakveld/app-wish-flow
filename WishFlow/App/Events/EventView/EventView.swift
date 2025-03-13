@@ -502,45 +502,48 @@ struct EventView: View {
                             Label("Add event to calendar", systemImage: "calendar")
                         }
                         
-                        Divider()
-                        
-                        Button("Manage invites", systemImage: "person.crop.circle.badge.plus") {
-                            isShowingInvitesSheet.toggle()
-                        }
-                        
-                        Divider()
-                        
-                        NavigationLink {
-                            EditEventView(documentId: documentId)
-                        } label: {
-                            Label("Edit event", systemImage: "pencil")
-                        }
-                        
-                        Button("Delete event", systemImage: "trash", role: .destructive) {
-                            alertManager.present(Alert(
-                                title: "Delete event",
-                                message: "Are you sure that you would like to delete the event?",
-                                actions: {
-                                    Button("Delete", role: .destructive) {
-                                        Task {
-                                            do {
-                                                try await vm.deleteEvent(documentId: documentId, isLoading: $vm.eventIsLoading)
-                                                mode.wrappedValue.dismiss()
-                                            } catch {
-                                                alertManager.present(Alert(
-                                                    title: "Something went wrong!",
-                                                    message: error.localizedDescription
-                                                ))
-                                                print(error)
+                        if let ownerParticpant = vm.event?.eventParticipants?.first(where: { $0.role == .owner }), ownerParticpant.user?.id == vm.user?.id {
+                            
+                            Divider()
+                            
+                            Button("Manage invites", systemImage: "person.crop.circle.badge.plus") {
+                                isShowingInvitesSheet.toggle()
+                            }
+                            
+                            Divider()
+                            
+                            NavigationLink {
+                                EditEventView(documentId: documentId)
+                            } label: {
+                                Label("Edit event", systemImage: "pencil")
+                            }
+                            
+                            Button("Delete event", systemImage: "trash", role: .destructive) {
+                                alertManager.present(Alert(
+                                    title: "Delete event",
+                                    message: "Are you sure that you would like to delete the event?",
+                                    actions: {
+                                        Button("Delete", role: .destructive) {
+                                            Task {
+                                                do {
+                                                    try await vm.deleteEvent(documentId: documentId, isLoading: $vm.eventIsLoading)
+                                                    mode.wrappedValue.dismiss()
+                                                } catch {
+                                                    alertManager.present(Alert(
+                                                        title: "Something went wrong!",
+                                                        message: error.localizedDescription
+                                                    ))
+                                                    print(error)
+                                                }
                                             }
                                         }
+                                        
+                                        Button("Cancel", role: .cancel) {
+                                            print("Cancel")
+                                        }
                                     }
-                                    
-                                    Button("Cancel", role: .cancel) {
-                                        print("Cancel")
-                                    }
-                                }
-                            ))
+                                ))
+                            }
                         }
                         
                     } label: {
