@@ -97,7 +97,7 @@ struct WishlistView: View {
                                 text: "No wishes yet — why not add something exciting?"
                             ) {
                                 NavigationLink {
-                                    EventsView()
+                                    AddWishView()
                                 } label: {
                                     HStack {
                                         Image(systemName: "plus.circle")
