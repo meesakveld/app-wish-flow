@@ -173,8 +173,7 @@ final class EventManager: ObservableObject, Sendable {
         maxBudgetAmount: Double? = nil,
         maxBudgetCurrency: Currency? = nil,
         giftDeadline: Date? = nil,
-        claimDeadline: Date? = nil,
-        gifts: [String]? = nil
+        claimDeadline: Date? = nil
     ) async throws -> Event {
         var data: [String: AnyCodable] = [:]
         if let title = title { data["title"] = .string(title) }
@@ -207,9 +206,18 @@ final class EventManager: ObservableObject, Sendable {
         if let claimDeadline = claimDeadline {
             data["claimDeadline"] = .string(claimDeadline.dateToStringFormatter(DateFormat: .RFC3339))
         } else { data["claimDeadline"] = .null }
+                        
+        let response = try await eventCollection
+            .withDocumentId(documentId)
+            .putData(StrapiRequestBody(data), as: Event.self)
+        return response.data
+    }
+    
+    @discardableResult
+    func updateGiftsForEvent(documentId: String, giftsDocumentIds: [String]) async throws -> Event {
+        var data: [String: AnyCodable] = [:]
+        data["gifts"] = .array(giftsDocumentIds.map({ return .string($0) }))
         
-        if let gifts = gifts { data["gifts"] = .array(gifts.map({ return .string($0) })) }
-                
         let response = try await eventCollection
             .withDocumentId(documentId)
             .putData(StrapiRequestBody(data), as: Event.self)

@@ -66,7 +66,7 @@ class AddWishesToEventViewModel: ObservableObject {
     func updateEventGiftAssignment(documentId: String, selectedGiftsIds: [String], isLoading: Binding<LoadingState>) async {
         setLoading(value: isLoading, .preparingToLoad)
         do {
-            try await EventManager.shared.updateEventByDocumentId(documentId: documentId, gifts: selectedGiftsIds)
+            try await EventManager.shared.updateGiftsForEvent(documentId: documentId, giftsDocumentIds: selectedGiftsIds)
         } catch {
             eventHasError = true
             print(error)
