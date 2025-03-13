@@ -85,6 +85,10 @@ final class EventManager: ObservableObject, Sendable {
                 }
             }
             .populate("eventInvites")
+            .populate("eventAssignments") { assignment in
+                assignment.populate("giver")
+                assignment.populate("receiver")
+            }
             .populate("giftClaims") { claims in
                 claims.populate("gift")
                 claims.populate("user")

@@ -361,18 +361,17 @@ struct EventView: View {
                                 Spacer()
                             }
                             
-                            if let participants = vm.event?.getGiftees().filter({ $0.user?.id != vm.user?.id }) {
+                            if let gifties = vm.event?.getGiftees(userId: vm.user?.id ?? 0) {
                                     VStack(spacing: 30) {
-                                    ForEach(participants, id: \.documentId) { participant in
+                                    ForEach(gifties, id: \.documentId) { giftie in
                                         ZStack {
-                                            // TODO: Fix issue with max 2
-                                            let participantsWishes = vm.event?.gifts?.filter({ $0.user?.id == participant.user?.id }) ?? []
+                                            let participantsWishes = vm.event?.gifts?.filter({ $0.user?.id == giftie.user?.id }) ?? []
                                             
                                             DropEffect {
                                                 VStack(spacing: 20) {
                                                     // No wishes added yet
                                                     if participantsWishes.isEmpty {
-                                                        Text("\(participant.user?.firstname ?? "User") has not added gifts here yet.")
+                                                        Text("\(giftie.user?.firstname ?? "User") has not added gifts here yet.")
                                                             .style(textStyle: .textSmall(.regular), color: .cBlack)
                                                             .frame(height: 200)
                                                             .frame(maxWidth: .infinity)
@@ -391,7 +390,7 @@ struct EventView: View {
                                                                             WishCard(wish: wish)
                                                                                 .frame(width: 130, height: 200)
                                                                             
-                                                                            if let giftClaims = vm.event?.giftClaims, giftClaims.contains(where: { $0.gift?.documentId == wish.documentId }) {
+                                                                            if let giftClaims = vm.event?.giftClaims, giftClaims.contains(where: { $0.gift?.documentId == wish.documentId && $0.user?.id == vm.user?.id }) {
                                                                                 VStack {
                                                                                     HStack {
                                                                                         CheckCircle(isChecked: true, { })
@@ -431,7 +430,7 @@ struct EventView: View {
                                                         await vm.getEvent(documentId: documentId, isLoading: $vm.eventIsLoading)
                                                     }
                                                 } content: {
-                                                    SelectWishesToGiveView(eventDocumentId: documentId, receiverUserId: participant.user?.id ?? 0)
+                                                    SelectWishesToGiveView(eventDocumentId: documentId, receiverUserId: giftie.user?.id ?? 0)
                                                 }
 
                                             }
@@ -440,12 +439,12 @@ struct EventView: View {
                                                 HStack {
                                                     HStack(spacing: 5) {
                                                         Avatar(
-                                                            image: participant.user?.avatar,
+                                                            image: giftie.user?.avatar,
                                                             width: 22
                                                         )
                                                         .padding(4)
                                                         
-                                                        Text("\(participant.user?.firstname ?? "") \(participant.user?.lastname ?? "")")
+                                                        Text("\(giftie.user?.firstname ?? "") \(giftie.user?.lastname ?? "")")
                                                             .style(textStyle: .textSmall(.regular), color: .cBlack)
                                                             .padding(.trailing, 10)
                                                     }
@@ -567,7 +566,7 @@ struct EventView: View {
     NavigationStack {
         NavigationLink("", value: true)
             .navigationDestination(isPresented: .constant(true)) {
-                EventView(documentId: "yyi02rmev5oqpgxllz903avf")
+                EventView(documentId: "pru0pq1a39fci8ygjv36c50y")
                     .environmentObject(AlertManager())
                     .environmentObject(NavigationManager())
             }
