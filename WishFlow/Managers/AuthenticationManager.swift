@@ -83,19 +83,32 @@ final class AuthenticationManager: ObservableObject, Sendable {
         user = nil
     }
     
-    func updateProfile(username: String? = nil, email: String? = nil) async throws -> User? {
+    func updateProfile(
+        username: String? = nil,
+        firstname: String? = nil,
+        lastname: String? = nil,
+        email: String? = nil,
+        imageId: Int? = nil
+    ) async throws -> User? {
         var data: [String: AnyCodable] = [:]
         if let username = username { data["username"] = .string(username) }
+        if let firstname = firstname { data["firstname"] = .string(firstname) }
+        if let lastname = lastname { data["lastname"] = .string(lastname) }
         if let email = email { data["email"] = .string(email) }
+        if let avatar = imageId { data["avatar"] = .int(avatar) }
         
         var responseUser: User? = nil
         if let userId = user?.id {
             let response = try await Strapi.authentication.local.updateProfile(StrapiRequestBody(data), userId: userId, as: User.self)
-            user = response
+            user = try await Strapi.authentication.local.me(as: User.self)
             responseUser = response
         } else {
             print("ERROR: Cannot update profile. No user logged in.")
         }
         return responseUser
+    }
+    
+    func updatePassword(currentPassword: String, newPassword: String) async throws {
+        try await Strapi.authentication.local.changePassword(currentPassword: currentPassword, newPassword: newPassword, as: User.self)
     }
 }

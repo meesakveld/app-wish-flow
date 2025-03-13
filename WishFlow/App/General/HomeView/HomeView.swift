@@ -12,6 +12,8 @@ struct HomeView: View {
     @EnvironmentObject private var navigationManager: NavigationManager
     let user: User? = AuthenticationManager.shared.user
     
+    @State var isShowingUpdateProfileSheet: Bool = false
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 40) {
@@ -43,6 +45,12 @@ struct HomeView: View {
                     }
                     
                     Menu {
+                        Button("Update profile", systemImage: "pencil") {
+                            isShowingUpdateProfileSheet.toggle()
+                        }
+                        
+                        Divider()
+                        
                         Button("Logout", systemImage: "rectangle.portrait.and.arrow.right", role: .destructive) {
                             AuthenticationManager.shared.logout()
                             navigationManager.navigate(to: .welcome)
@@ -52,6 +60,12 @@ struct HomeView: View {
                         .padding(1)
                     }
                 }
+                .sheet(isPresented: $isShowingUpdateProfileSheet) {
+                    //
+                } content: {
+                    EditProfileView()
+                }
+
                 
                 // MARK: - Search
                 NavigationLink {
