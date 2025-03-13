@@ -86,7 +86,7 @@ struct EventsView: View {
                                 text: "No events planned — why not plan something fun?"
                             ) {
                                 NavigationLink {
-                                    EventsView()
+                                    AddEventView()
                                 } label: {
                                     HStack {
                                         Image(systemName: "plus.circle")
