@@ -387,8 +387,25 @@ struct EventView: View {
                                                                     NavigationLink {
                                                                         WishView(documentId: wish.documentId)
                                                                     } label: {
-                                                                        WishCard(wish: wish)
-                                                                            .frame(width: 130, height: 200)
+                                                                        ZStack {
+                                                                            WishCard(wish: wish)
+                                                                                .frame(width: 130, height: 200)
+                                                                            
+                                                                            if let giftClaims = vm.event?.giftClaims, giftClaims.contains(where: { $0.gift?.documentId == wish.documentId }) {
+                                                                                VStack {
+                                                                                    HStack {
+                                                                                        CheckCircle(isChecked: true, { })
+                                                                                            .padding(1.5)
+                                                                                            .background(Color.cBlack)
+                                                                                            .cornerRadius(.infinity)
+                                                                                            .offset(x: -5)
+                                                                                        
+                                                                                        Spacer()
+                                                                                    }
+                                                                                    Spacer()
+                                                                                }
+                                                                            }
+                                                                        }
                                                                     }
                                                                 }
                                                             }

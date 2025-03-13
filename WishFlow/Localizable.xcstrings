@@ -40,7 +40,7 @@
     "%@ | Wishflow" : {
 
     },
-    "%@ has not added gifts here yet" : {
+    "%@ has not added gifts here yet." : {
 
     },
     "%@ time%@" : {
@@ -246,16 +246,19 @@
     "Select the gift(s) you will give." : {
 
     },
+    "Select the wish(es) you will give." : {
+
+    },
     "Select the wishes you would like to receive during this event." : {
+
+    },
+    "Select wish(es) to give" : {
 
     },
     "Select wishes" : {
 
     },
     "Share wish" : {
-
-    },
-    "Show all wishes" : {
 
     },
     "There are no open invites." : {
