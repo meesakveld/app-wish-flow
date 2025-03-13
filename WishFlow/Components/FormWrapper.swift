@@ -108,6 +108,19 @@ struct FormWrapper<TextEntries: View, Submit: View>: View {
                 .cornerRadius(7.5)
             }
             
+            if let formSuccess = formSuccess, !formSuccess.isEmpty {
+                HStack {
+                    Text(formSuccess)
+                        .padding(15)
+                        .multilineTextAlignment(.leading)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+                .style(textStyle: .text(.medium), color: .cBlack)
+                .background(Color.cGreen)
+                .cornerRadius(7.5)
+            }
+            
             VStack(alignment: .leading, spacing: 24) {
                 
                 VStack(alignment: .leading, spacing: 16) {
