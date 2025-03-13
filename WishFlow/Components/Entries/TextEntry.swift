@@ -63,10 +63,16 @@ struct TextEntry: View {
                         .textInputAutocapitalization(.never)
                         .frame(height: 44)
                 case .secureField:
-                    SecureField(placeholder, text: $value)
-                        .style(textStyle: .text(.regular), color: .cBlack)
-                        .textInputAutocapitalization(.never)
-                        .frame(height: 44)
+                    Group {
+                        if isSecure {
+                            SecureField(placeholder, text: $value)
+                        } else {
+                            TextField(placeholder, text: $value)
+                        }
+                    }
+                    .style(textStyle: .text(.regular), color: .cBlack)
+                    .textInputAutocapitalization(.never)
+                    .frame(height: 44)
                 case .textEditor(let lineLimit):
                     TextEditor(text: $value)
                         .style(textStyle: .text(.regular), color: value == placeholder ? .cBlack.opacity(0.3) : .cBlack)
