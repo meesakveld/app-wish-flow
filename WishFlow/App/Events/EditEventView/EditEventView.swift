@@ -158,7 +158,7 @@ struct EditEventView: View {
                             }
                             
                         }
-                    } submit: { setIsLoading, setFormError, inputsErrors, isShowingInputsErrors in
+                    } submit: { setIsLoading, setFormError, setFormSuccess, inputsErrors, isShowingInputsErrors in
                         Button {
                             Task {
                                 setIsLoading(.isLoading)

@@ -75,7 +75,7 @@ struct AddWishView: View {
                                     isShowingErrors: isShowingInputsErrors
                                 )
                             }
-                        } submit: { setIsLoading, setFormError, inputsErrors, isShowingInputsErrors in
+                        } submit: { setIsLoading, setFormError, setFormSuccess, inputsErrors, isShowingInputsErrors in
                             Button {
                                 Task {
                                     setIsLoading(.isLoading)
@@ -200,7 +200,7 @@ struct AddWishView: View {
                                     }
                                 }
                             }
-                        } submit: { setIsLoading, setFormError, inputsErrors, isShowingInputsErrors in
+                        } submit: { setIsLoading, setFormError, setFormSuccess, inputsErrors, isShowingInputsErrors in
                             Button {
                                 Task {
                                     setIsLoading(.isLoading)

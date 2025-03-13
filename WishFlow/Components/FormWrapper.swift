@@ -19,26 +19,25 @@ import SwiftUI
 /// ```swift
 /// FormWrapper { inputsErrors, isShowingInputsErrors in
 ///     Group {
-///         TextEntry(
-///             identifier: "identifier",
-///             value: $identifier,
-///             title: "Email or username",
-///             placeholder: "Enter email or username",
-///             errors: inputsErrors,
-///             isShowingErrors: isShowingInputsErrors
-///         )
+///          TextEntry(
+///              identifier: "identifier",
+///              value: $identifier,
+///              title: "Email or username",
+///              placeholder: "Enter email or username",
+///              errors: inputsErrors,
+///              isShowingErrors: isShowingInputsErrors
+///          )
 ///
-///         TextEntry(
-///             identifier: "password",
-///             value: $password,
-///             title: "Password",
-///             placeholder: "Enter password",
-///             errors: inputsErrors,
-///             isShowingErrors: isShowingInputsErrors,
-///             isSecureField: true
-///         )
-///     }
-/// } submit: { setIsLoading, setFormError, inputsErrors, isShowingInputsErrors in
+///          TextEntry(
+///              identifier: "password",
+///              value: $password,
+///              title: "Password",
+///              placeholder: "Enter password",
+///              errors: inputsErrors,
+///              isShowingErrors: isShowingInputsErrors,
+///              entryType: .secureField
+///          )
+/// } submit: { setIsLoading, setFormError, setFormSuccess, inputsErrors, isShowingInputsErrors in
 ///     Button {
 ///         Task {
 ///             setIsLoading(.isLoading)
@@ -80,6 +79,7 @@ import SwiftUI
 struct FormWrapper<TextEntries: View, Submit: View>: View {
     @State private var loadingState: LoadingState = .readyToLoad
     @State private var formError: String? = nil
+    @State private var formSuccess: String? = nil
     @State private var inputsErrors: [TextEntryError] = []
     @State private var isShowingInputsErrors: Bool = false
     
@@ -89,6 +89,7 @@ struct FormWrapper<TextEntries: View, Submit: View>: View {
     
     let submit: (_ setIsLoading: @escaping (LoadingState) -> Void,
                   _ setFormError: @escaping (String?) -> Void,
+                  _ setFormSuccess: @escaping (String?) -> Void,
                   _ inputsErrors: [TextEntryError],
                   _ isShowingInputsErrors: Binding<Bool>) -> Submit
     
@@ -120,6 +121,7 @@ struct FormWrapper<TextEntries: View, Submit: View>: View {
                 submit(
                     { newLoadingState in setLoading(value: $loadingState, newLoadingState) },
                     { newError in formError = newError },
+                    { newSuccess in formSuccess = newSuccess },
                     inputsErrors,
                     $isShowingInputsErrors
                 )
