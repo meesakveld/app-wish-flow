@@ -75,6 +75,7 @@ struct InvitePeopleToEventView: View {
                                         errors: inputsErrors,
                                         isShowingErrors: isShowingInputsErrors
                                     )
+                                    .padding(.horizontal, 1)
                                 }
                             } submit: { setIsLoading, setFormError, inputsErrors, isShowingInputsErrors in
                                 Button {
