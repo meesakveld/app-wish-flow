@@ -200,6 +200,8 @@ struct EditProfileView: View {
                                         currentPassword = ""
                                         newPassword = ""
                                         confirmNewPassword = ""
+                                        
+                                        isShowingInputsErrors.wrappedValue = false
                                     } catch let error as StrapiSwiftError {
                                         switch error {
                                         case .badResponse(_, let message):
