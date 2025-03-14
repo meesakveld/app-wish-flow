@@ -40,6 +40,8 @@ class NavigationManager: ObservableObject {
             WishlistView()
         case .wish(let documentId):
             WishView(documentId: documentId)
+        case .buylist:
+            BuylistView()
         }
     }
     
@@ -58,20 +60,18 @@ class NavigationManager: ObservableObject {
             } else {
                 navigate(to: .events)
             }
-            
         case "wishlist":
             if let wishId = pathComponents.dropFirst().first {
                 navigate(to: .wish(documentId: wishId))
             } else {
                 navigate(to: .wishList)
             }
-            
         case "welcome":
             navigate(to: .welcome)
-            
         case "home":
             navigate(to: .home)
-            
+        case "buylist":
+            navigate(to: .buylist)
         default:
             return
         }
@@ -85,5 +85,6 @@ class NavigationManager: ObservableObject {
         case event(documentId: String, isShowingInvitesSheet: Bool)
         case wishList
         case wish(documentId: String)
+        case buylist
     }
 }
