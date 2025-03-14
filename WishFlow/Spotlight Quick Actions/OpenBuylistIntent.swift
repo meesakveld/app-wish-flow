@@ -9,17 +9,17 @@ import Foundation
 import AppIntents
 import SwiftUI
 
-struct OpenEventsIntent: AppIntent {
-    static var title: LocalizedStringResource = "Open Events"
+struct OpenBuylistIntent: AppIntent {
+    static var title: LocalizedStringResource = "Open buylist"
     
-    static var description = IntentDescription("Opens the Wishflow events page.")
+    static var description = IntentDescription("Opens the Wishflow buylist.")
 
     static var openAppWhenRun: Bool = true
     
     @MainActor
     func perform() async throws -> some IntentResult {
-        guard let url = URL(string: "wishflow://events") else {
-            throw OpenEventsError.invalidURL
+        guard let url = URL(string: "wishflow://buylist") else {
+            throw OpenWishlistError.invalidURL
         }
         await UIApplication.shared.open(url)
         return .result()
@@ -27,6 +27,6 @@ struct OpenEventsIntent: AppIntent {
 }
 
 // Optioneel: definieer een specifieke error
-enum OpenEventsError: Error {
+enum OpenBuylistError: Error {
     case invalidURL
 }

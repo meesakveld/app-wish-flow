@@ -108,6 +108,9 @@
     "Budget:" : {
 
     },
+    "Buylist" : {
+
+    },
     "Cancel" : {
 
     },
@@ -214,6 +217,24 @@
 
     },
     "Nobody has accepted yet." : {
+
+    },
+    "Open buylist" : {
+
+    },
+    "Open Events" : {
+
+    },
+    "Open wishlist" : {
+
+    },
+    "Opens the Wishflow buylist." : {
+
+    },
+    "Opens the Wishflow events page." : {
+
+    },
+    "Opens the Wishflow wishlist." : {
 
     },
     "Price:" : {
