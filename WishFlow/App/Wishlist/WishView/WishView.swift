@@ -10,7 +10,7 @@ import SwiftUI
 struct WishView: View {
     let documentId: String
     
-    @ObservedObject var vm: WishViewModel = WishViewModel()
+    @StateObject var vm: WishViewModel = WishViewModel()
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var alertManager: AlertManager
 
