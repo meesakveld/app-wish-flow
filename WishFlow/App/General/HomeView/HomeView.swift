@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    @ObservedObject var vm: HomeViewModel = HomeViewModel()
+    @StateObject var vm: HomeViewModel = HomeViewModel()
     @EnvironmentObject private var navigationManager: NavigationManager
     let user: User? = AuthenticationManager.shared.user
     
