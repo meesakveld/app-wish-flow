@@ -174,7 +174,11 @@ struct WishView: View {
                             if let events = vm.wish?.events {
                                 if events.count > 0 {
                                     ForEach(events, id: \.documentId) { event in
-                                        EventCard(event: event)
+                                        NavigationLink {
+                                            EventView(documentId: event.documentId)
+                                        } label: {
+                                            EventCard(event: event)
+                                        }
                                     }
                                 } else {
                                     HStack {
