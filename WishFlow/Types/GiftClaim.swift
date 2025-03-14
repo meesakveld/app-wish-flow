@@ -16,6 +16,17 @@ struct GiftClaim: Codable {
     var giftStatus: GiftStatus
     var createdAt: Date
     var updatedAt: Date
+    
+    init() {
+        self.id = 1
+        self.documentId = UUID().uuidString
+        self.user = nil
+        self.gift = Gift()
+        self.event = Event()
+        self.giftStatus = .purchased
+        self.createdAt = Date()
+        self.updatedAt = Date()
+    }
 
     enum CodingKeys: String, CodingKey {
         case id, documentId, giftStatus, createdAt, updatedAt, user, gift, event
@@ -61,4 +72,13 @@ struct GiftClaim: Codable {
 enum GiftStatus: String, Codable {
     case reserved
     case purchased
+    
+    var title: String {
+        switch self {
+        case .reserved:
+            return "Reserved"
+        case .purchased:
+            return "Purchased"
+        }
+    }
 }

@@ -165,6 +165,9 @@
     "Event date" : {
 
     },
+    "Event title" : {
+
+    },
     "Event type" : {
 
     },
@@ -178,9 +181,6 @@
 
     },
     "Giftees" : {
-
-    },
-    "Hello, World!" : {
 
     },
     "Info" : {
@@ -243,6 +243,9 @@
     "Price:" : {
 
     },
+    "Purchased" : {
+
+    },
     "Receive limit" : {
 
     },
@@ -253,6 +256,12 @@
 
     },
     "Register" : {
+
+    },
+    "Remove claim" : {
+
+    },
+    "Reserved" : {
 
     },
     "Save" : {

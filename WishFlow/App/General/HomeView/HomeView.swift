@@ -61,8 +61,6 @@ struct HomeView: View {
                     }
                 }
                 .sheet(isPresented: $isShowingUpdateProfileSheet) {
-                    //
-                } content: {
                     EditProfileView()
                 }
 
@@ -84,7 +82,11 @@ struct HomeView: View {
                         Card(title: "Wish\nlist", image: "giftWithStars", bgColor: .cBlue)
                     }
                     
-                    Card(title: "Buy\nlist", image: "giftlist", bgColor: .cOrange)
+                    NavigationLink {
+                        BuylistView()
+                    } label: {
+                        Card(title: "Buy\nlist", image: "giftlist", bgColor: .cOrange)
+                    }
                 }
                 
                 
