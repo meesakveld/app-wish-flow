@@ -18,9 +18,6 @@ struct WishFlowApp: App {
             ContentView()
                 .environmentObject(navigationManager)
                 .environmentObject(alertManager)
-                .onOpenURL { url in
-                    print(url)
-                }
         }
     }
 }

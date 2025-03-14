@@ -24,6 +24,9 @@ struct ContentView: View {
                     WelcomeView()
                 }
             }
+            .onOpenURL { url in
+                navigationManager.navigate(to: url)
+            }
             .navigationDestination(for: NavigationManager.NavigationDestination.self) { destination in
                 navigationManager.destinationView(for: destination)
             }

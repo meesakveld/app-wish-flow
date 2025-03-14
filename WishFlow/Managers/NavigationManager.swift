@@ -43,6 +43,41 @@ class NavigationManager: ObservableObject {
         }
     }
     
+    func navigate(to url: URL) {
+        guard url.scheme == "wishflow" else { return }
+        
+        let pathComponents = url.pathComponents.filter { !$0.isEmpty }
+        let firstComponent = url.host ?? pathComponents.first
+        
+        guard let firstComponent else { return }
+        
+        switch firstComponent {
+        case "events":
+            if let eventId = pathComponents.dropFirst().first {
+                navigate(to: .event(documentId: eventId, isShowingInvitesSheet: false))
+            } else {
+                navigate(to: .events)
+            }
+            
+        case "wishlist":
+            if let wishId = pathComponents.dropFirst().first {
+                navigate(to: .wish(documentId: wishId))
+            } else {
+                navigate(to: .wishList)
+            }
+            
+        case "welcome":
+            navigate(to: .welcome)
+            
+        case "home":
+            navigate(to: .home)
+            
+        default:
+            return
+        }
+    }
+
+    
     enum NavigationDestination: Hashable {
         case home
         case welcome
