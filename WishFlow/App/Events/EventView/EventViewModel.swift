@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import StrapiSwift
 
 @MainActor
 class EventViewModel: ObservableObject {
@@ -74,6 +75,64 @@ class EventViewModel: ObservableObject {
         } catch {
             setLoading(value: isLoading, .finished)
             throw error
+        }
+        setLoading(value: isLoading, .finished)
+    }
+    
+    
+    // MARK: -
+    
+    func randomizeGifties(eventDocumentId: String, isLoading: Binding<LoadingState>) async {
+        eventHasError = false
+        setLoading(value: isLoading, .isLoading)
+        do {
+            // Get event Particpants
+            let participantsData = try await Strapi.contentManager.collection("event-participants")
+                .filter("[event][documentId]", operator: .equal, value: eventDocumentId)
+                .populate("user")
+                .getDocuments(as: [EventParticipant].self)
+            
+            let participants = participantsData.data.map { $0.user!.id }
+            
+            guard participants.count > 1 else {
+                throw NSError(domain: "Not enough participants", code: 1, userInfo: nil)
+            }
+            
+            // Shuffle the participants
+            var shuffledParticipants = participants.shuffled()
+
+            // Ensure no one pulls themselves using a circular shift
+            if participants.count > 1 {
+                repeat {
+                    shuffledParticipants.shuffle()
+                } while zip(participants, shuffledParticipants).contains(where: { $0 == $1 })
+            }
+
+            // Make the assignments [giver : receiver]
+            let assignments = Dictionary(uniqueKeysWithValues: zip(participants, shuffledParticipants))
+            
+            // assign random
+            for (giver, receiver) in assignments {
+                try await Strapi.contentManager.collection("event-assignments")
+                    .postData(StrapiRequestBody([
+                        "giver": .int(giver),
+                        "receiver": .int(receiver),
+                        "event": .string(eventDocumentId)
+                    ]), as: EventAssignment.self)
+            }
+            
+            // Delete all open eventInvites
+            let eventInvites = try await Strapi.contentManager.collection("event-invites")
+                .filter("[event][documentId]", operator: .equal, value: eventDocumentId)
+                .getDocuments(as: [EventInvite].self)
+            
+            for invite in eventInvites.data {
+                try await Strapi.contentManager.collection("event-invites").withDocumentId(invite.documentId).delete()
+            }
+            
+        } catch {
+            eventHasError = true
+            print(error)
         }
         setLoading(value: isLoading, .finished)
     }

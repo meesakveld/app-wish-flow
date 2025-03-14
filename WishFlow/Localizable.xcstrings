@@ -99,7 +99,13 @@
     "Add wish to event" : {
 
     },
+    "Ask the organizer to randomize the giftees." : {
+
+    },
     "Asked for in events" : {
+
+    },
+    "Assign giftees" : {
 
     },
     "Budget" : {
@@ -151,6 +157,9 @@
 
     },
     "Denied" : {
+
+    },
+    "Did everyone join?" : {
 
     },
     "Edit event" : {
@@ -222,6 +231,9 @@
     "Nobody has accepted yet." : {
 
     },
+    "OK" : {
+
+    },
     "Open buylist" : {
 
     },
@@ -244,6 +256,9 @@
 
     },
     "Purchased" : {
+
+    },
+    "Randomize the giftees" : {
 
     },
     "Receive limit" : {
@@ -298,6 +313,9 @@
 
     },
     "Timing" : {
+
+    },
+    "To get an giftee assigned, all members need to be registered and have accepted the invitation to join." : {
 
     },
     "Upcoming Events" : {

@@ -163,7 +163,6 @@ struct EventView: View {
                             .frame(maxWidth: .infinity)
                             .frame(height: 45)
                         }
-                        
                     }
                     
                     // MARK: - Info
@@ -320,7 +319,7 @@ struct EventView: View {
                             } content: {
                                 AddWishesToEventView(eventDocumentId: documentId)
                             }
-
+                            
                             
                             let gifts = vm.event?.gifts?.filter({ $0.user?.id == vm.user?.id }) ?? []
                             
@@ -348,124 +347,185 @@ struct EventView: View {
                     
                     // MARK: - Giftees
                     if vm.eventViewSubpage == .giftees {
-                        VStack(spacing: 40) {
-                            HStack(alignment: .top) {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text(vm.event?.eventType == .groupGifting ? "Giftees" : "Giftee")
-                                        .style(textStyle: .text(.bold), color: .cForeground)
+                        
+                        // Visible when eventType equals oneToOne and there are no assignments yet
+                        if !(vm.event?.eventType == .oneToOne && (vm.event?.eventAssignments?.count ?? 0) == 0) {
+                            
+                            VStack(spacing: 40) {
+                                HStack(alignment: .top) {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text(vm.event?.eventType == .groupGifting ? "Giftees" : "Giftee")
+                                            .style(textStyle: .text(.bold), color: .cForeground)
+                                        
+                                        Text("Select the gift(s) you will give.")
+                                            .style(textStyle: .textSmall(.regular), color: .cForeground)
+                                    }
                                     
-                                    Text("Select the gift(s) you will give.")
-                                        .style(textStyle: .textSmall(.regular), color: .cForeground)
+                                    Spacer()
                                 }
                                 
-                                Spacer()
-                            }
-                            
-                            if let gifties = vm.event?.getGiftees(userId: vm.user?.id ?? 0) {
+                                if let gifties = vm.event?.getGiftees(userId: vm.user?.id ?? 0) {
                                     VStack(spacing: 30) {
-                                    ForEach(gifties, id: \.documentId) { giftie in
-                                        ZStack {
-                                            let participantsWishes = vm.event?.gifts?.filter({ $0.user?.id == giftie.user?.id }) ?? []
-                                            
-                                            DropEffect {
-                                                VStack(spacing: 20) {
-                                                    // No wishes added yet
-                                                    if participantsWishes.isEmpty {
-                                                        Text("\(giftie.user?.firstname ?? "User") has not added gifts here yet.")
-                                                            .style(textStyle: .textSmall(.regular), color: .cBlack)
-                                                            .frame(height: 200)
-                                                            .frame(maxWidth: .infinity)
-                                                            .padding(.horizontal, 15)
-                                                    }
-                                                    
-                                                    // Wishes
-                                                    if !participantsWishes.isEmpty {
-                                                        ScrollView(.horizontal, showsIndicators: false) {
-                                                            LazyHStack(spacing: 15) {
-                                                                ForEach(participantsWishes, id: \.documentId) { wish in
-                                                                    NavigationLink {
-                                                                        WishView(documentId: wish.documentId)
-                                                                    } label: {
-                                                                        ZStack {
-                                                                            WishCard(wish: wish)
-                                                                                .frame(width: 130, height: 200)
-                                                                            
-                                                                            if let giftClaims = vm.event?.giftClaims, giftClaims.contains(where: { $0.gift?.documentId == wish.documentId && $0.user?.id == vm.user?.id }) {
-                                                                                VStack {
-                                                                                    HStack {
-                                                                                        CheckCircle(isChecked: true, { })
-                                                                                            .padding(1.5)
-                                                                                            .background(Color.cBlack)
-                                                                                            .cornerRadius(.infinity)
-                                                                                            .offset(x: -5)
-                                                                                        
+                                        ForEach(gifties, id: \.documentId) { giftie in
+                                            ZStack {
+                                                let participantsWishes = vm.event?.gifts?.filter({ $0.user?.id == giftie.user?.id }) ?? []
+                                                
+                                                DropEffect {
+                                                    VStack(spacing: 20) {
+                                                        // No wishes added yet
+                                                        if participantsWishes.isEmpty {
+                                                            Text("\(giftie.user?.firstname ?? "User") has not added gifts here yet.")
+                                                                .style(textStyle: .textSmall(.regular), color: .cBlack)
+                                                                .frame(height: 200)
+                                                                .frame(maxWidth: .infinity)
+                                                                .padding(.horizontal, 15)
+                                                        }
+                                                        
+                                                        // Wishes
+                                                        if !participantsWishes.isEmpty {
+                                                            ScrollView(.horizontal, showsIndicators: false) {
+                                                                LazyHStack(spacing: 15) {
+                                                                    ForEach(participantsWishes, id: \.documentId) { wish in
+                                                                        NavigationLink {
+                                                                            WishView(documentId: wish.documentId)
+                                                                        } label: {
+                                                                            ZStack {
+                                                                                WishCard(wish: wish)
+                                                                                    .frame(width: 130, height: 200)
+                                                                                
+                                                                                if let giftClaims = vm.event?.giftClaims, giftClaims.contains(where: { $0.gift?.documentId == wish.documentId && $0.user?.id == vm.user?.id }) {
+                                                                                    VStack {
+                                                                                        HStack {
+                                                                                            CheckCircle(isChecked: true, { })
+                                                                                                .padding(1.5)
+                                                                                                .background(Color.cBlack)
+                                                                                                .cornerRadius(.infinity)
+                                                                                                .offset(x: -5)
+                                                                                            
+                                                                                            Spacer()
+                                                                                        }
                                                                                         Spacer()
                                                                                     }
-                                                                                    Spacer()
                                                                                 }
                                                                             }
                                                                         }
                                                                     }
                                                                 }
+                                                                .frame(maxWidth: .infinity)
+                                                                .padding(.leading, 15)
                                                             }
-                                                            .frame(maxWidth: .infinity)
-                                                            .padding(.leading, 15)
-                                                        }
-                                                        
-                                                        Button {
-                                                            isShowingSelectWishesToGiveSheet.toggle()
-                                                        } label: {
-                                                            Text("Select wish(es) to give")
-                                                                .style(textStyle: .text(.medium), color: .cForeground)
-                                                                .underline()
-                                                                .padding(.horizontal, 15)
+                                                            
+                                                            Button {
+                                                                isShowingSelectWishesToGiveSheet.toggle()
+                                                            } label: {
+                                                                Text("Select wish(es) to give")
+                                                                    .style(textStyle: .text(.medium), color: .cForeground)
+                                                                    .underline()
+                                                                    .padding(.horizontal, 15)
+                                                            }
                                                         }
                                                     }
-                                                }
-                                                .padding([.top], 35)
-                                                .padding(.bottom, 15)
-                                                .background { Color.cYellow }
-                                                .sheet(isPresented: $isShowingSelectWishesToGiveSheet) {
-                                                    Task {
-                                                        await vm.getEvent(documentId: documentId, isLoading: $vm.eventIsLoading)
+                                                    .padding([.top], 35)
+                                                    .padding(.bottom, 15)
+                                                    .background { Color.cYellow }
+                                                    .sheet(isPresented: $isShowingSelectWishesToGiveSheet) {
+                                                        Task {
+                                                            await vm.getEvent(documentId: documentId, isLoading: $vm.eventIsLoading)
+                                                        }
+                                                    } content: {
+                                                        SelectWishesToGiveView(eventDocumentId: documentId, receiverUserId: giftie.user?.id ?? 0)
                                                     }
-                                                } content: {
-                                                    SelectWishesToGiveView(eventDocumentId: documentId, receiverUserId: giftie.user?.id ?? 0)
+                                                    
                                                 }
-
-                                            }
-                                            
-                                            VStack {
-                                                HStack {
-                                                    HStack(spacing: 5) {
-                                                        Avatar(
-                                                            image: giftie.user?.avatar,
-                                                            width: 22
+                                                
+                                                VStack {
+                                                    HStack {
+                                                        HStack(spacing: 5) {
+                                                            Avatar(
+                                                                image: giftie.user?.avatar,
+                                                                width: 22
+                                                            )
+                                                            .padding(4)
+                                                            
+                                                            Text("\(giftie.user?.firstname ?? "") \(giftie.user?.lastname ?? "")")
+                                                                .style(textStyle: .textSmall(.regular), color: .cBlack)
+                                                                .padding(.trailing, 10)
+                                                        }
+                                                        .padding(1)
+                                                        .background(Color.cOrange)
+                                                        .cornerRadius(25)
+                                                        .overlay(
+                                                            RoundedRectangle(cornerRadius: 25)
+                                                                .stroke(Color.cBlack, lineWidth: 1.5)
                                                         )
-                                                        .padding(4)
                                                         
-                                                        Text("\(giftie.user?.firstname ?? "") \(giftie.user?.lastname ?? "")")
-                                                            .style(textStyle: .textSmall(.regular), color: .cBlack)
-                                                            .padding(.trailing, 10)
+                                                        Spacer()
+                                                        
                                                     }
-                                                    .padding(1)
-                                                    .background(Color.cOrange)
-                                                    .cornerRadius(25)
-                                                    .overlay(
-                                                        RoundedRectangle(cornerRadius: 25)
-                                                            .stroke(Color.cBlack, lineWidth: 1.5)
-                                                    )
-                                                    
                                                     Spacer()
-                                                    
                                                 }
-                                                Spacer()
+                                                .offset(x: 15, y: -10)
                                             }
-                                            .offset(x: 15, y: -10)
                                         }
                                     }
                                 }
                             }
+                            
+                        } else {
+                            
+                            VStack(spacing: 20) {
+                                Text("Did everyone join?")
+                                    .style(textStyle: .title(.h2), color: .cForeground)
+                                
+                                Text("To get an giftee assigned, all members need to be registered and have accepted the invitation to join.")
+                                    .style(textStyle: .text(.medium), color: .cForeground)
+                                
+                                // Assign button for event owner
+                                if let ownerParticpant = vm.event?.eventParticipants?.first(where: { $0.role == .owner }), ownerParticpant.user?.id == vm.user?.id {
+                                 
+                                    Button("Randomize the giftees") {
+                                        guard (vm.event?.eventParticipants?.count ?? 0) >= 2 else {
+                                            alertManager.present(Alert(
+                                                title: "Not enough accepted participants",
+                                                message: "To randomize the giftees, at least two participants are required.",
+                                                actions: {
+                                                    Button("Manage invites") {
+                                                        isShowingInvitesSheet.toggle()
+                                                    }
+                                                    
+                                                    Button("OK", role: .cancel) { }
+                                                }
+                                            ))
+                                            return
+                                        }
+                                        
+                                        alertManager.present(Alert(
+                                            title: "Randomize the giftees",
+                                            message: "Are you sure that you would like to randomize the giftees? You can't add more people after this action.",
+                                            actions: {
+                                                Button("Assign giftees", role: .destructive) {
+                                                    Task {
+                                                        await vm.randomizeGifties(eventDocumentId: documentId, isLoading: $vm.eventIsLoading)
+                                                        await vm.getEvent(documentId: documentId, isLoading: $vm.eventIsLoading)
+                                                    }
+                                                }
+                                                
+                                                Button("Cancel", role: .cancel) { }
+                                            }
+                                        ))
+                                    }
+                                    .style(textStyle: .text(.regular), color: .cOrange)
+                                    
+                                } else {
+                                    
+                                    Text("Ask the organizer to randomize the giftees.")
+                                        .style(textStyle: .text(.regular), color: .cForeground)
+                                    
+                                }
+                            }
+                            .multilineTextAlignment(.center)
+                            .padding(15)
+                            
                         }
                     }
                 }
@@ -507,7 +567,14 @@ struct EventView: View {
                             Divider()
                             
                             Button("Manage invites", systemImage: "person.crop.circle.badge.plus") {
-                                isShowingInvitesSheet.toggle()
+                                if (vm.event?.eventType == .oneToOne && (vm.event?.eventAssignments?.count ?? 0) > 0) {
+                                    alertManager.present(Alert(
+                                        title: "Not available",
+                                        message: "This can't be managed anymore because the giftees have been randomized and assigned."
+                                    ))
+                                } else {
+                                    isShowingInvitesSheet.toggle()
+                                }
                             }
                             
                             Divider()
