@@ -120,7 +120,7 @@ struct RegisterView: View {
                                     setFormError("Something went wrong")
                                 }
                             }
-                            
+                            await AuthenticationManager.shared.logout()
                             setIsLoading(.finished)
                         }
                     } label: {

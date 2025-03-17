@@ -52,8 +52,14 @@ struct HomeView: View {
                         Divider()
                         
                         Button("Logout", systemImage: "rectangle.portrait.and.arrow.right", role: .destructive) {
-                            AuthenticationManager.shared.logout()
-                            navigationManager.navigate(to: .welcome)
+                            Task {
+                                do {
+                                    try await AuthenticationManager.shared.logout()
+                                    navigationManager.navigate(to: .welcome)
+                                } catch {
+                                    print(error.localizedDescription)
+                                }
+                            }
                         }
                     } label: {
                         Avatar(image: user?.avatar)

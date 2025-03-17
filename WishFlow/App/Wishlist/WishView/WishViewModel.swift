@@ -17,7 +17,7 @@ class WishViewModel: ObservableObject {
     let user: User? = AuthenticationManager.shared.user
 
     init() {
-        if user == nil { AuthenticationManager.shared.logout() }
+        if user == nil { Task { await AuthenticationManager.shared.logout() } }
     }
     
     func getWish(documentId: String, isLoading: Binding<LoadingState>) async {

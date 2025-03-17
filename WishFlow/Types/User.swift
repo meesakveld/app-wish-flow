@@ -23,9 +23,14 @@ struct User: Codable, Identifiable {
     let publishedAt: Date
     let avatar: StrapiImage?
     let role: Role?
+    let deviceTokens: [DeviceToken]?
+    
+    struct DeviceToken: Codable {
+        let value: String
+    }
     
     enum CodingKeys: String, CodingKey {
-        case id, documentId, firstname, lastname, username, email, confirmed, blocked, provider, createdAt, updatedAt, publishedAt, avatar, role
+        case id, documentId, firstname, lastname, username, email, confirmed, blocked, provider, createdAt, updatedAt, publishedAt, avatar, role, deviceTokens
     }
     
     init(from decoder: Decoder) throws {
@@ -42,6 +47,7 @@ struct User: Codable, Identifiable {
         provider = try container.decode(String.self, forKey: .provider)
         avatar = try container.decodeIfPresent(StrapiImage.self, forKey: .avatar)
         role = try container.decodeIfPresent(Role.self, forKey: .role)
+        deviceTokens = try container.decodeIfPresent([DeviceToken].self, forKey: .deviceTokens)
         
         // Use a custom formatter that supports milliseconds
         let formatter = DateFormatter.iso8601WithMilliseconds
@@ -65,6 +71,7 @@ struct User: Codable, Identifiable {
         try container.encode(provider, forKey: .provider)
         try container.encodeIfPresent(avatar, forKey: .avatar)
         try container.encodeIfPresent(role, forKey: .role)
+        try container.encodeIfPresent(deviceTokens, forKey: .deviceTokens)
         
         let formatter = DateFormatter.iso8601WithMilliseconds
         try container.encode(formatter.string(from: createdAt), forKey: .createdAt)

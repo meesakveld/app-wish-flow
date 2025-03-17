@@ -77,6 +77,8 @@ struct LoginView: View {
                                         } catch {
                                             print(error)
                                             setFormError("Something went wrong")
+                                            
+                                            await AuthenticationManager.shared.logout()
                                         }
                                     }
 
