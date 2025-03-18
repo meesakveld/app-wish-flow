@@ -50,13 +50,22 @@ class NavigationManager: ObservableObject {
         
         let pathComponents = url.pathComponents.filter { !$0.isEmpty }
         let firstComponent = url.host ?? pathComponents.first
+        let queryItems = url.extractQueryItems()
         
         guard let firstComponent else { return }
+        
+        var showManageInvitesSheet: Bool {
+            if let queryItems = queryItems, let value = queryItems["showManageInvitesSheet"] {
+                return Bool(value) ?? false
+            }
+            return false
+        }
+
         
         switch firstComponent {
         case "events":
             if let eventId = pathComponents.dropFirst().first {
-                navigate(to: .event(documentId: eventId, isShowingInvitesSheet: false))
+                navigate(to: .event(documentId: eventId, isShowingInvitesSheet: showManageInvitesSheet))
             } else {
                 navigate(to: .events)
             }

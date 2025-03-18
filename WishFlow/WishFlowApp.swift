@@ -23,13 +23,16 @@ struct WishFlowApp: App {
     }
 }
 
-class AppDelegate: NSObject, UIApplicationDelegate {    
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         // —— Configure StrapiSwift ——
         StrapiSwiftManager.shared.configure()
-        
+
         // —— Configure Remote Notifications ——
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+        let center = UNUserNotificationCenter.current()
+        center.delegate = self
+        center.requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
             if granted {
                 DispatchQueue.main.async {
                     UIApplication.shared.registerForRemoteNotifications()
@@ -43,6 +46,23 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
         UserDefaults.standard.set(token, forKey: "apnsDeviceToken")
-        print("APNs Device Token: \(token)")
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        let userInfo = response.notification.request.content.userInfo
+
+        if let urlString = userInfo["url"] as? String {
+            openDeepLink(urlString)
+        }
+
+        completionHandler()
+    }
+
+    func openDeepLink(_ urlString: String) {
+        if let url = URL(string: urlString) {
+            DispatchQueue.main.async {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }
     }
 }
