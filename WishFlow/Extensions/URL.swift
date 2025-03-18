@@ -205,4 +205,19 @@ extension URL {
         // Return the collected object
         return PageData(title: title, openGraphData: openGraphData, jsonLD: jsonLD)
     }
+    
+    // Extract query items from url
+    func extractQueryItems() -> [String: String]? {
+        guard let components = URLComponents(url: self, resolvingAgainstBaseURL: false),
+              let queryItems = components.queryItems else {
+            return nil
+        }
+        
+        var queryParameters = [String: String]()
+        for item in queryItems {
+            queryParameters[item.name] = item.value
+        }
+        
+        return queryParameters
+    }
 }
