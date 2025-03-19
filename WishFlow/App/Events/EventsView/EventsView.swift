@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EventsView: View {
-    @ObservedObject var vm: EventsViewModel = EventsViewModel()
+    @StateObject var vm: EventsViewModel = EventsViewModel()
     let user: User? = AuthenticationManager.shared.user
     var searchActivated: Bool = false
     

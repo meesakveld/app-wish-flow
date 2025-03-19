@@ -11,7 +11,7 @@ struct EventView: View {
     let documentId: String
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     @EnvironmentObject var alertManager: AlertManager
-    @ObservedObject var vm: EventViewModel = EventViewModel()
+    @StateObject var vm: EventViewModel = EventViewModel()
     @ObservedObject var navigationManager: NavigationManager = NavigationManager()
     
     @State var showAllParticipants: Bool = false
