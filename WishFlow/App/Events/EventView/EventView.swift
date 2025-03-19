@@ -185,10 +185,10 @@ struct EventView: View {
                                 // Eventdate
                                 HStack(alignment: .center) {
                                     Text("Eventdate:")
-                                        .style(textStyle: .text(.medium), color: .cBlack)
+                                        .style(textStyle: .text(.medium), color: .cForeground)
                                     
                                     Text((vm.event?.eventDate ?? Date()).dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
-                                        .style(textStyle: .text(.regular), color: .cBlack)
+                                        .style(textStyle: .text(.regular), color: .cForeground)
                                     
                                     Spacer()
                                 }
@@ -197,10 +197,10 @@ struct EventView: View {
                                 if let budget = vm.event?.getMinMaxBudgetText() {
                                     HStack(alignment: .center) {
                                         Text("Budget:")
-                                            .style(textStyle: .text(.medium), color: .cBlack)
+                                            .style(textStyle: .text(.medium), color: .cForeground)
                                         
                                         Text(budget)
-                                            .style(textStyle: .text(.regular), color: .cBlack)
+                                            .style(textStyle: .text(.regular), color: .cForeground)
                                         
                                         Spacer()
                                     }
@@ -211,10 +211,10 @@ struct EventView: View {
                                 if vm.eventUserRole == .owner || vm.eventUserRole == .recipient, let giftDeadline = vm.event?.giftDeadline {
                                     HStack(alignment: .center) {
                                         Text("Deadline adding wishes:")
-                                            .style(textStyle: .text(.medium), color: .cBlack)
+                                            .style(textStyle: .text(.medium), color: .cForeground)
                                         
                                         Text(giftDeadline.dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
-                                            .style(textStyle: .text(.regular), color: .cBlack)
+                                            .style(textStyle: .text(.regular), color: .cForeground)
                                         
                                         Spacer()
                                     }
@@ -225,10 +225,10 @@ struct EventView: View {
                                 if vm.eventUserRole == .owner || vm.eventUserRole == .participant || vm.event?.eventType == .oneToOne, let claimDeadline = vm.event?.claimDeadline {
                                     HStack(alignment: .center) {
                                         Text("Deadline selecting wishes:")
-                                            .style(textStyle: .text(.medium), color: .cBlack)
+                                            .style(textStyle: .text(.medium), color: .cForeground)
                                         
                                         Text(claimDeadline.dateToStringFormatter(DateFormat: .dd_MMM_yyyy))
-                                            .style(textStyle: .text(.regular), color: .cBlack)
+                                            .style(textStyle: .text(.regular), color: .cForeground)
                                         
                                         Spacer()
                                     }

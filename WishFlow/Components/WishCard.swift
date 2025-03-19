@@ -35,7 +35,7 @@ struct WishCard: View {
                 .aspectRatio(1, contentMode: .fit)
                 .overlay {
                     RoundedRectangle(cornerRadius: 5)
-                        .stroke(Color.cForeground, lineWidth: 2)
+                        .stroke(Color.cBlack, lineWidth: 2)
                 }
                 
                 HStack {
@@ -44,8 +44,8 @@ struct WishCard: View {
                             .style(textStyle: .text(.medium), color: .cBlack)
                             .lineLimit(1)
                             .multilineTextAlignment(.leading)
-                        
-                        Text(wish.price?.formatted() ?? "€ 30")
+                            
+                        Text(wish.price?.formatted() ?? "")
                             .style(textStyle: .textSmall(.regular), color: .cBlack)
                     }
                     Spacer()

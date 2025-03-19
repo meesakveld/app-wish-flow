@@ -31,7 +31,7 @@ struct EventCard: View {
                 }
                 .overlay {
                     RoundedRectangle(cornerRadius: 5)
-                        .stroke(Color.cForeground, lineWidth: 2)
+                        .stroke(Color.cBlack, lineWidth: 2)
                 }
                 
                 HStack {

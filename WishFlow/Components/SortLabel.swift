@@ -31,6 +31,7 @@ struct SortLabel: View {
                         Image(systemName: icon)
                             .resizable()
                             .scaledToFit()
+                            .foregroundStyle(.cBlack)
                     }
                     .padding(10)
                     .background(Color.cOrange)
@@ -40,6 +41,7 @@ struct SortLabel: View {
                     HStack {
                         Image(systemName: state.getSFSymbol())
                             .frame(maxWidth: 35, maxHeight: 35)
+                            .foregroundStyle(.cBlack)
                         
                         Text(state.getFullName())
                             .style(textStyle: .textSmall(.regular), color: .cBlack)

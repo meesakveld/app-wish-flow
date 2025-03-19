@@ -94,6 +94,7 @@ struct PriceEntry: View {
                     }
                 } label: {
                     Text(vm.selectedCurrency?.symbol ?? "...")
+                        .foregroundStyle(.cBlack)
                         .frame(height: 40)
                         .padding(.horizontal, 15)
                         .background(Color.cWhite)
@@ -105,6 +106,7 @@ struct PriceEntry: View {
                 }
                 
                 TextField("12,99", text: $price)
+                    .foregroundStyle(.cBlack)
                     .frame(height: 40)
                     .keyboardType(.decimalPad)
                     .multilineTextAlignment(.trailing)

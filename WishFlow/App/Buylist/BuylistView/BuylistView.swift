@@ -55,6 +55,7 @@ struct BuylistView: View {
                                                                     Spacer()
                                                                     
                                                                     Image(systemName: "chevron.down")
+                                                                        .foregroundStyle(.cBlack)
                                                                 }
                                                                 .padding(.vertical, 10)
                                                                 .padding(.horizontal, 15)
@@ -81,7 +82,7 @@ struct BuylistView: View {
                                                         .frame(width: 22, height: 22)
                                                         .foregroundStyle(.cGreen)
                                                 }
-                                                .overlay(Circle().stroke(Color.cForeground, lineWidth: 2))
+                                                .overlay(Circle().stroke(Color.cBlack, lineWidth: 2))
                                                 .padding(4)
                                                 
                                                 Text("Event title")
@@ -149,6 +150,7 @@ struct BuylistView: View {
                                                                         Spacer()
                                                                         
                                                                         Image(systemName: "chevron.down")
+                                                                            .foregroundStyle(.cBlack)
                                                                     }
                                                                     .padding(.vertical, 10)
                                                                     .padding(.horizontal, 15)
@@ -191,7 +193,7 @@ struct BuylistView: View {
                                                             .clipShape(Circle())
                                                         }
                                                     }
-                                                    .overlay(Circle().stroke(Color.cForeground, lineWidth: 2))
+                                                    .overlay(Circle().stroke(Color.cBlack, lineWidth: 2))
                                                     .padding(4)
                                                     
                                                     Text(giftClaimsPerEvent.event.title)

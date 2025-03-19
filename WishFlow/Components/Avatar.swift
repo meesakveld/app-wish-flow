@@ -41,7 +41,7 @@ struct Avatar: View {
                 .clipShape(Circle())
             }
         }
-        .overlay(Circle().stroke(Color.cForeground, lineWidth: 2))
+        .overlay(Circle().stroke(Color.cBlack, lineWidth: 2))
     }
 }
 

@@ -75,6 +75,7 @@ struct TextEntry: View {
                     .frame(height: 44)
                 case .textEditor(let lineLimit):
                     TextEditor(text: $value)
+                        .scrollContentBackground(.hidden)
                         .style(textStyle: .text(.regular), color: value == placeholder ? .cBlack.opacity(0.3) : .cBlack)
                         .frame(height: 5 + (lineLimit * 33) + 5)
                         .onAppear { if value.isEmpty { value = placeholder } }

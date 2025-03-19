@@ -107,36 +107,38 @@ struct WishView: View {
                                 // Receive limit
                                 HStack(alignment: .center) {
                                     Text("Receive limit:")
-                                        .style(textStyle: .text(.medium), color: .cBlack)
+                                        .style(textStyle: .text(.medium), color: .cForeground)
                                     
                                     Text("\(vm.wish?.giftLimit.description ?? "1") time\((vm.wish?.giftLimit ?? 1) > 1 ? "s" : "")")
-                                        .style(textStyle: .text(.regular), color: .cBlack)
+                                        .style(textStyle: .text(.regular), color: .cForeground)
                                     
                                     Spacer()
                                 }
                             }
                             
                             // Price
-                            HStack(alignment: .center) {
-                                Text("Price:")
-                                    .style(textStyle: .text(.medium), color: .cBlack)
-                                
-                                Text(vm.wish?.price?.formatted() ?? "€20")
-                                    .style(textStyle: .text(.regular), color: .cBlack)
-                                
-                                Spacer()
+                            if let price = vm.wish?.price {
+                                HStack(alignment: .center) {
+                                    Text("Price:")
+                                        .style(textStyle: .text(.medium), color: .cForeground)
+                                    
+                                    Text(price.formatted())
+                                        .style(textStyle: .text(.regular), color: .cForeground)
+                                    
+                                    Spacer()
+                                }
                             }
                             
                             // URL
                             if let url = vm.wish?.url {
                                 HStack(alignment: .center) {
                                     Text("URL:")
-                                        .style(textStyle: .text(.medium), color: .cBlack)
+                                        .style(textStyle: .text(.medium), color: .cForeground)
                                     
                                     if let url = URL(string: url), let host = url.host() {
                                         Link(destination: url) {
                                             Text(host)
-                                                .style(textStyle: .text(.regular), color: .cBlack)
+                                                .style(textStyle: .text(.regular), color: .cForeground)
                                                 .underline()
                                         }
                                     }

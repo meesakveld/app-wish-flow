@@ -40,10 +40,17 @@ struct HomeView: View {
                         NavigationLink {
                             NotificationsView()
                         } label: {
-                            Image(systemName: vm.hasNewNotifications ? "bell.badge.circle" : "bell.circle")
-                                .font(.custom("", fixedSize: 32))
-                                .foregroundStyle(.cForeground)
-                                .symbolEffect(.bounce, value: vm.hasNewNotifications)
+                            ZStack {
+                                Image(systemName: vm.hasNewNotifications ? "bell.badge.circle" : "bell.circle")
+                                    .font(.custom("", fixedSize: 32))
+                                    .foregroundStyle(.cBlack)
+                                    .symbolEffect(.bounce, value: vm.hasNewNotifications)
+                                
+                                Image(systemName: vm.hasNewNotifications ? "bell.badge.fill" : "bell.fill")
+                                    .font(.custom("", fixedSize: 18))
+                                    .foregroundStyle(.cForeground)
+                                    .symbolEffect(.bounce, value: vm.hasNewNotifications)
+                            }
                         }
                     }
                     

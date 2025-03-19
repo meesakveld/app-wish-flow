@@ -43,16 +43,16 @@ struct Searchbar: View {
                 Image(systemName: "magnifyingglass")
                     .font(.custom("", fixedSize: 20))
                     .frame(minHeight: 48)
-                    .foregroundStyle(.cForeground)
+                    .foregroundStyle(.cBlack)
                     .padding(.horizontal, 12)
                     .background(Color.cGreen)
-                    .border(Color.black)
+                    .border(width: 2, edges: [.trailing], color: .cBlack)
                     .onTapGesture {
                         isFocused = true
                     }
 
                 TextField(searchString, text: $viewModel.searchDebounce)
-                    .style(textStyle: .text(.regular), color: .black)
+                    .style(textStyle: .text(.regular), color: .cBlack)
                     .frame(maxWidth: .infinity, minHeight: 48)
                     .padding(.horizontal, 10)
                     .background(Color.cWhite)
