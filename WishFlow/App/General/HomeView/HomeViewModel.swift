@@ -7,12 +7,15 @@
 
 import Foundation
 import SwiftUI
+import StrapiSwift
 
 @MainActor
 class HomeViewModel: ObservableObject {
     @Published var upcomingEvents: [Event] = []
     @Published var upcomingEventsIsLoading: LoadingState = .isLoading
     @Published var upcomingEventsHasError: Bool = false
+    
+    @Published var hasNewNotifications: Bool = false
     
     let user: User? = AuthenticationManager.shared.user
     
@@ -32,5 +35,18 @@ class HomeViewModel: ObservableObject {
             print(error)
         }
         setLoading(value: isLoading, .finished)
+    }
+    
+    func checkForNewNotifications() async {
+        do {            
+            let response = try await Strapi.contentManager.collection("notifications")
+                .filter("[user][id]", operator: .equal, value: user?.id ?? 0)
+                .filter("[isRead]", operator: .equal, value: false)
+                .getDocuments(as: [Notification].self)
+            
+            hasNewNotifications = !response.data.isEmpty
+        } catch {
+            print(error)
+        }
     }
 }

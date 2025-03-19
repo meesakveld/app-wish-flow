@@ -20,7 +20,7 @@ struct HomeView: View {
                 
                 // MARK: - Header
                 HStack(alignment: .center) {
-                    VStack(alignment: .leading, spacing: 0) {
+                    LazyVStack(alignment: .leading, spacing: 0) {
                         Text(greet())
                             .style(textStyle: .text(.regular), color: .cForeground)
                         HStack(alignment: .center) {
@@ -37,11 +37,14 @@ struct HomeView: View {
                     Spacer()
                     
                     HStack {
-                        //TODO: MAKE BUTTON TO SHOW NOTIFICATIONS
-                        //TODO: ONAPPEAR -> CHECK FOR NOTIFICATIONS
-                        Image(systemName: "bell.circle")
-                            .font(.custom("", fixedSize: 32))
-                            .foregroundStyle(.cForeground)
+                        NavigationLink {
+                            NotificationsView()
+                        } label: {
+                            Image(systemName: vm.hasNewNotifications ? "bell.badge.circle" : "bell.circle")
+                                .font(.custom("", fixedSize: 32))
+                                .foregroundStyle(.cForeground)
+                                .symbolEffect(.bounce, value: vm.hasNewNotifications)
+                        }
                     }
                     
                     Menu {
@@ -53,12 +56,8 @@ struct HomeView: View {
                         
                         Button("Logout", systemImage: "rectangle.portrait.and.arrow.right", role: .destructive) {
                             Task {
-                                do {
-                                    try await AuthenticationManager.shared.logout()
-                                    navigationManager.navigate(to: .welcome)
-                                } catch {
-                                    print(error.localizedDescription)
-                                }
+                                await AuthenticationManager.shared.logout()
+                                navigationManager.navigate(to: .welcome)
                             }
                         }
                     } label: {
@@ -178,10 +177,9 @@ struct HomeView: View {
                     }
                     
                 }
-                .onAppear {
-                    Task {
-                        await vm.getUpcomingEvents(isLoading: $vm.upcomingEventsIsLoading)
-                    }
+                .task {
+                    await vm.getUpcomingEvents(isLoading: $vm.upcomingEventsIsLoading)
+                    await vm.checkForNewNotifications()
                 }
                 
             }
@@ -190,6 +188,7 @@ struct HomeView: View {
         .refreshable {
             Task {
                 await vm.getUpcomingEvents(isLoading: $vm.upcomingEventsIsLoading)
+                await vm.checkForNewNotifications()
             }
         }
         .background(Color.cBackground.ignoresSafeArea())
