@@ -131,7 +131,6 @@ struct Event: Codable, Identifiable {
     
     func getGiftees(userId: Int) -> [EventParticipant] {
         var participants: [EventParticipant] = []
-        print("eventType: \(eventType)")
         
         guard let eventParticipants = eventParticipants else {
             return participants
@@ -148,6 +147,16 @@ struct Event: Codable, Identifiable {
         }
 
         return participants
+    }
+    
+    func getStatus() -> (text: String, sfSymbol: String)? {
+        guard self.eventDate.isTodayOrPast() else { return nil }
+        
+        if self.eventDate.isToday() {
+            return (text: "Today is party day", sfSymbol: "party.popper")
+        }
+        
+        return nil
     }
 }
 

@@ -45,13 +45,24 @@ extension Date {
         return self.addingTimeInterval(-15 * 60) // 15 minuten in seconden
     }
     
-    func isTodayOrFuture() -> Bool {
-        let today = Calendar.current.startOfDay(for: Date())
-        return self >= today
+    func isToday() -> Bool {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let selfDay = calendar.startOfDay(for: self)
+        return calendar.isDate(selfDay, inSameDayAs: today)
     }
-
+    
+    func isTodayOrFuture() -> Bool {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let selfDay = calendar.startOfDay(for: self)
+        return selfDay >= today
+    }
+    
     func isTodayOrPast() -> Bool {
-        let today = Calendar.current.startOfDay(for: Date())
-        return self <= today
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let selfDay = calendar.startOfDay(for: self)
+        return selfDay <= today
     }
 }
