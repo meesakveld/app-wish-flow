@@ -47,7 +47,7 @@ struct EventCard: View {
                 .frame(maxWidth: .infinity)
             }
             .padding(15)
-            .background(Color.cPurple)
+            .background(event.eventDate.isTodayOrFuture() ? Color.cPurple : Color.cBlue)
         }
     }
 }
