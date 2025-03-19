@@ -22,19 +22,20 @@ struct NotificationCard: View {
         DropEffect {
             HStack(alignment: .firstTextBaseline, spacing: 15) {
                 Image(systemName: notification.isRead ? "bell" : "bell.fill")
+                    .foregroundStyle(.cBlack)
                 
                 VStack(alignment: .leading, spacing: 20) {
                     VStack(alignment: .leading, spacing: 10) {
                         
                         HStack {
                             Text(notification.message)
-                                .style(textStyle: .text(notification.isRead ? .regular : .medium), color: .cForeground)
+                                .style(textStyle: .text(notification.isRead ? .regular : .medium), color: .cBlack)
                             
                             Spacer()
                         }
                         
                         Text(notification.publishedAt.dateToStringFormatter(DateFormat: .dd_MM_yyyy_mm_hh))
-                            .style(textStyle: .textSmall(.medium), color: .cForeground.opacity(0.5))
+                            .style(textStyle: .textSmall(.medium), color: .cBlack.opacity(0.5))
                         
                     }
                     
