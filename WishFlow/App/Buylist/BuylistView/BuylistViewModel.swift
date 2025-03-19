@@ -46,6 +46,9 @@ class BuylistViewModel: ObservableObject {
             let response = try await Strapi.contentManager.collection("gift-claims")
                 .populate("gift") { gift in
                     gift.populate("image")
+                    gift.populate("price") { price in
+                        price.populate("currency")
+                    }
                 }
                 .populate("event") { event in
                     event.populate("image")
