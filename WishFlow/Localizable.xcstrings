@@ -78,6 +78,9 @@
     "A gifting system where pairings are **randomly assigned**, each person gives a gift to one person within a group." : {
 
     },
+    "Accept" : {
+
+    },
     "Accepted" : {
 
     },
@@ -231,6 +234,9 @@
     "Nobody has accepted yet." : {
 
     },
+    "Notifications" : {
+
+    },
     "OK" : {
 
     },
@@ -271,6 +277,9 @@
 
     },
     "Register" : {
+
+    },
+    "Reject" : {
 
     },
     "Remove claim" : {
