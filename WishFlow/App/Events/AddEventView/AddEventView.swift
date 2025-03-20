@@ -161,7 +161,7 @@ struct AddEventView: View {
                                     isShowingErrors: isShowingInputsErrors
                                 )
                                 
-                                DatePicker(selection: $eventDate, in: Date()..., displayedComponents: [.date]) {
+                                DatePicker(selection: $eventDate, in: Date().tomorrow()..., displayedComponents: [.date]) {
                                     Text("Event date")
                                         .style(textStyle: .text(.medium), color: .cForeground)
                                 }

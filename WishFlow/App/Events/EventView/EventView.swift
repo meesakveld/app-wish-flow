@@ -579,10 +579,12 @@ struct EventView: View {
                             
                             Divider()
                             
-                            NavigationLink {
-                                EditEventView(documentId: documentId)
-                            } label: {
-                                Label("Edit event", systemImage: "pencil")
+                            if let event = vm.event, !event.eventDate.yesterday().isTodayOrPast() {
+                                NavigationLink {
+                                    EditEventView(documentId: documentId)
+                                } label: {
+                                    Label("Edit event", systemImage: "pencil")
+                                }
                             }
                             
                             Button("Delete event", systemImage: "trash", role: .destructive) {

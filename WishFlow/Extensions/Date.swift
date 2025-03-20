@@ -45,6 +45,14 @@ extension Date {
         return self.addingTimeInterval(-15 * 60) // 15 minuten in seconden
     }
     
+    func tomorrow() -> Date {
+        self.addingTimeInterval(86400)
+    }
+    
+    func yesterday() -> Date {
+        self.addingTimeInterval(-86400)
+    }
+    
     func isToday() -> Bool {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
@@ -64,5 +72,19 @@ extension Date {
         let today = calendar.startOfDay(for: Date())
         let selfDay = calendar.startOfDay(for: self)
         return selfDay <= today
+    }
+    
+    func isFuture() -> Bool {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let selfDay = calendar.startOfDay(for: self)
+        return selfDay > today
+    }
+    
+    func isPast() -> Bool {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let selfDay = calendar.startOfDay(for: self)
+        return selfDay < today
     }
 }
