@@ -127,34 +127,39 @@ struct EditEventView: View {
                                 .opacity(isShowingMaxPrice ? 1 : 0.4)
                             }
                             
-                            Text("Timing")
-                                .style(textStyle: .text(.bold), color: .cForeground)
-                                .padding(.top, 10)
-                            
-                            HStack {
-                                CheckCircle(isChecked: isShowingGiftDeadline) {
-                                    withAnimation { isShowingGiftDeadline.toggle() }
+                            // If eventDate is not today and not in the past
+                            if !eventDate.isTodayOrPast() {
+                                
+                                Text("Timing")
+                                    .style(textStyle: .text(.bold), color: .cForeground)
+                                    .padding(.top, 10)
+                                
+                                HStack {
+                                    CheckCircle(isChecked: isShowingGiftDeadline) {
+                                        withAnimation { isShowingGiftDeadline.toggle() }
+                                    }
+                                    
+                                    DatePicker(selection: $giftDeadline, in: Date()...eventDate.addFifteenMinutes(), displayedComponents: [.date]) {
+                                        Text("Deadline adding wishes")
+                                            .style(textStyle: .text(.medium), color: .cForeground)
+                                    }
+                                    .disabled(!isShowingGiftDeadline)
+                                    .opacity(isShowingGiftDeadline ? 1 : 0.4)
                                 }
                                 
-                                DatePicker(selection: $giftDeadline, in: Date()...eventDate.addFifteenMinutes(), displayedComponents: [.date]) {
-                                    Text("Deadline adding wishes")
-                                        .style(textStyle: .text(.medium), color: .cForeground)
-                                }
-                                .disabled(!isShowingGiftDeadline)
-                                .opacity(isShowingGiftDeadline ? 1 : 0.4)
-                            }
-                            
-                            HStack {
-                                CheckCircle(isChecked: isShowingClaimDeadline) {
-                                    withAnimation { isShowingClaimDeadline.toggle() }
+                                HStack {
+                                    CheckCircle(isChecked: isShowingClaimDeadline) {
+                                        withAnimation { isShowingClaimDeadline.toggle() }
+                                    }
+                                    
+                                    DatePicker(selection: $claimDeadline, in: giftDeadline...eventDate.addFifteenMinutes(), displayedComponents: [.date]) {
+                                        Text("Deadline gift selecting")
+                                            .style(textStyle: .text(.medium), color: .cForeground)
+                                    }
+                                    .disabled(!isShowingClaimDeadline)
+                                    .opacity(isShowingClaimDeadline ? 1 : 0.4)
                                 }
                                 
-                                DatePicker(selection: $claimDeadline, in: giftDeadline...eventDate.addFifteenMinutes(), displayedComponents: [.date]) {
-                                    Text("Deadline gift selecting")
-                                        .style(textStyle: .text(.medium), color: .cForeground)
-                                }
-                                .disabled(!isShowingClaimDeadline)
-                                .opacity(isShowingClaimDeadline ? 1 : 0.4)
                             }
                             
                         }
