@@ -149,14 +149,41 @@ struct Event: Codable, Identifiable {
         return participants
     }
     
-    func getStatus() -> (text: String, sfSymbol: String)? {
-        guard self.eventDate.isTodayOrPast() else { return nil }
+    func getStatus(userId: Int) -> (text: String, sfSymbol: String)? {
+        guard self.eventDate.isTodayOrFuture() else { return nil }
         
+        // TODAY IS PARTY DAY
         if self.eventDate.isToday() {
             return (text: "Today is party day", sfSymbol: "party.popper")
         }
         
-        return nil
+        // SELECT THE GIFTS YOU WOULD LIKE TO RECEIVE
+        if let participant = self.eventParticipants?.first(where: { $0.user?.id ?? 0 == userId }),
+           participant.role == .owner || participant.role == .recipient,
+           self.gifts?.count(where: { ($0.user?.id ?? 0) == userId }) ?? 0 == 0
+        {
+            return (text: "Select the gifts you would like to receive.", sfSymbol: "checklist")
+        }
+        
+        // SELECT THE GIFTS YOU ARE GOING TO BUY
+        if let participant = self.eventParticipants?.first(where: { $0.user?.id ?? 0 == userId }),
+           self.giftClaims?.count(where: { ($0.user?.id ?? 0) == userId }) ?? 0 == 0
+        {
+            if self.eventType == .singleRecipient && participant.role == .owner {} else {
+                // TODO: FIX
+                return (text: "Select the gifts you are going to buy.", sfSymbol: "cart.badge.plus")
+            }
+        }
+        
+        // TIME TO BUY THE GIFTS
+        if let participant = self.eventParticipants?.first(where: { $0.user?.id ?? 0 == userId }),
+           self.giftClaims?.count(where: { ($0.user?.id ?? 0) == userId && $0.giftStatus == .purchased }) ?? 0 == 0 {
+            if self.eventType == .singleRecipient && participant.role == .owner {} else {
+                return (text: "Time to buy the gifts!", sfSymbol: "cart")
+            }
+        }
+            
+        return (text: "You are ready for the event!", sfSymbol: "checkmark")
     }
 }
 

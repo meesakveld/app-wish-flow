@@ -19,29 +19,20 @@ final class EventManager: ObservableObject, Sendable {
     
     private let eventCollection: CollectionQuery = Strapi.contentManager.collection("events")
     
-    private func eventsCollectionQueryWithAllPopulations() async throws -> CollectionQuery {
-        return eventCollection
-            .populate("image")
-            .populate("minBudget") { minBudget in
-                minBudget.populate("currency")
-            }
-            .populate("maxBudget") { maxBudget in
-                maxBudget.populate("currency")
-            }
-            .populate("gifts")
-            .populate("eventParticipants") { eventParticipants in
-                eventParticipants.populate("user")
-            }
-            .populate("giftClaims")
-            .populate("eventAssignments")
-            .populate("eventInvites")
-    }
-    
     func getUpcomingEventsWithUserId(userId: Int, limit: Int = 3) async throws -> [Event] {
         let currentDate = Date().dateToStringFormatter(DateFormat: .yyyy_MM_dd)
         
         let response = try await eventCollection
             .populate("image")
+            .populate("eventParticipants") { eventParticipants in
+                eventParticipants.populate("user")
+            }
+            .populate("gifts") { gifts in
+                gifts.populate("user")
+            }
+            .populate("giftClaims") { claims in
+                claims.populate("user")
+            }
             .filter("[eventParticipants][user][id]", operator: .includedIn, value: userId)
             .filter("[eventDate]", operator: .greaterThanOrEqual, value: currentDate)
             .paginate(limit: limit)
@@ -59,6 +50,15 @@ final class EventManager: ObservableObject, Sendable {
     ) async throws -> StrapiResponse<[Event]> {
         let response = try await eventCollection
             .populate("image")
+            .populate("eventParticipants") { eventParticipants in
+                eventParticipants.populate("user")
+            }
+            .populate("giftClaims") { claims in
+                claims.populate("user")
+            }
+            .populate("gifts") { gifts in
+                gifts.populate("user")
+            }
             .filter("[eventParticipants][user][id]", operator: .includedIn, value: userId)
             .filter("[title]", operator: .containsInsensitive, value: search)
             .sort(by: "eventDate", order: sortEventDate)

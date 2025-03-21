@@ -7,7 +7,17 @@
 
 import SwiftUI
 
+@MainActor
+class EventCardViewModel: ObservableObject {
+    let user: User? = AuthenticationManager.shared.user
+    
+    init() {
+        if user == nil { Task { await AuthenticationManager.shared.logout() } }
+    }
+}
+
 struct EventCard: View {
+    @StateObject var vm: EventCardViewModel = EventCardViewModel()
     let event: Event
     
     var body: some View {
@@ -49,7 +59,7 @@ struct EventCard: View {
                     .frame(maxWidth: .infinity)
                 }
                 
-                if let (text, sfSymbol) = event.getStatus() {
+                if let (text, sfSymbol) = event.getStatus(userId: vm.user?.id ?? 0) {
                     HStack {
                         Image(systemName: sfSymbol)
                         
