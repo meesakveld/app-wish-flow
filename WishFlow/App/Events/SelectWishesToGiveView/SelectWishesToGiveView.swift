@@ -10,6 +10,7 @@ import SwiftUI
 struct SelectWishesToGiveView: View {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     @StateObject var vm: SelectWishesToGiveViewModel = SelectWishesToGiveViewModel()
+    @EnvironmentObject var alertManager: AlertManager
     
     let eventDocumentId: String
     let receiverUserId: Int
@@ -18,6 +19,8 @@ struct SelectWishesToGiveView: View {
         GridItem(.flexible(), spacing: 15),
         GridItem(.flexible(), spacing: 15)
     ]
+    
+    @State var isShowingNotAvailableAlert: Bool = false
     
     var body: some View {
         VStack {
@@ -100,15 +103,26 @@ struct SelectWishesToGiveView: View {
                                     ForEach(vm.wishes, id: \.documentId) { wish in
                                         HStack(alignment: .center, spacing: 20) {
                                             let isChecked = vm.selectedGiftsIds.contains(where: { $0 == wish.documentId })
+                                            let isCheckedWhenArrived = vm.selectedGiftsIdsOriginal.contains(where: { $0 == wish.documentId })
+                                            let isAvailable: Bool = (wish.giftClaims?.count ?? 0) < wish.giftLimit
                                             
                                             WishCard(wish: wish)
                                                 .opacity(isChecked ? 1 : 0.7)
                                             
-                                            CheckCircle(isChecked: isChecked) {
-                                                if !isChecked {
-                                                    vm.selectedGiftsIds.append(wish.documentId)
-                                                } else {
-                                                    vm.selectedGiftsIds = vm.selectedGiftsIds.filter { $0 != wish.documentId }
+                                            if isAvailable || isCheckedWhenArrived {
+                                                CheckCircle(isChecked: isChecked) {
+                                                    if !isChecked {
+                                                        vm.selectedGiftsIds.append(wish.documentId)
+                                                    } else {
+                                                        vm.selectedGiftsIds = vm.selectedGiftsIds.filter { $0 != wish.documentId }
+                                                    }
+                                                }
+                                            } else {
+                                                Button {
+                                                    isShowingNotAvailableAlert.toggle()
+                                                } label: {
+                                                    Image(systemName: "lock")
+                                                        .frame(width: 25, height: 25)
                                                 }
                                             }
                                         }
@@ -175,6 +189,7 @@ struct SelectWishesToGiveView: View {
                     await vm.initWishes(eventDocumentId: eventDocumentId, receiverUserId: receiverUserId, isLoading: $vm.wishesIsLoading)
                 }
                 .padding([.top, .horizontal])
+                .alert("Not available – someone else has already selected this wish to buy.", isPresented: $isShowingNotAvailableAlert) {}
             }
             
         }

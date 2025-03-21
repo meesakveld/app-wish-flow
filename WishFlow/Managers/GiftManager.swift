@@ -75,6 +75,7 @@ final class GiftManager: ObservableObject, Sendable {
             .populate("price") { price in
                 price.populate("currency")
             }
+            .populate("giftClaims")
             .filter("[events][documentId]", operator: .includedIn, value: eventDocumentId)
             .filter("[user][id]", operator: .equal, value: receiverUserId)
             .filter("[events][eventParticipants][user][id]", operator: .includedIn, value: userId)

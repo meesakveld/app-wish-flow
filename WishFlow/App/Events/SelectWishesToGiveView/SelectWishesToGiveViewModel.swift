@@ -22,6 +22,7 @@ class SelectWishesToGiveViewModel: ObservableObject {
     @Published var wishesHasError: Bool = false
     
     @Published var selectedGiftsIds: [String] = []
+    @Published private(set) var selectedGiftsIdsOriginal: [String] = []
     
     func initEvent(documentId: String, isLoading: Binding<LoadingState>) async {
         eventHasError = false
@@ -39,6 +40,7 @@ class SelectWishesToGiveViewModel: ObservableObject {
                         selectedGiftsIds.append(gift.documentId)
                     }
                 }
+                selectedGiftsIdsOriginal = selectedGiftsIds
             }
         } catch {
             eventHasError = true
@@ -52,7 +54,11 @@ class SelectWishesToGiveViewModel: ObservableObject {
         setLoading(value: isLoading, .isLoading)
         do {
             // Get events
-            let strapiResponse = try await GiftManager.shared.getGiftsAskedForEventByUserId(eventDocumentId: eventDocumentId, receiverUserId: receiverUserId, userId: user?.id ?? 0)
+            let strapiResponse = try await GiftManager.shared.getGiftsAskedForEventByUserId(
+                eventDocumentId: eventDocumentId,
+                receiverUserId: receiverUserId,
+                userId: user?.id ?? 0
+            )
             wishes = strapiResponse
         } catch {
             wishesHasError = true
