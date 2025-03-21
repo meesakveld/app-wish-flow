@@ -60,10 +60,11 @@ struct EventCard: View {
                 }
                 
                 if let (text, sfSymbol) = event.getStatus(userId: vm.user?.id ?? 0) {
-                    HStack {
+                    HStack(alignment: .firstTextBaseline) {
                         Image(systemName: sfSymbol)
                         
                         Text(text)
+                            .multilineTextAlignment(.leading)
                         
                         Spacer()
                     }
