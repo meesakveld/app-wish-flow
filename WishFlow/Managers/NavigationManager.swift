@@ -45,7 +45,8 @@ class NavigationManager: ObservableObject {
         }
     }
     
-    func navigate(to url: URL) {
+    func navigate(to url: URL, isLoggedIn: Bool) {
+        guard isLoggedIn else { return }
         guard url.scheme == "wishflow" else { return }
         
         let pathComponents = url.pathComponents.filter { !$0.isEmpty }

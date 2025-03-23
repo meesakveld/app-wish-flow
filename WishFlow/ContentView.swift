@@ -25,7 +25,7 @@ struct ContentView: View {
                 }
             }
             .onOpenURL { url in
-                navigationManager.navigate(to: url)
+                navigationManager.navigate(to: url, isLoggedIn: authManager.user != nil)
             }
             .navigationDestination(for: NavigationManager.NavigationDestination.self) { destination in
                 navigationManager.destinationView(for: destination)
