@@ -170,7 +170,6 @@ struct Event: Codable, Identifiable {
            self.giftClaims?.count(where: { ($0.user?.id ?? 0) == userId }) ?? 0 == 0
         {
             if self.eventType == .singleRecipient && participant.role == .owner {} else {
-                // TODO: FIX
                 return (text: "Select the gifts you are going to buy.", sfSymbol: "cart.badge.plus")
             }
         }
