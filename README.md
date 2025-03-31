@@ -77,11 +77,11 @@ The database structure for the WishFlow app is designed to be simple and easy to
 If you have any questions or need further assistance, please feel free to contact me on LinkedIn or on my website.
 
 <div style="display: flex; gap: 0.5rem;">
-<a href="https://www.linkedin.com/in/meesakveld/">
+<a href="https://www.linkedin.com/in/meesakveld/" target="_blank">
     <img align="left" src="https://raw.githubusercontent.com/yushi1007/yushi1007/main/images/linkedin.svg" alt="Mees Akveld | LinkedIn" width="21px"/>
 </a>
 
-<a href="https://www.meesakveld.be/contact">
+<a href="https://www.meesakveld.be/contact" target="_blank">
     <img align="left" src="https://www.meesakveld.be/favicon.ico" alt="Mees Akveld | LinkedIn" width="21px"/>
 </a>
 </div>
