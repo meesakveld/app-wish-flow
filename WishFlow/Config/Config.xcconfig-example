@@ -6,5 +6,5 @@
 //
 
 // STRAPI
-STRAPI_BASE_URL=
+STRAPI_BASE_URL=www.example-strapi-url.com
 STRAPI_TOKEN=
